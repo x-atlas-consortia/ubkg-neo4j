@@ -28,8 +28,10 @@ The RRF files are loaded into a data mart. A python script then executes SQL scr
 The UMLS CSVs can be loaded into neo4j to build a graph version of the UMLS and concepts from many of the vocabularies and ontologies that are integrated into the UMLS, such as SNOMED CT, ICD10, etc. The UBKG extends the UMLS by integrating additional concepts and relationships from sources outside of the UMLS, including a number of standard biomedical ontologies that are published in NCBO BioPortal.
 
 The **generation framework** is a suite of scripts that:
-- extract information on assertions (also known as _triples_, or _subject-predicate-object_ relatioonships) found in ontologies or derived from other sources
+- extract information on assertions (also known as _triples_, or _subject-predicate-object_ relationships) found in ontologies or derived from other sources
 - iteratively add assertion information to the base set of UMLS CSVs to create a set of **ontology CSVs**.
+
+Once a set of ontology CSVs is ready, they can be imported into a neo4j database to form a new instance of the UBKG.
 
 The generation framework can work with:
 - data from ontologies published in [Web Ontology Language](https://www.w3.org/OWL/) (OWL) files that conform to the [principles](https://obofoundry.org/principles/fp-000-summary.html) of the OBO Foundry
