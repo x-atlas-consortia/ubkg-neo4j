@@ -14,18 +14,42 @@ The primary components of the UBKG are:
 The UBKG database is populated from the load of a set of CSV files, using [**neo4j-admin import**] (https://neo4j.com/docs/operations-manual/current/tutorial/neo4j-admin-import/). The set of CSV import files is the product of two _generation frameworks_. 
 
 ### Source framework
-The base set of nodes (entities) and edges (relationships) of the UBKG graph are obtained by converting information from the UMLS. 
-- Information on the concepts in the ontologies and vocabularies that are integrated into the UMLS Metathesaurus can be downloaded using the [MetamorphoSys](https://www.ncbi.nlm.nih.gov/books/NBK9683/#:~:text=MetamorphoSys%20is%20the%20UMLS%20installation,to%20create%20customized%20Metathesaurus%20subsets.) application. 
+The **source framework** is a combination of manual and automated processes that obtain the base set of nodes (entities) and edges (relationships) of the UBKG graph.
+
+- Information on the concepts in the ontologies and vocabularies that are integrated into the UMLS Metathesaurus can be downloaded using the [MetamorphoSys](https://www.ncbi.nlm.nih.gov/books/NBK9683/#:~:text=MetamorphoSys%20is%20the%20UMLS%20installation,to%20create%20customized%20Metathesaurus%20subsets.) application. MetamorphoSys can be configured to download subsets of the entire UMLS.
 - Additional semantic information related to the UMLS can be downloaded manually from the [Semantic Network](https://lhncbc.nlm.nih.gov/semanticnetwork/). 
 
-The result of the downloads is a set of files in [Rich Release Format](https://www.ncbi.nlm.nih.gov/books/NBK9685) (RRF). The RRF files contain information on source vocabularies or ontologies, codes, terms, and relationships both with other codes in the same vocabularies and with UMLS concepts.
+The result of the Metathesaurus and Semantic Network downloads is a set of files in [Rich Release Format](https://www.ncbi.nlm.nih.gov/books/NBK9685) (RRF). The RRF files contain information on source vocabularies or ontologies, codes, terms, and relationships both with other codes in the same vocabularies and with UMLS concepts.
 
-The RRF files are loaded into a data mart. A python script then executes SQL scripts that perform Extraction, Transformation, and Loading of the RRF data into a set of twelve tables. These tables are exported to CSV format to become the **UMLS CSVs**.
+The RRF files are loaded into a data mart. A python script then executes SQL scripts that perform Extraction, Transformation, and Loading of the RRF data into a set of twelve temporary tables. These tables are exported to CSV format in files that become the **UMLS CSVs**.
 
 ![Source_framework](https://user-images.githubusercontent.com/10928372/202307155-5bfd7a77-e858-4e5c-89a1-a42d964b871d.jpg)
 
 ### Generation framework
-The UMLS CSVs can be loaded into neo4j to build a graph version of the UMLS and concepts from many of the vocabularies and ontologies that are integrated into the UMLS, such as SNOMED CT, ICD10, etc. The UBKG extends the UMLS by integrating additional concepts and relationships from sources outside of the UMLS, including a number of standard biomedical ontologies that are published in NCBO BioPortal.
+The UMLS CSVs can be loaded into neo4j to build a graph version of the UMLS, including concepts and relationships from over 150 vocabularies and ontologies that are integrated into the UMLS, such as SNOMED CT, ICD10, NCI, etc.. 
+
+The UBKG extends the UMLS graph by integrating additional concepts and relationships from sources outside of the UMLS, including a number of standard biomedical ontologies that are published in NCBO BioPortal, including:
+
+Ontology or Source | Description
+--- | ---
+[PATO](https://bioportal.bioontology.org/ontologies/PATO) | Phenotypic Quality Ontology
+[UBERON](https://bioportal.bioontology.org/ontologies/UBERON) | Uber Anatomy Ontology 
+[CL](https://bioportal.bioontology.org/ontologies/CL) | Cell Ontology
+[DOID](https://bioportal.bioontology.org/ontologies/DOID) | Human Disease Ontology
+[OBI](https://bioportal.bioontology.org/ontologies/OBI)| Ontology for Biomedical Investigations
+[EDAM](https://bioportal.bioontology.org/ontologies/EDAM) | EDAM
+[HSAPDV](https://bioportal.bioontology.org/ontologies/HSAPDV) | Human Developmental Stages Ontology
+[SBO](https://bioportal.bioontology.org/ontologies/SBO) | Systems Biology Ontology
+[MI](https://bioportal.bioontology.org/ontologies/MI) |Molecular Interactions
+[CHEBI](https://bioportal.bioontology.org/ontologies/CHEBI) | Chemical Entities of Biological Interest Ontology
+[MP](https://bioportal.bioontology.org/ontologies/MP) | Mammalian Phenotype Ontology
+[ORDO](https://bioportal.bioontology.org/ontologies/ORDO) | Orphan Rare Disease Ontology
+[UO](https://bioportal.bioontology.org/ontologies/UO)|Units of Measurement Ontology
+[UNIPROTKB](https://www.uniprot.org/uniprotkb/?query=*)|Protein-gene relationships from UniProtKB
+[HUSAT](https://bioportal.bioontology.org/ontologies/HUSAT) | HuBMAP Samples Added Terms
+[HUBMAP](https://hubmapconsortium.org/)|the application ontology supporting the infrastructure of the HuBMAP Consortium
+[CCF](https://bioportal.bioontology.org/ontologies/CCF)|Human Reference Atlas Common Coordinate Framework Ontology
+[MONDO](https://bioportal.bioontology.org/ontologies/MONDO)|MONDO Disease Ontology
 
 The **generation framework** is a suite of scripts that:
 - extract information on assertions (also known as _triples_, or _subject-predicate-object_ relationships) found in ontologies or derived from other sources
