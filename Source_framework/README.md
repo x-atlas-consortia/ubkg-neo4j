@@ -1,4 +1,5 @@
-# UMLS-Graph
+# UMLS-Graph (aka the UBKG source framework)
+
 UMLS Graph database for semantic queries.
 
 This project extracts from UMLS Metathesauras and Semantic Network files in Oracle, transforms, loads, deploys, and queries the resulting neo4j knowledge graph.
@@ -20,3 +21,6 @@ Graph-Deploy-AWS.md contains implementation instructions to build a Docker versi
 
 ## UI Javascript code
 Guesdt-X.X.X.html is the UI code deployed at guesdt.com after login.
+
+# NOTE ON VERSIONS
+The relevant script is **UMLS-Graph-Extracts.py**. This script contains the original code from the Jupyter notebook (UMLS-Graph-Extracts.ipynb), converted to Python with additional functionality (argument parsing).
