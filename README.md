@@ -20,7 +20,15 @@ The base set of nodes (entities) and edges (relationships) of the UBKG graph are
 
 The result of the downloads is a set of files in [Rich Release Format](https://www.ncbi.nlm.nih.gov/books/NBK9685) (RRF). The RRF files contain information on source vocabularies or ontologies, codes, terms, and relationships both with other codes in the same vocabularies and with UMLS concepts.
 
-The RRF files are loaded into a data mart. SQL scripts then perform Extraction, Transformation, and Loading of the RRF data into a set of twelve tables. These tables are then exported to CSV format to become the **UMLS CSVs***.
+The RRF files are loaded into a data mart. A python script then executes SQL scripts that perform Extraction, Transformation, and Loading of the RRF data into a set of twelve tables. These tables are exported to CSV format to become the **UMLS CSVs**.
 
+![Source_framework](https://user-images.githubusercontent.com/10928372/202307155-5bfd7a77-e858-4e5c-89a1-a42d964b871d.jpg)
+
+### Generation framework
+The UMLS CSVs can be loaded into neo4j to build a graph version of the UMLS and concepts from many of the vocabularies and ontologies that are integrated into the UMLS, such as SNOMED CT, ICD10, etc. The UBKG extends the UMLS by integrating additional concepts and relationships from sources outside of the UMLS, including a number of standard biomedical ontologies that are published in NCBO BioPortal.
+
+The **generation framework** is a suite of scripts that:
+- extract information on assertions (also known as _triples_, or _subject-predicate-object_ relatioonships) found in ontologies or derived from other sources
+- iteratively add assertion information to the base set of UMLS CSVs to create a set of **ontology CSVs**.
 
 
