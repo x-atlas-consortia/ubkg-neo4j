@@ -16,6 +16,8 @@ The UBKG database is populated from the load of a set of CSV files, using [**neo
 ### Source framework
 The **source framework** is a combination of manual and automated processes that obtain the base set of nodes (entities) and edges (relationships) of the UBKG graph.
 
+The source framework is also known as the **UMLS-Graph**.
+
 - Information on the concepts in the ontologies and vocabularies that are integrated into the UMLS Metathesaurus can be downloaded using the [MetamorphoSys](https://www.ncbi.nlm.nih.gov/books/NBK9683/#:~:text=MetamorphoSys%20is%20the%20UMLS%20installation,to%20create%20customized%20Metathesaurus%20subsets.) application. MetamorphoSys can be configured to download subsets of the entire UMLS.
 - Additional semantic information related to the UMLS can be downloaded manually from the [Semantic Network](https://lhncbc.nlm.nih.gov/semanticnetwork/). 
 
