@@ -31,4 +31,13 @@ The **generation framework** is a suite of scripts that:
 - extract information on assertions (also known as _triples_, or _subject-predicate-object_ relatioonships) found in ontologies or derived from other sources
 - iteratively add assertion information to the base set of UMLS CSVs to create a set of **ontology CSVs**.
 
+The generation framework can work with:
+- data from ontologies published in [Web Ontology Language](https://www.w3.org/OWL/) (OWL) files that conform to the [principles](https://obofoundry.org/principles/fp-000-summary.html) of the OBO Foundry
+- data from private or custom ontologies that are in the SimpleKnowledge format. (SimpleKnowledge is a lightweight ontology editor based on spreadsheets developed by Pitt UBMI.)
+- assertion data that conforms to the _UBKG Edge/Node format_.
 
+### PheKnowLator and OWLNETS
+The generation framework obtains assertion data from OWL files with scripts that are based on the [Phenotype Knowledge Translator](https://github.com/callahantiff/PheKnowLator) (PheKnowLator) application. PheKnowLator converts information from an OWL file into the [OWL-NETS](https://github.com/callahantiff/PheKnowLator/wiki/OWL-NETS-2.0) (OWL NEtwork Transformation for Statistical learning) format.
+
+
+![generation_framework](https://user-images.githubusercontent.com/10928372/202308840-1abc0684-684d-476a-8ed5-1a1b4118ffc6.jpg)
