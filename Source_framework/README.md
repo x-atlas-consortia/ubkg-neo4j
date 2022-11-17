@@ -1,7 +1,12 @@
 # Note
-This README.md contains references to other documentation in markdown files.
+This README.md contains references to other documentation in markdown files. In some cases, this documentation is for an earlier iteration.
 
-# UMLS-Graph (aka the UBKG source framework)
+## Framework
+![Source_framework](https://user-images.githubusercontent.com/10928372/202453373-6e2f73ba-e7ae-4d8f-9ece-31b0b0732a74.jpg)
+
+
+# UMLS-Graph 
+This corresponds to the set of **UMLS CSVs** that can be used to generate a knowledge graph of the UMLS.
 
 UMLS Graph database for semantic queries.
 
