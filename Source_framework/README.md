@@ -29,6 +29,9 @@ Refer to the conceptual model in the following illustration.
 
 An early prototype of the UMLS graph database is deployed in a Docker container on Amazon Web Services with a UI at [Guesdt.com](https://guesdt.com/).
 
+## UMLS MetamorphoSys configuration
+The [MetamorphoSys](https://www.nlm.nih.gov/research/umls/implementation_resources/metamorphosys/help.html#starting) application is used to download data from both the UMLS Metathesaurus and the Semantic Network.
+
 ## CSV-Extracts
 [**CSV-Extracts.md**](https://github.com/dbmi-pitt/UBKG/blob/main/Source_framework/CSV-Extracts.md) contains descriptions of and the SQL to generate each of the CSV files from UMLS active subset in Oracle. This file also contains the neo4j database import load script which reads the CSV files and loads them into neo4j. Note this has only been tested on the community edition running from neo4j's unix tar distribution on Mac OSX. A roughly equivalent but better Jupyter Notebook for the SQL extracts is also in this repository (not including the neo4j loads or index calls).
 
