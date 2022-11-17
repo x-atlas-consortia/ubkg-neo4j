@@ -5,8 +5,8 @@ venv/
 **/*.bak
 \#*\#
 **~
-neo4j/import*
-neo4j/data/
+neo4j_KG/import*
+neo4j_KG/data/
 Generation_framework/builds/logs/*.log
 Generation_framework/resources/
 Generation_framework/pkt_kg/
