@@ -19,7 +19,7 @@ The starting point of this repository is the UMLS active subset distribution loa
 The ending point of this repository (what it functionally creates) is a live neo4j database of the UMLS active subset English Terms, Codes (including NDC Codes as an SAB called NDC), Concepts, Semantic Types, and Definitions according to the conceptual model pictured, and deployed in a docker container on Amazon Web Services with a UI at Guesdt.com.
 
 ## CSV-Extracts
-**CSV-Extracts.md** contains descriptions of and the SQL to generate each of the CSV files from UMLS active subset in Oracle. This file also contains the neo4j database import load script which reads the CSV files and loads them into neo4j. Note this has only been tested on the community edition running from neo4j's unix tar distribution on Mac OSX. A roughly equivalent but better Jupyter Notebook for the SQL extracts is also in this repository (not including the neo4j loads or index calls).
+[**CSV-Extracts.md**](https://github.com/dbmi-pitt/UBKG/blob/main/Source_framework/CSV-Extracts.md) contains descriptions of and the SQL to generate each of the CSV files from UMLS active subset in Oracle. This file also contains the neo4j database import load script which reads the CSV files and loads them into neo4j. Note this has only been tested on the community edition running from neo4j's unix tar distribution on Mac OSX. A roughly equivalent but better Jupyter Notebook for the SQL extracts is also in this repository (not including the neo4j loads or index calls).
 
 ## Graph-Query-Examples
 **Graph-Query-Examples.md** contains example useful Cypher queries for the complete UMLS-Graph database running in neo4j.
