@@ -41,7 +41,7 @@ The [MetamorphoSys](https://www.nlm.nih.gov/research/umls/implementation_resourc
 Update: Access to the UBKG knowledge graph information will be mediated by a REST API that will encapsulate Cypher queries.
 
 ## Graph-Deploy-AWS
-**Graph-Deploy-AWS.md** contains implementation instructions to build a Docker version of UMLS-Graph on an AWS EC2 instance (minimum 4 GB memory recommended).  This is not the deployment for the UBKG, but for the UMLS-only prototype.
+[**Graph-Deploy-AWS.md**](https://github.com/dbmi-pitt/UBKG/blob/main/Source_framework/Graph-Deploy-AWS.md) contains implementation instructions to build a Docker version of UMLS-Graph on an AWS EC2 instance (minimum 4 GB memory recommended).  This is not the deployment for the UBKG, but for the UMLS-only prototype.
 
 ## UI Javascript code
 Guesdt-X.X.X.html is the UI code deployed at guesdt.com after login.
