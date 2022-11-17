@@ -21,6 +21,3 @@ Graph-Deploy-AWS.md contains implementation instructions to build a Docker versi
 
 ## UI Javascript code
 Guesdt-X.X.X.html is the UI code deployed at guesdt.com after login.
-
-# NOTE ON VERSIONS
-The relevant script is **UMLS-Graph-Extracts.py**. This script contains the original code from the Jupyter notebook (UMLS-Graph-Extracts.ipynb), converted to Python with additional functionality (argument parsing).
