@@ -19,8 +19,8 @@ It uses the conceptual model pictured here:
 
 The **starting point** of this repository is the UMLS active subset distribution loaded into Oracle.
 The **ending point** of this repository (what it functionally creates) is a live neo4j database of the UMLS active subset, including:
-- English **terms** (including preferred terms and synonym)
-- **Codes** (including NDC Codes as an SAB called NDC)
+- English **terms** (including preferred terms and synonyms)
+- **Codes** (including NDC Codes with the SAB {_Source Abbreviation_}  **NDC**)
 - **Concepts** 
 - **Semantic Types**
 - **Definitions** 
