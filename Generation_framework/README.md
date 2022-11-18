@@ -45,6 +45,14 @@ Parameters in the build_csv.**py** script (called by the build_csv.**sh** shell 
 The file 'scripts/ontologies.json' is used to specify information about the ontologies (e.g., source url, the associated SAB).
 The key of the JSON object is used on the command line of the build_csv.sh script.
 
+'''
+"MONDO": {
+    "owl_url": "http://purl.obolibrary.org/obo/mondo.owl",
+    "home_url": "https://obofoundry.org/ontology/mondo.html",
+    "comment": "The Mondo Disease Ontology (MONDO): a global community effort to harmonize multiple disease resources to yield a coherent merged ontology"
+  }
+'''
+
 The JSON file allows for both the conversion of OWL-based files and custom conversion.
 
 ### Regenerating without downloading or OWLNETS conversion
