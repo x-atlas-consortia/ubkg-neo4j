@@ -9,6 +9,7 @@ formats that can be appended to the set of UMLS CSV files.
 
 ![generation_framework](https://user-images.githubusercontent.com/10928372/202733307-d9a7c76d-8a0a-401f-a0e2-011d8449ac41.jpg)
 
+# Basic workflow
 The integration of an ontology into the UBKG requires two types of script file:
 
 ### 1. OWLNETS: triple store information--edges, nodes, and (optional) relations metadata
@@ -22,65 +23,54 @@ Source data from an ontology is converted into files of triple store data--i.e.,
 * For ontologies that are not described in OWL files (e.g., HUBMAP, UNIPROTKB), custom converters create files that conform to the OWLNETS format.
 
 ### 2. Integration of assertions into CSV files 
-The OWLNETS-UMLS-GRAPH script, described below, converts data from the triple store files
-into content that can be integrated into the base UMLS CSV structure.
+The OWLNETS-UMLS-GRAPH script, described below, converts data from the triple store files into content that can be integrated into the base UMLS CSV structure.
 
 ### Logging
 
 Information is logged to a file './builds/logs/pkt_build_log.log'.
 
-# Running build_csv.sh to generate the CSV files 
+### Integration of an ontology
 
-To add an ontology, include an appropriate parameter to the 
-command line of the build script--e.g.,
+Integrating an ontology into UBKG involves the following steps:
+* Build the necessary conversion script:
+- For ontologies from OWL files, the script based in PheKnowLator should be sufficient.
+- For other data, a custom script will be required.
+* Add an entry to the ontologies.json file.
+* Call the script with an argument that corresponds to the SAB (identifier for the ontology)
+ 
+Parameters in the build_csv.**py** script (called by the build_csv.**sh** shell script) control processing.
+
+### ontology.json
+
+The file 'scripts/ontologies.json' is used to specify information about the ontologies (e.g., source url, the associated SAB).
+The key of the JSON object is used on the command line of the build_csv.sh script.
+
+The JSON file allows for both the conversion of OWL-based files and custom conversion.
+
+### Regenerating without downloading or OWLNETS conversion
+Once the script has been run on the local machine for an ontology, it is possible 
+to rerun the script without generating triple store data by downloading source files (e.g, OWL files) or running the OWL-OWLNETS conversion scripts again. 
+
+This avoids the need to obtain source data for ontologies that do not update often.
+
+To run the script without regenerating triple store data, use the -s parameter.
+
+Example of running the script with SAB arguments:
 ```
 $ cd scripts
 $ ./build_csv.sh -v PATO UBERON CL DOID CCFASCTB OBI EDAM HSAPDV SBO MI CHEBI MP ORDO PR UO HUSAT HUBMAP UNIPROTKB
 ```
-The CSV files can be enhanced iteratively by calling the script successively.
+The UBKG CSV files can be enhanced iteratively by calling the script successively, as illustrated in the architecture diagram.
 For example, two calls to the script
 
 ```
 ./build_csv.sh -v PATO
 ./build_csv.sh -v UBERON
 ```
-
 are equivalent to the call that combines the arguments
 ```
 ./build_csv.sh -v PATO UBERON
 ```
-
-### Run times by ontology
-The approximate complete run time for creating the CSV files associated with 15 ontologies is 
-about 26 hrs on a MacBook Pro 2.6 GHz 6-core I7 /w 32 GB 2667 MHz memory.
-
-Sample times per ontology:
-* PATO: 1 minute
-* UBERON: 4 minutes
-* CL: 3 minutes
-* DOID: 2 minutes
-* CCFASCTB: 1 minute
-* OBI: 1 minute
-* EDAM: 1 minute
-* HSAPDV: 1 minute
-* SBO: 1 minute
-* MI: 1 minute
-* **CHEBI: 8 hours**
-* MP: 8 minutes
-* ORDO: 6 minutes
-* **PR: 11 hours**
-* HUSAT: 1 minute
-* HUBMAP: 1 minute
-* UNIPROTKB: 5 minutes
-
-### Regenerating without downloading or OWLNETS conversion
-Once the complete script has been run on the local machine, it is possible 
-to rerun the build script without downloading source files (e.g, OWL files) 
-or running the OWL-OWLNETS conversion scripts again. This avoids the need
-to obtain source data for ontologies that do not update often.
-
-A number of parameters in the
-build_csv.**py** script (called by the build_csv.**sh** shell script) control processing.
 
 ### Order of ontology integration
 Nodes in an ontologies can refer to nodes in other ontologies in two ways:
@@ -89,7 +79,7 @@ Nodes in an ontologies can refer to nodes in other ontologies in two ways:
 
 If an ontology refers to nodes in another ontology, the referred ontology nodes should be defined 
 one of two places:
-#### 
+
 1. The OWLNETS_node_metadata.txt file of the ontology. (For example, the PATO ontology refers to nodes in ontologies like CHEBI, but defines them with distinct IRIs in the node metadata.)
 2. The ontology CSV files--in particular, CUI-CODES.CSV.
 
@@ -117,12 +107,29 @@ The recommended order of generation follows.
 
 The order appears to be of particular importance for custom ontologies such as HUBMAP and UNIPROTKB.
 
-### ontology.json
+### Run times by ontology
+The approximate complete run time for creating the CSV files associated with 15 ontologies is 
+about 26 hrs on a MacBook Pro 2.6 GHz 6-core I7 /w 32 GB 2667 MHz memory.
 
-The file 'scripts/ontologies.json' is used to specify information about the ontologies (e.g., source url, the associated SAB).
-The key of the JSON object is used on the command line of the build_csv.sh script.
+Sample times per ontology:
+* PATO: 1 minute
+* UBERON: 4 minutes
+* CL: 3 minutes
+* DOID: 2 minutes
+* CCFASCTB: 1 minute
+* OBI: 1 minute
+* EDAM: 1 minute
+* HSAPDV: 1 minute
+* SBO: 1 minute
+* MI: 1 minute
+* **CHEBI: 8 hours**
+* MP: 8 minutes
+* ORDO: 6 minutes
+* **PR: 11 hours**
+* HUSAT: 1 minute
+* HUBMAP: 1 minute
+* UNIPROTKB: 5 minutes
 
-The JSON file allows for both the conversion of OWL-based files and custom conversion.
 
 ## OWL to OWLNETS files
 
