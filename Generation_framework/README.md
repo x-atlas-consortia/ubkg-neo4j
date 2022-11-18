@@ -32,20 +32,26 @@ Information is logged to a file './builds/logs/pkt_build_log.log'.
 ### Integration of an ontology
 
 Integrating an ontology into UBKG involves the following steps:
-* Build the necessary conversion script:
+1. Build the necessary conversion script:
 - For ontologies from OWL files, the script based in PheKnowLator should be sufficient.
 - For other data, a custom script will be required.
-* Add an entry to the ontologies.json file.
-* Call the script with an argument that corresponds to the SAB (identifier for the ontology)
+2. Add an entry to the ontologies.json file.
+3. Call the script with an argument that corresponds to the SAB (identifier for the ontology)
  
 Parameters in the build_csv.**py** script (called by the build_csv.**sh** shell script) control processing.
 
 ### ontology.json
 
-The file 'scripts/ontologies.json' is used to specify information about the ontologies (e.g., source url, the associated SAB).
+The file [ontologies.json](https://github.com/dbmi-pitt/UBKG/blob/main/Generation_framework/ontologies.json) is used to direct conversion of an ontology or data source.
+
+- For ontologies that are describe in published OWL files, the relevant key/value pairs are:
+* "owl_url": the URL to download the OWL file
+* "home_url": the URL that describes the OWL
+
+- For ontologies or data sources with custom converters, the "execute" key/value specifies the location of the conversion script.
 
 
-'''
+```
 "MONDO": {
     "owl_url": "http://purl.obolibrary.org/obo/mondo.owl",
     "home_url": "https://obofoundry.org/ontology/mondo.html",
@@ -55,7 +61,7 @@ The file 'scripts/ontologies.json' is used to specify information about the onto
     "comment": "HubMAP application ontology, obtained from input spreadsheet in SimpleKnowledge format",
     "execute": "./skowlnets/skowlnets.py SimpleKnowledgeHuBMAP.xlsx HUBMAP"
   }
-'''
+```
 
 The JSON file allows for both the conversion of OWL-based files and custom conversion.
 
@@ -119,11 +125,12 @@ The recommended order of generation follows.
 
 The order appears to be of particular importance for custom ontologies such as HUBMAP and UNIPROTKB.
 
-### Run times by ontology
-The approximate complete run time for creating the CSV files associated with 15 ontologies is 
-about 26 hrs on a MacBook Pro 2.6 GHz 6-core I7 /w 32 GB 2667 MHz memory.
+### Triplet conversion times by ontology
 
-Sample times per ontology:
+The build script is run on a local development machine. The bulk of the processing involves the PheKnowLator conversion of OWL files to OWLNETS triple store files.
+
+Sample OWLNETS conversion times per ontology when run on a MacBook Pro 32 GB M1 running Ventura:
+
 * PATO: 1 minute
 * UBERON: 4 minutes
 * CL: 3 minutes
