@@ -1,8 +1,7 @@
-# Scripts used by the Ontology Knowledge Graph Architecture
+# Unified Biomedical Knowledge Graph Generation Framework
 
 ## Background
-The application architecture that supports the HuBMAP ontology service 
-includes a knowledge graph representing a polyhierarchical organization of 
+The application architecture that supports the UBKG includes a knowledge graph representing a polyhierarchical organization of 
 interconnected ontologies. The knowledge graph is based on an export from the UMLS Metathesaurus, 
 which manages the majority of the standard ontologies and vocabularies in the system. The distinctive feature of 
 the HubMAP ontology is that it extends the UMLS knowledge by integrating concepts from other ontologies. 
@@ -15,10 +14,7 @@ The foundation of the ontology graph is a set of CSV files obtained
 from a MetamorPhoSys download of UMLS concept and semantic data. This initial set
 of CSVs is enhanced with additions of data from other ontologies.
 
-[This presentation](https://docs.google.com/presentation/d/1fTGVvTE5nziAMNt21wupmbkF1-X2GvW5Uhk26svaRvQ/edit?usp=sharing) i
-describes:
-* the overall solution architecture
-* the process for obtaining the initial UMLS CSV files
+
 
 The scripts in this folder path are used to convert data from ontologies into 
 formats that can be appended to the set of UMLS CSV files.
