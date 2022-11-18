@@ -2,27 +2,17 @@
 
 ## Background
 The application architecture that supports the UBKG includes a knowledge graph representing a polyhierarchical organization of 
-interconnected ontologies. The knowledge graph is based on an export from the UMLS Metathesaurus, 
-which manages the majority of the standard ontologies and vocabularies in the system. The distinctive feature of 
-the HubMAP ontology is that it extends the UMLS knowledge by integrating concepts from other ontologies. 
-In particular, the ontology includes information from sources such as: 
-* Ontologies that are not in UMLS, but published in other sources such as the [OBO Foundry](https://obofoundry.org/) and the [NCBO BioPortal](https://bioportal.bioontology.org/) 
-* Custom application ontologies, such as the ontology built for HuBMAP configuration information
-* Data sources that can be represented as ontologies, such as the [UniProtKB](https://www.uniprot.org/) protein database.
-
-The foundation of the ontology graph is a set of CSV files obtained 
-from a MetamorPhoSys download of UMLS concept and semantic data. This initial set
-of CSVs is enhanced with additions of data from other ontologies.
-
-
+interconnected ontologies. 
 
 The scripts in this folder path are used to convert data from ontologies into 
 formats that can be appended to the set of UMLS CSV files.
 
-The integration of an ontology into the complete set requires two stages 
-for each ontology. The process is coordinated by a build file.
+![generation_framework](https://user-images.githubusercontent.com/10928372/202733307-d9a7c76d-8a0a-401f-a0e2-011d8449ac41.jpg)
 
-### Stage 1
+The integration of an ontology into the UBKG requires two types of script file:
+
+### Triplet information: edges, nodes, and (optional) relations metadata
+
 Source data from an ontology is converted into the [OWLNETS](https://github.com/callahantiff/PheKnowLator/wiki/OWL-NETS-2.0) format. 
 OWLNETs files represent ontologies as simple subject-predicate-object triples and metadata.
 
