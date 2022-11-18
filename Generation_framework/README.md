@@ -11,18 +11,18 @@ formats that can be appended to the set of UMLS CSV files.
 
 The integration of an ontology into the UBKG requires two types of script file:
 
-### Triplet information: edges, nodes, and (optional) relations metadata
+### 1. OWLNETS: triple store information--edges, nodes, and (optional) relations metadata
 
-Source data from an ontology is converted into the [OWLNETS](https://github.com/callahantiff/PheKnowLator/wiki/OWL-NETS-2.0) format. 
-OWLNETs files represent ontologies as simple subject-predicate-object triples and metadata.
+Source data from an ontology is converted into files of triple store data--i.e.,
+* _edges_, or triples of assertions in subject | predicate | object format
+* _nodes_ metadata
+* optional _relations_ metadata
 
-* For ontologies that are described in OWL files, the architecture uses the PheKnowLator package, as
-described below, to extract OWL file content to OWLNETS format.
-* For ontologies that are not described with OWL files (e.g., HUBMAP, UNIPROTKB), custom 
-converters create files that conform to the OWLNETS format.
+* For ontologies that are published in OWL files, the triple store data is in a set of files in [OWLNETS](https://github.com/callahantiff/PheKnowLator/wiki/OWL-NETS-2.0) format. The OWL files are converted using the PheKnowLator package, as
+* For ontologies that are not described in OWL files (e.g., HUBMAP, UNIPROTKB), custom converters create files that conform to the OWLNETS format.
 
-### Stage 2
-The OWLNETS-UMLS-GRAPH script, described below, converts data from the OWLNETS files
+### 2. Integration of assertions into CSV files 
+The OWLNETS-UMLS-GRAPH script, described below, converts data from the triple store files
 into content that can be integrated into the base UMLS CSV structure.
 
 ### Logging
