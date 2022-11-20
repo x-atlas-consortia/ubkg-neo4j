@@ -2,6 +2,9 @@
 This appendix is intended as a working glossary, and not as a formal or exhaustive terminology.
 When the discussion of a term in the glossary refers to another term in the glossary, the other term will be in **_bold italic_**.
 
+## Assertion
+An assertion establishes a **_relationship_** between two **_entities_**.
+
 ## BioPortal
 A repository of biomedical ontologies maintained by [NCBO](https://bioportal.bioontology.org/). 
 
@@ -83,4 +86,61 @@ A synonym for an **_entity_**, used primarily in **_knowledge graphs_**.
 ## Ontology
 For the purposes of the UBKG, an ontology is the representation of a set of **_entities_** and the **_relationships_** between them. 
 
+## OLS 
+The Ontology Lookup Service [OLS](https://www.ebi.ac.uk/ols/index) is a repository of biomedical **_ontologies_**. The OLS allows for searches of relationship properties (**_relationships_**), including those from the **_RO_**.
+
+## OBO Foundry
+The Open Biological and Biomedical Ontology Foundry [OBO](https://obofoundry.org/) is a community that maintains a set of “interoperable ontologies for the biomedical sciences”, as well as a set of [principles](https://obofoundry.org/principles/fp-000-summary.html)–i.e., best practices and standards for representing ontologies in OWL.
+
+Many of the ontologies published in BioPortal follow OBO principles.
+
+## OWL files
+The **Web Ontology Language** [OWL](https://www.w3.org/OWL/) is a language for representing **_ontologies_** in a standard format that can be interpreted by software applications. Biomedical ontologies can be published as OWL files in reference sites such as the **_NCBO BioPortal_** and the **_OBO Foundry_**.
+
+## Relationship
+A relationship is an association between two **_entities_** in an **_ontology_**.
+
+### Types of relationships
+Most of the relationships in biomedical ontologies can be characterized with one of two types:
+- _hierarchical_ (e.g., _5'-AMP-activated protein kinase subunit gamma-1_ **isa** _protein_)
+- _non-hierarchical_ (e.g., _protein PMS2CL (human)_ **gene_product_of** _PMS2CL gene_)
+
+In a **_knowledge graph_**, a relationship corresponds to an **_edge_** between two **_nodes_**.
+
+## Relationship Ontology (RO)
+The Relationship Ontology (RO) is an **_ontology_** of the **_relationships_** that are used in other ontologies–i.e., how relationships themselves relate to one another. 
+
+A relationship between relationships that is important in the UBKG is the **_inverse relationship_**. 
+
+Relationships in RO can be reviewed in a number of ways, including:
+- By searching the **_OLS_**
+- [this JSON file](https://raw.githubusercontent.com/oborel/obo-relations/master/ro.json)
+
+## SAB
+The UBKG adopts the UMLS practice of identifying source ontologies with a **Source Abbreviation** (SAB). Examples of UMLS SABs include SNOMED_CT and UBERON. UBKG uses published acronyms for ontologies when possible–e.g., PATO.
+
+## Term: preferred term, synonym
+A usually short text identifier for a **_code_** in an **_ontology**_. For example, a term for code 64033007 in SNOMED_CT is “kidney”.
+
+A term can be a _preferred term_ or a _synonym_.
+
+## Triple
+A triple **_asserts_** a **_relationship**_ between two **_entities_** (nodes) in an **_ontology_**.
+
+A triple is in the format
+_subject_ _predicate_	_object_
+
+_subject_ and _object_ are both entities (nodes). _predicate_ is a relationship (edge).
+
+## Vocabulary
+For the purposes of the UBKG, a vocabulary is similar to an **_ontology_**. Some vocabularies (e.g., SNOMED_CT) are also ontologies.
+
+## UMLS
+The Unified Medical Language System [UMLS](https://www.nlm.nih.gov/research/umls/index.html) consolidates a number of different biomedical **_ontologies_**, **_vocabularies_**, and standards. 
+
+The UBKG represents UMLS and other concept data with a set of **_nodes_** and **_edges_**, including nodes for 
+- the **_code_** for the concept in its originating ontology
+- the **_CUI_** for the code in the UBKG
+- **_terms_** for the concept, both for preferred terms and synonyms
+- definitions of the concept
 
