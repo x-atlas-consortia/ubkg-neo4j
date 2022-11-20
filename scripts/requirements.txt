@@ -1,7 +1,7 @@
 pkt_kg == 3.0.0
 pandas == 1.5.0
 psutil = 2.0
-ray[default] == 1.5.1
+ray == 1.5.1
 rdflib == 6.0.0
 setuptools == 60.2.0
 tqdm == 4.62.0
