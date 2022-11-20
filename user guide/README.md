@@ -32,4 +32,49 @@ An ingest file set consists of two Tab-Separated Variables (TSV) files:
 - **edges.tsv**: Describes the triples comprising the ontology
 - **nodes.tsv**: Describes metadata for entities
 
-This file provides added detail for OPTIONAL Data Distillery fields and examples, beyond the general UBKG requirements for which this guide is written.
+[This file](https://github.com/dbmi-pitt/UBKG/blob/main/user%20guide/Distillery_Ingest_format%20-%20Instructions.csv) provides added detail for OPTIONAL Data Distillery fields and examples, beyond the general UBKG requirements for which this guide is written.
+
+# edges.tsv
+The edges file lists the triples that constitute the ontology.
+
+## Fields
+Field|Corresponding element in UBKG|Accepted formats|Examples
+---|---|---|---
+subject|**Code** node|IRI for a concept in a published ontology|http://purl.obolibrary.org/obo/UBERON_0004086
+ | | |Code for the concept in the format _SAB_ {space} _code in ontology_|UBERON 0004086
+predicate|relationships|For hierarchical relationships, the IRI http://www.w3.org/2000/01/rdf-schema#subClassOf OR the string “isa”| http://www.w3.org/2000/01/rdf-schema#subClassOf 
+ | | |For non-hierarchical relationships, an IRI for a relationship property in RO	|http://purl.obolibrary.org/obo/RO_0002292
+ | | |or an IRI for a relationship property not in RO |
+ | | |Custom string | drinks milkshake of
+ object|**Code** node|same as for subject
+ 
+ # nodes.tsv
+ The nodes.tsv file provides metadata on entities.
+
+## Fields
+Field|Corresponding element in UBKG|Accepted formats|Examples
+---|---|---|---
+node_id|**Code** node|IRI for a concept in a published ontology|http://purl.obolibrary.org/obo/UBERON_0004086
+ | | |Code for the concept in the format _SAB_ {space} _code in ontology_|UBERON 0004086
+node_label|**Term** node, _Preferred Term_ (PT) relationship|Text string|Ventricles of hindbrain
+node_definition (_optional_)|**Definition** node, _DEF_ relationship |Text string|One of the system of communicating cavities in the brain ….
+node_synonyms (_optional_)|**Term** node; _Synonym_ (SYN) relationship|**Pipe-delimited** list of synonyms|Example for synonyms
+node_dbxrefs (_optional_)|Cross-references|Pipe-delimited list of references to cross-referenced concepts. Each cross-reference should be in format SAB:code or UMLS:CUI |Example for dbxrefs
+
+
+### Example for synonyms: 
+region of ventricular system of brain|brain ventricles|cerebral ventricle
+### Example for dbxrefs:
+umls:c0007799|fma:78447
+
+# Requirements for nodes and relationships
+1. A node identified in edges.tsv must satisfy one of the following criteria:
+- It is defined in nodes.tsv.
+- It already exists in the UBKG.
+The UBKG will not ingest nodes that do not satisfy at least one of the criteria.
+
+2. If a triple in edges.tsv refers to a node from a non-UMLS ontology, the non-UMLS ontology should be ingested first. For example, because the Mammalian Phenotype Ontology (MP) includes nodes from the Cell Ontology (CL), CL should be integrated into the UBKG before MP. This generally improves the cross-referencing because the general ontologies generally have deeper external-referencing to UMLS and other OBO sources.
+
+3. This spreadsheet lists the SABs and example codes for the ontologies that are currently represented in the UBKG. It should be used as the reference for formatting existing source abbreviations (SAB) and their codes.
+
+
