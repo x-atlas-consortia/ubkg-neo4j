@@ -144,3 +144,5 @@ The UBKG represents UMLS and other concept data with a set of **_nodes_** and **
 - **_terms_** for the concept, both for preferred terms and synonyms
 - definitions of the concept
 
+![image](https://user-images.githubusercontent.com/10928372/202926462-2075143e-1fcb-476d-adca-b256874c0987.png)
+
