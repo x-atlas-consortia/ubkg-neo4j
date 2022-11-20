@@ -98,4 +98,3 @@ If it is not feasible to cross-reference a UMLS CUI, then try to cross-reference
 
 A cross-reference is not the same thing as an isa relationship.
 
-
