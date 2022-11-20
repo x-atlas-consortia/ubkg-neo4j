@@ -44,7 +44,6 @@ subject|**Code** node|IRI for a concept in a published ontology|http://purl.obol
  | | |Code for the concept in the format _SAB_ {space} _code in ontology_|UBERON 0004086
 predicate|relationships|For hierarchical relationships, the IRI http://www.w3.org/2000/01/rdf-schema#subClassOf OR the string “isa”| http://www.w3.org/2000/01/rdf-schema#subClassOf 
  | | |For non-hierarchical relationships, an IRI for a relationship property in RO	|http://purl.obolibrary.org/obo/RO_0002292
- | | |or an IRI for a relationship property not in RO |
  | | |Custom string | drinks milkshake of
  object|**Code** node|same as for subject
  
@@ -75,6 +74,28 @@ The UBKG will not ingest nodes that do not satisfy at least one of the criteria.
 
 2. If a triple in edges.tsv refers to a node from a non-UMLS ontology, the non-UMLS ontology should be ingested first. For example, because the Mammalian Phenotype Ontology (MP) includes nodes from the Cell Ontology (CL), CL should be integrated into the UBKG before MP. This generally improves the cross-referencing because the general ontologies generally have deeper external-referencing to UMLS and other OBO sources.
 
-3. This spreadsheet lists the SABs and example codes for the ontologies that are currently represented in the UBKG. It should be used as the reference for formatting existing source abbreviations (SAB) and their codes.
+3. [This spreadsheet](https://github.com/dbmi-pitt/UBKG/blob/main/user%20guide/ontology%20neo4j%20SABs%20and%20sample%20codes%20-%20ontology%20neo4j%20SABs%20and%20sample%20codes.csv) lists the SABs and example codes for the ontologies that are currently represented in the UBKG. It should be used as the reference for formatting existing source abbreviations (SAB) and their codes.
+
+4. Some ontologies (including HGNC, GO, and HPC) include the SAB in codes (e.g., HGNC:9999) Nodes for concepts from these ontologies should be formatted as <SAB><space><SAB>: code-e.g., “HGNC HGNC:9999”.
+5. The UBKG ingestion will reformat relationships so that strings are delimited with underscores.
+6. The UBKG ultimately requires that two nodes be linked with both a relationship and its inverse. However, in an edges file each relationship should be represented only once (NOT with the original and inverse). The UBKG identifies and adds the inverse relationships using the RO as follows:
+
+predicate|form of inverse relationship|comment
+---|---|---
+IRI of relationship property in RO|Resolution via RO, using the IRI
+String that corresponds to the relation label (e.g., “has gene product”)|Resolution via RO, using relationship labels|not as precise as IRI
+Custom string|Appends “inverse_” to the string |If the custom string actually corresponds to a relationship in RO with an ambiguous inverse, UBKG will create a new inverse relationship.
+IRI of relationship property from ontology other than RO|none|The UBKG will ignore these relationships.
+
+# Best Practices for cross-references 
+The items in the **_node_dbxref_** field of **nodes.tsv** establish cross-references. The degree to which an ontology integrates with the UBKG depends directly on cross-references: an ontology with nodes that cross-reference nodes in other ontologies are more likely to contribute to new relationships, while an ontology with few cross-references will essentially exist independently of the rest of the UBKG.
+
+A good rule of thumb for cross-references is: _the closer to a UMLS CUI, the better_.
+
+The UBKG ingestion preferentially selects UMLS CUIs from the list in node_dbxref. 
+It is not necessary to list both a UMLS CUI and a code from an ontology that is already in the UMLS. 
+If it is not feasible to cross-reference a UMLS CUI, then try to cross-reference a code from a published, OBO-compliant ontology.
+
+A cross-reference is not the same thing as an isa relationship.
 
 
