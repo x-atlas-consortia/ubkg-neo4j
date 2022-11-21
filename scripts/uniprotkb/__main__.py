@@ -9,6 +9,7 @@ import logging.config
 import time
 from datetime import timedelta
 import hashlib
+from base64 import urlsafe_b64encode
 
 
 class RawTextArgumentDefaultsHelpFormatter(
@@ -74,7 +75,7 @@ proteins_node_ids: dict = {}
 
 
 def base64it(x: str) -> str:
-   return base64.urlsafe_b64encode(str(x).encode('UTF-8')).decode('ascii')
+   return urlsafe_b64encode(str(x).encode('UTF-8')).decode('ascii')
 
 
 # Because the 'proteins' is really a description, a unique label is needed for it...

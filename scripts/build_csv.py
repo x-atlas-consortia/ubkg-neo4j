@@ -11,6 +11,14 @@ import re
 import subprocess
 from datetime import timedelta
 import json
+from typing import List
+
+
+log_dir, log, log_config = 'builds/logs', 'pkt_build_log.log', glob.glob('**/logging.ini', recursive=True)
+logger = logging.getLogger(__name__)
+# TODO: log_config == [] at this point?!
+# logging.config.fileConfig(log_config[0], disable_existing_loggers=False, defaults={'log_file': log_dir + '/' + log})
+
 
 # TODO: make these optional parameters and print them out when --verbose
 OWLNETS_SCRIPT: str = './owlnets_script/__main__.py'
@@ -100,10 +108,6 @@ parser.add_argument("-v", "--verbose", action="store_true",
                     #help='organism (e.g., human, mouse)')
 
 args = parser.parse_args()
-
-log_dir, log, log_config = 'builds/logs', 'pkt_build_log.log', glob.glob('**/logging.ini', recursive=True)
-logger = logging.getLogger(__name__)
-logging.config.fileConfig(log_config[0], disable_existing_loggers=False, defaults={'log_file': log_dir + '/' + log})
 
 
 def print_and_logger_info(message: str) -> None:
