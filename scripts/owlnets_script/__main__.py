@@ -120,7 +120,7 @@ def download_owltools(loc: str) -> None:
         os.chdir(cwd)
 
 
-def download_owl(url: str, loc: str, working_file: str, force_empty=True) -> str:
+def download_owl(url: str, loc: str, working_file: str, force_empty=True) -> None:
     logger.info(f'Downloading owl file from \'{url}\' to \'{loc}\'')
 
     cwd: str = os.getcwd()
@@ -361,6 +361,7 @@ for cls in tqdm(ont_classes):
         namespace: str = str(cls).split('/')[2]
 
     # update dict
+    # TODO: 'namespace' can be undefined...
     entity_metadata['nodes'][str(cls)] = {
         'label': ont_labels[str(cls)] if str(cls) in ont_labels.keys() else 'None',
         'synonyms': syns if syns != '' else 'None',
