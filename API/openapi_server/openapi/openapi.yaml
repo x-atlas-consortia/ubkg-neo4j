@@ -27,7 +27,7 @@ paths:
         schema:
           default: []
           items:
-            example: NCI,MDR
+            example: "NCI,MDR"
             type: string
           type: array
           uniqueItems: true
@@ -41,8 +41,8 @@ paths:
                   $ref: '#/components/schemas/CodesCodesObj'
                 type: array
           description: A JSON array of dictionaries
-      summary: Returns a list of code_ids {Concept, Code, SAB} that code the same
-        concept(s) as the code_id, optionally restricted to source (SAB)
+      summary: "Returns a list of code_ids {Concept, Code, SAB} that code the same\
+        \ concept(s) as the code_id, optionally restricted to source (SAB)"
       x-openapi-router-controller: openapi_server.controllers.default_controller
   /codes/{code_id}/concepts:
     get:
@@ -66,7 +66,7 @@ paths:
                   $ref: '#/components/schemas/ConceptDetail'
                 type: array
           description: A JSON array of dictionaries
-      summary: Returns a list of concepts {Concept, Prefterm} that the code_id codes
+      summary: "Returns a list of concepts {Concept, Prefterm} that the code_id codes"
       x-openapi-router-controller: openapi_server.controllers.default_controller
   /concepts/expand:
     post:
@@ -94,7 +94,11 @@ paths:
                 items:
                   $ref: '#/components/schemas/ConceptPrefterm'
                 type: array
-          description: Return all {concept, prefterm}
+          description: "Return all {concept, prefterm}"
+      summary: "Returns a unique list of concepts (Concept, Preferred Term) on all\
+        \ paths including starting concept (query_concept_id) restricted by list of\
+        \ relationship types (rel), list of relationship sources (sab), and depth\
+        \ of travel."
       x-openapi-router-controller: openapi_server.controllers.default_controller
   /concepts/paths:
     post:
@@ -209,7 +213,7 @@ paths:
         schema:
           default: []
           items:
-            example: MEDLINEPLUS,MSH,MEDCIN
+            example: "MEDLINEPLUS,MSH,MEDCIN"
             type: string
           type: array
           uniqueItems: true
@@ -245,11 +249,11 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/SabRelationshipConceptPrefterm'
+                  $ref: '#/components/schemas/SabRelationshipConceptTerm'
                 type: array
-          description: A JSON array of {Sab, Relationship, Concept, Prefterm} dictionaries
-      summary: Returns a list of concepts {Sab, Relationship, Concept, Prefterm} related
-        to the concept
+          description: "A JSON array of {Sab, Relationship, Concept, Prefterm} dictionaries"
+      summary: "Returns a list of concepts {Sab, Relationship, Concept, Prefterm}\
+        \ related to the concept"
       x-openapi-router-controller: openapi_server.controllers.default_controller
   /concepts/{concept_id}/definitions:
     get:
@@ -272,8 +276,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/SabDefinition'
                 type: array
-          description: A JSON array of {Sab, Definition} dictionaries
-      summary: Returns a list of definitions {Sab, Definition} of the concept
+          description: "A JSON array of {Sab, Definition} dictionaries"
+      summary: "Returns a list of definitions {Sab, Definition} of the concept"
       x-openapi-router-controller: openapi_server.controllers.default_controller
   /concepts/{concept_id}/semantics:
     get:
@@ -296,8 +300,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/StyTuiStn'
                 type: array
-          description: A JSON array of {Sty, Tui, Stn} dictionaries
-      summary: Returns a list of semantic_types {Sty, Tui, Stn} of the concept
+          description: "A JSON array of {Sty, Tui, Stn} dictionaries"
+      summary: "Returns a list of semantic_types {Sty, Tui, Stn} of the concept"
       x-openapi-router-controller: openapi_server.controllers.default_controller
   /semantics/{semantic_id}/semantics:
     get:
@@ -320,9 +324,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/QQST'
                 type: array
-          description: A JSON array of {queryTUI, querySTN ,semantic, TUI_STN} dictionaries
-      summary: Returns a list of semantic_types {queryTUI, querySTN ,semantic, TUI_STN}
-        of the semantic type
+          description: "A JSON array of {queryTUI, querySTN ,semantic, TUI_STN} dictionaries"
+      summary: "Returns a list of semantic_types {queryTUI, querySTN ,semantic, TUI_STN}\
+        \ of the semantic type"
       x-openapi-router-controller: openapi_server.controllers.default_controller
   /terms/{term_id}/codes:
     get:
@@ -345,8 +349,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/TermtypeCode'
                 type: array
-          description: A JSON array of {TermType, Code} dictionaries
-      summary: Returns a list of codes {TermType, Code} of the text string
+          description: "A JSON array of {TermType, Code} dictionaries"
+      summary: "Returns a list of codes {TermType, Code} of the text string"
       x-openapi-router-controller: openapi_server.controllers.default_controller
   /terms/{term_id}/concepts:
     get:
@@ -394,9 +398,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/ConceptTerm'
                 type: array
-          description: A JSON array of {Concept, Term} dictionaries
-      summary: Returns an expanded list of concept(s) and preferred term(s) {Concept,
-        Term} from an exact text match
+          description: "A JSON array of {Concept, Term} dictionaries"
+      summary: "Returns an expanded list of concept(s) and preferred term(s) {Concept,\
+        \ Term} from an exact text match"
       x-openapi-router-controller: openapi_server.controllers.default_controller
   /tui/{tui_id}/semantics:
     get:
@@ -419,9 +423,58 @@ paths:
                 items:
                   $ref: '#/components/schemas/SemanticStn'
                 type: array
-          description: A JSON array of {semantic, STN} dictionaries
-      summary: Returns a list of symantic_types {semantic, STN} of the type unique
-        id (tui)
+          description: "A JSON array of {semantic, STN} dictionaries"
+      summary: "Returns a list of symantic_types {semantic, STN} of the type unique\
+        \ id (tui)"
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /valueset:
+    get:
+      operationId: valueset_get
+      parameters:
+      - description: the SAB of the parent concept
+        explode: true
+        in: query
+        name: parent_sab
+        required: true
+        schema:
+          example: HUBMAP
+          type: string
+        style: form
+      - description: the code of the parent concept in the SAB (local ontology)
+        explode: true
+        in: query
+        name: parent_code
+        required: true
+        schema:
+          example: C000530
+          type: string
+        style: form
+      - description: "the list of SABs for child concepts, in order of preference\
+          \ (in case of parent concepts with cross-references)"
+        explode: true
+        in: query
+        name: child_sabs
+        required: true
+        schema:
+          default: []
+          items:
+            example: "HUSAT,SNOMEDCT_US"
+            type: string
+          type: array
+          uniqueItems: true
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SabCodeTerm'
+                type: array
+          description: A JSON array of preferred terms for child codes that have an
+            isa relationship with the parent code
+      summary: Returns a valueset of concepts that are children (have as isa relationship)
+        of another concept.
       x-openapi-router-controller: openapi_server.controllers.default_controller
 components:
   schemas:
@@ -472,6 +525,7 @@ components:
       properties:
         query_concept_id:
           example: C2720507
+          title: query_concept_id
           type: string
         sab:
           example:
@@ -479,6 +533,7 @@ components:
           - HGNC
           items:
             type: string
+          title: sab
           type: array
         rel:
           example:
@@ -486,7 +541,9 @@ components:
           - isa
           items:
             type: string
+          title: rel
           type: array
+      title: ConceptSabRel
       type: object
     ConceptSabRelDepth:
       example:
@@ -501,6 +558,7 @@ components:
       properties:
         query_concept_id:
           example: C2720507
+          title: query_concept_id
           type: string
         sab:
           example:
@@ -508,6 +566,7 @@ components:
           - HGNC
           items:
             type: string
+          title: sab
           type: array
         rel:
           example:
@@ -515,10 +574,13 @@ components:
           - isa
           items:
             type: string
+          title: rel
           type: array
         depth:
           example: 2
+          title: depth
           type: integer
+      title: ConceptSabRelDepth
       type: object
     ConceptPrefterm:
       example:
@@ -596,9 +658,11 @@ components:
       properties:
         query_concept_id:
           example: C2720507
+          title: query_concept_id
           type: string
         target_concept_id:
           example: C1272753
+          title: target_concept_id
           type: string
         sab:
           example:
@@ -606,6 +670,7 @@ components:
           - HGNC
           items:
             type: string
+          title: sab
           type: array
         rel:
           example:
@@ -613,7 +678,9 @@ components:
           - part_of
           items:
             type: string
+          title: rel
           type: array
+      title: QconceptTconceptSabRel
       type: object
     QQST:
       example:
@@ -666,7 +733,7 @@ components:
           type: string
       title: SabDefinition
       type: object
-    SabRelationshipConceptPrefterm:
+    SabRelationshipConceptTerm:
       example:
         sab: ICD10AM
         concept: C0006826
@@ -689,7 +756,7 @@ components:
           example: Malignant Neoplasms
           title: prefterm
           type: string
-      title: SabRelationshipConceptPrefterm
+      title: SabRelationshipConceptTerm
       type: object
     SemanticStn:
       example:
@@ -740,4 +807,24 @@ components:
           title: code
           type: string
       title: TermtypeCode
+      type: object
+    SabCodeTerm:
+      example:
+        code: C16853
+        sab: NCI
+        term: Microscopy
+      properties:
+        sab:
+          example: NCI
+          title: sab
+          type: string
+        code:
+          example: C16853
+          title: code
+          type: string
+        term:
+          example: Microscopy
+          title: term
+          type: string
+      title: SabCodeTerm
       type: object

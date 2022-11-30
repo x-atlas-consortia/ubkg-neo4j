@@ -18,8 +18,17 @@ All endpoints and Flask related calls are kept in **controllers/default_controll
 Each controller makes one call to a method of the same name found in **managers/neo4j_manager.py**.
 In this manner the OpenAPI generated Flask code is separated from the business logic located in the manager.
 
-Adding a new endpoint requires updating the **ontology-api-spec.yml**, running **build-server.sh**,
-creating an additional business logic method in **neo4j_manager.py**.
+## New endpoints
+
+To add a new endpoint, update two files:
+1. The manager file _neo4j_manager.py in the **openapi_server/managers** path.
+2. The __ontology-api-spec.yml__ file, currently at the API root of this repo.
+3. Run the generator script (build-server.sh).
+
+The manager and YAML file relate as follows:
+1. The endpoint function in the manager file should align with an element in the **paths** section of the YAML. 
+2. If the endpoint returns a JSON object, the schema for the object should align with a schema component in the YAML.
+
 Note that generating the new server will remove all calls from the controller to the manager.
 
 ## Running Locally
@@ -38,6 +47,10 @@ The server will be available at the URL
 ```
 http://localhost:8080/
 ```
+
+### neo4j
+For run_server_on_localhost.py to work, a local instance of neo4j should be running.
+If neo4j is not running, the error message will throw a "connection refused" exception.
 
 ## Rebuilding the Docker container
 

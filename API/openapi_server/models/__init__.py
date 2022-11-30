@@ -12,8 +12,9 @@ from openapi_server.models.concept_term import ConceptTerm
 from openapi_server.models.path_item_concept_relationship_sab_prefterm import PathItemConceptRelationshipSabPrefterm
 from openapi_server.models.qqst import QQST
 from openapi_server.models.qconcept_tconcept_sab_rel import QconceptTconceptSabRel
+from openapi_server.models.sab_code_term import SabCodeTerm
 from openapi_server.models.sab_definition import SabDefinition
-from openapi_server.models.sab_relationship_concept_prefterm import SabRelationshipConceptPrefterm
+from openapi_server.models.sab_relationship_concept_term import SabRelationshipConceptTerm
 from openapi_server.models.semantic_stn import SemanticStn
 from openapi_server.models.sty_tui_stn import StyTuiStn
 from openapi_server.models.termtype_code import TermtypeCode

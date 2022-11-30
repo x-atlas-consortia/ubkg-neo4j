@@ -14,8 +14,9 @@ from openapi_server.models.concept_term import ConceptTerm  # noqa: E501
 from openapi_server.models.path_item_concept_relationship_sab_prefterm import PathItemConceptRelationshipSabPrefterm  # noqa: E501
 from openapi_server.models.qqst import QQST  # noqa: E501
 from openapi_server.models.qconcept_tconcept_sab_rel import QconceptTconceptSabRel  # noqa: E501
+from openapi_server.models.sab_code_term import SabCodeTerm  # noqa: E501
 from openapi_server.models.sab_definition import SabDefinition  # noqa: E501
-from openapi_server.models.sab_relationship_concept_prefterm import SabRelationshipConceptPrefterm  # noqa: E501
+from openapi_server.models.sab_relationship_concept_term import SabRelationshipConceptTerm  # noqa: E501
 from openapi_server.models.semantic_stn import SemanticStn  # noqa: E501
 from openapi_server.models.sty_tui_stn import StyTuiStn  # noqa: E501
 from openapi_server.models.termtype_code import TermtypeCode  # noqa: E501
@@ -53,14 +54,14 @@ cypher_tail: str = \
 
 cypher_head: str = \
     "CALL db.index.fulltext.queryNodes(\"Term_name\", '\\\"'+$queryx+'\\\"')" \
-     " YIELD node" \
-     " WITH node AS matched_term" \
-     " MATCH (matched_term)" \
-     " WHERE size(matched_term.name) = size($queryx)" \
-     " WITH matched_term" \
-     " OPTIONAL MATCH (matched_term:Term)<-[relationship]-(:Code)<-[:CODE]-(concept:Concept)" \
-     " WHERE relationship.CUI = concept.CUI" \
-     " OPTIONAL MATCH (matched_term:Term)<-[:PREF_TERM]-(concept:Concept)"
+    " YIELD node" \
+    " WITH node AS matched_term" \
+    " MATCH (matched_term)" \
+    " WHERE size(matched_term.name) = size($queryx)" \
+    " WITH matched_term" \
+    " OPTIONAL MATCH (matched_term:Term)<-[relationship]-(:Code)<-[:CODE]-(concept:Concept)" \
+    " WHERE relationship.CUI = concept.CUI" \
+    " OPTIONAL MATCH (matched_term:Term)<-[:PREF_TERM]-(concept:Concept)"
 
 
 def rel_str_to_array(rels: List[str]) -> List[List]:
@@ -79,7 +80,8 @@ def parse_and_check_rel(rel: List[str]) -> List[List]:
     try:
         rel_list: List[List] = rel_str_to_array(rel)
     except TypeError:
-        raise Exception(f"The rel optional parameter must be of the form 'Type[SAB]', 'Type[*]', '*[SAB], or '*[*]'", 400)
+        raise Exception(f"The rel optional parameter must be of the form 'Type[SAB]', 'Type[*]', '*[SAB], or '*[*]'",
+                        400)
     for r in rel_list:
         if not re.match(r"\*|[a-zA-Z_]+", r[0]):
             raise Exception(f"Invalid Type in rel optional parameter list", 400)
@@ -110,7 +112,7 @@ class Neo4jManager(object):
 
     def codes_code_id_codes_get(self, code_id: str, sab: List[str]) -> List[CodesCodesObj]:
         codesCodesObjs: List[CodesCodesObj] = []
-        query: str =\
+        query: str = \
             'WITH [$code_id] AS query' \
             ' MATCH (a:Code)<-[:CODE]-(b:Concept)-[:CODE]->(c:Code)' \
             ' WHERE a.CodeID IN query AND (c.SAB IN $SAB OR $SAB = [])' \
@@ -120,7 +122,7 @@ class Neo4jManager(object):
             recds: neo4j.Result = session.run(query, code_id=code_id, SAB=sab)
             for record in recds:
                 try:
-                    codesCodesObj: CodesCodesObj =\
+                    codesCodesObj: CodesCodesObj = \
                         CodesCodesObj(record.get('Concept'), record.get('Code2'), record.get('Sab2'))
                     codesCodesObjs.append(codesCodesObj)
                 except KeyError:
@@ -129,7 +131,7 @@ class Neo4jManager(object):
 
     def codes_code_id_concepts_get(self, code_id: str) -> List[ConceptDetail]:
         conceptDetails: List[ConceptDetail] = []
-        query: str =\
+        query: str = \
             'WITH [$code_id] AS query' \
             ' MATCH (a:Code)<-[:CODE]-(b:Concept)' \
             ' WHERE a.CodeID IN query' \
@@ -149,7 +151,7 @@ class Neo4jManager(object):
     # https://neo4j.com/docs/api/python-driver/current/api.html#explicit-transactions
     def concepts_concept_id_codes_get(self, concept_id: str, sab: List[str]) -> List[str]:
         codes: List[str] = []
-        query: str =\
+        query: str = \
             'WITH [$concept_id] AS query' \
             ' MATCH (a:Concept)-[:CODE]->(b:Code)' \
             ' WHERE a.CUI IN query AND (b.SAB IN $SAB OR $SAB = [])' \
@@ -165,9 +167,9 @@ class Neo4jManager(object):
                     pass
         return codes
 
-    def concepts_concept_id_concepts_get(self, concept_id: str) -> List[SabRelationshipConceptPrefterm]:
+    def concepts_concept_id_concepts_get(self, concept_id: str) -> List[SabRelationshipConceptTerm]:
         sabRelationshipConceptPrefterms: [SabRelationshipConceptPrefterm] = []
-        query: str =\
+        query: str = \
             'WITH [$concept_id] AS query' \
             ' MATCH (b:Concept)<-[c]-(d:Concept)' \
             ' WHERE b.CUI IN query' \
@@ -180,7 +182,7 @@ class Neo4jManager(object):
             recds: neo4j.Result = session.run(query, concept_id=concept_id)
             for record in recds:
                 try:
-                    sabRelationshipConceptPrefterm: SabRelationshipConceptPrefterm =\
+                    sabRelationshipConceptPrefterm: SabRelationshipConceptPrefterm = \
                         SabRelationshipConceptPrefterm(record.get('SAB'), record.get('Relationship'),
                                                        record.get('Concept2'), record.get('Prefterm2'))
                     sabRelationshipConceptPrefterms.append(sabRelationshipConceptPrefterm)
@@ -190,7 +192,7 @@ class Neo4jManager(object):
 
     def concepts_concept_id_definitions_get(self, concept_id: str) -> List[SabDefinition]:
         sabDefinitions: [SabDefinition] = []
-        query: str =\
+        query: str = \
             'WITH [$concept_id] AS query' \
             ' MATCH (a:Concept)-[:DEF]->(b:Definition)' \
             ' WHERE a.CUI in query' \
@@ -208,7 +210,7 @@ class Neo4jManager(object):
 
     def concepts_concept_id_semantics_get(self, concept_id) -> List[StyTuiStn]:
         styTuiStns: [StyTuiStn] = []
-        query: str =\
+        query: str = \
             'WITH [$concept_id] AS query' \
             ' MATCH (a:Concept)-[:STY]->(b:Semantic)' \
             ' WHERE a.CUI IN query' \
@@ -226,7 +228,7 @@ class Neo4jManager(object):
     def concepts_expand_post(self, concept_sab_rel_depth: ConceptSabRelDepth) -> List[ConceptPrefterm]:
         logger.info(f'concepts_expand_post; Request Body: {concept_sab_rel_depth.to_dict()}')
         conceptPrefterms: [ConceptPrefterm] = []
-        query: str =\
+        query: str = \
             "MATCH (c:Concept {CUI: $query_concept_id})" \
             " CALL apoc.path.expand(c, apoc.text.join([x IN [$rel] | '<'+x], '|'), 'Concept', 1, $depth)" \
             " YIELD path" \
@@ -249,7 +251,7 @@ class Neo4jManager(object):
                                               )
             for record in recds:
                 try:
-                    conceptPrefterm: ConceptPrefterm =\
+                    conceptPrefterm: ConceptPrefterm = \
                         ConceptPrefterm(record.get('concept'), record.get('prefterm'))
                     conceptPrefterms.append(conceptPrefterm)
                 except KeyError:
@@ -259,7 +261,7 @@ class Neo4jManager(object):
     def concepts_path_post(self, concept_sab_rel: ConceptSabRel) -> List[PathItemConceptRelationshipSabPrefterm]:
         logger.info(f'concepts_path_post; Request Body: {concept_sab_rel.to_dict()}')
         pathItemConceptRelationshipSabPrefterms: [PathItemConceptRelationshipSabPrefterm] = []
-        query: str =\
+        query: str = \
             "MATCH (c:Concept {CUI: $query_concept_id})" \
             " CALL apoc.path.expandConfig(c, {relationshipFilter: apoc.text.join([x in [$rel] | '<'+x], ','),minLevel: size([$rel]),maxLevel: size([$rel])})" \
             " YIELD path" \
@@ -285,7 +287,7 @@ class Neo4jManager(object):
                                               )
             for record in recds:
                 try:
-                    pathItemConceptRelationshipSabPrefterm: PathItemConceptRelationshipSabPrefterm =\
+                    pathItemConceptRelationshipSabPrefterm: PathItemConceptRelationshipSabPrefterm = \
                         PathItemConceptRelationshipSabPrefterm(record.get('path'), record.get('item'),
                                                                record.get('concept'), record.get('relationship'),
                                                                record.get('sab'), record.get('prefterm'))
@@ -294,10 +296,11 @@ class Neo4jManager(object):
                     pass
         return pathItemConceptRelationshipSabPrefterms
 
-    def concepts_shortestpaths_post(self, qconcept_tconcept_sab_rel: QconceptTconceptSabRel) -> List[PathItemConceptRelationshipSabPrefterm]:
+    def concepts_shortestpaths_post(self, qconcept_tconcept_sab_rel: QconceptTconceptSabRel) -> List[
+        PathItemConceptRelationshipSabPrefterm]:
         logger.info(f'concepts_shortestpath_post; Request Body: {qconcept_tconcept_sab_rel.to_dict()}')
         pathItemConceptRelationshipSabPrefterms: [PathItemConceptRelationshipSabPrefterm] = []
-        query: str =\
+        query: str = \
             "MATCH (c:Concept {CUI: $query_concept_id})" \
             " MATCH (d:Concept {CUI: $target_concept_id})" \
             " CALL apoc.algo.dijkstraWithDefaultWeight(c, d, apoc.text.join([x in [$rel] | '<'+x], '|'), 'none', 10)" \
@@ -325,7 +328,7 @@ class Neo4jManager(object):
                                               )
             for record in recds:
                 try:
-                    pathItemConceptRelationshipSabPrefterm: PathItemConceptRelationshipSabPrefterm =\
+                    pathItemConceptRelationshipSabPrefterm: PathItemConceptRelationshipSabPrefterm = \
                         PathItemConceptRelationshipSabPrefterm(record.get('path'), record.get('item'),
                                                                record.get('concept'), record.get('relationship'),
                                                                record.get('sab'), record.get('prefterm'))
@@ -334,10 +337,11 @@ class Neo4jManager(object):
                     pass
         return pathItemConceptRelationshipSabPrefterms
 
-    def concepts_trees_post(self, concept_sab_rel_depth: ConceptSabRelDepth) -> List[PathItemConceptRelationshipSabPrefterm]:
+    def concepts_trees_post(self, concept_sab_rel_depth: ConceptSabRelDepth) -> List[
+        PathItemConceptRelationshipSabPrefterm]:
         logger.info(f'concepts_trees_post; Request Body: {concept_sab_rel_depth.to_dict()}')
         pathItemConceptRelationshipSabPrefterms: [PathItemConceptRelationshipSabPrefterm] = []
-        query: str =\
+        query: str = \
             "MATCH (c:Concept {CUI: $query_concept_id})" \
             " CALL apoc.path.spanningTree(c, {relationshipFilter: apoc.text.join([x in [$rel] | '<'+x], '|'),minLevel: 1,maxLevel: $depth})" \
             " YIELD path" \
@@ -364,7 +368,7 @@ class Neo4jManager(object):
                                               )
             for record in recds:
                 try:
-                    pathItemConceptRelationshipSabPrefterm: PathItemConceptRelationshipSabPrefterm =\
+                    pathItemConceptRelationshipSabPrefterm: PathItemConceptRelationshipSabPrefterm = \
                         PathItemConceptRelationshipSabPrefterm(record.get('path'), record.get('item'),
                                                                record.get('concept'), record.get('relationship'),
                                                                record.get('sab'), record.get('prefterm'))
@@ -375,7 +379,7 @@ class Neo4jManager(object):
 
     def semantics_semantic_id_semantics_get(self, semantic_id: str) -> List[QQST]:
         qqsts: [QQST] = []
-        query: str =\
+        query: str = \
             'WITH [$semantic_id] AS query' \
             ' MATCH (a:Semantic)-[:ISA_STY]->(b:Semantic)' \
             ' WHERE (a.name IN query OR query = [])' \
@@ -385,7 +389,8 @@ class Neo4jManager(object):
             recds: neo4j.Result = session.run(query, semantic_id=semantic_id)
             for record in recds:
                 try:
-                    qqst: QQST = QQST(record.get('queryTUI'), record.get('querySTN'), record.get('semantic'), record.get('TUI'), record.get('STN'))
+                    qqst: QQST = QQST(record.get('queryTUI'), record.get('querySTN'), record.get('semantic'),
+                                      record.get('TUI'), record.get('STN'))
                     qqsts.append(qqst)
                 except KeyError:
                     pass
@@ -393,7 +398,7 @@ class Neo4jManager(object):
 
     def terms_term_id_codes_get(self, term_id: str) -> List[TermtypeCode]:
         termtypeCodes: [TermtypeCode] = []
-        query: str =\
+        query: str = \
             'WITH [$term_id] AS query' \
             ' MATCH (a:Term)<-[b]-(c:Code)' \
             ' WHERE a.name IN query' \
@@ -411,7 +416,7 @@ class Neo4jManager(object):
 
     def terms_term_id_concepts_get(self, term_id: str) -> List[str]:
         concepts: [str] = []
-        query: str =\
+        query: str = \
             'WITH [$term_id] AS query' \
             ' OPTIONAL MATCH (a:Term)<-[b]-(c:Code)<-[:CODE]-(d:Concept)' \
             ' WHERE a.name IN query AND b.CUI = d.CUI' \
@@ -430,7 +435,7 @@ class Neo4jManager(object):
 
     def terms_term_id_concepts_terms_get(self, term_id: str) -> List[ConceptTerm]:
         conceptTerms: [ConceptTerm] = []
-        query: str =\
+        query: str = \
             'WITH [$term_id] AS query' \
             ' OPTIONAL MATCH (a:Term)<-[b]-(c:Code)<-[:CODE]-(d:Concept)' \
             ' WHERE a.name IN query AND b.CUI = d.CUI' \
@@ -454,7 +459,7 @@ class Neo4jManager(object):
 
     def tui_tui_id_semantics_get(self, tui_id: str) -> List[SemanticStn]:
         semanticStns: [SemanticStn] = []
-        query: str =\
+        query: str = \
             'WITH [$tui_id] AS query' \
             ' MATCH (a:Semantic)' \
             ' WHERE (a.TUI IN query OR query = [])' \
@@ -468,3 +473,86 @@ class Neo4jManager(object):
                 except KeyError:
                     pass
         return semanticStns
+
+    def valueset_get(self, parent_sab: str, parent_code: str, child_sabs: List[str]) -> List[SabCodeTerm]:
+        # JAS 29 NOV 2022
+        # Returns a valueset of concepts that are children (have as isa relationship) of another concept.
+
+        # A valueset is defined as the set of terms associated the concept's child concepts. The parent
+        # concept acts as an aggregator of concepts from multiple SABs. The main use case for a valueset
+        # is an encoded set of terms that correspond to the possible answers for a categorical question.
+
+        # The argument child_sabs is list of SABs from which to select child concepts, in order of
+        # preference. If a parent concept has a cross-reference with another concept, it is likely that the
+        # cross-referenced concept has child concepts from many SABs, especially if the cross-referenced concept
+        # is from the UMLS. The order of SABs in the list indicates the order in which child concepts should be
+        # selected.
+
+        sabcodeterms: [SabCodeTerm] = []
+
+        # Build clauses of the query that depend on child_sabs, including:
+        # 1. an IN statement
+        # 2. The CASE statement that will be used twice in the correlated subquery.
+        #    The CASE statement orders the codes for child concepts by where the SABs for the child concepts
+        #    occur in the child_sabs list.
+
+        sab_case: str = 'CASE codeChild.SAB '
+        sab_in: str = '['
+        for index, item in enumerate(child_sabs):
+            sab_case = sab_case + ' WHEN \'' + item + '\' THEN ' + str(index + 1)
+            sab_in = sab_in + '\'' + item + '\''
+            if index < len(child_sabs)-1:
+                sab_in = sab_in + ', '
+        sab_case = sab_case + ' END'
+        sab_in = sab_in + ']'
+
+        # Build correlated subquery.
+
+        # 1. Find the child concepts with an isa relationship with the parent HUBMAP concept (identified by code).
+        # 2. Order the child concepts based on the positions of the SABs for their codes in a list
+        #    (as opposed to an alphabetic order).
+        # 3. Identify the code from the SAB that is the earliest in the list.  For example,
+        #    if codes from SNOMEDCT_US are preferred to those from NCI, the list would include
+        #    [...,'SNOMEDCT_US','NCI',...].
+
+        query: str = 'CALL'
+        query = query + '{'
+        query = query + 'MATCH (codeChild:Code)<-[:CODE]-(conceptChild:Concept)-[:isa]->(conceptParent:Concept)-[' \
+                        ':CODE]->(codeParent:Code) '
+        query = query + ' WHERE codeParent.SAB=\'' + parent_sab + '\' AND codeParent.CODE=\'' + parent_code + '\''
+        query = query + ' AND codeChild.SAB IN ' + sab_in
+        query = query + ' RETURN conceptChild.CUI AS conceptChildCUI, min(' + sab_case + ') AS minSAB'
+        query = query + ' ORDER BY conceptChildCUI'
+        query = query + '}'
+
+        # 4. Filter to the code for the child concepts with the "earliest" SAB. The "earliest" SAB will be different for
+        #    each child concept.  Limit to 1 to account for multiple cross-references (e.g., UMLS C0026018, which maps
+        #    to 2 NCI codes).
+        query = query + ' CALL'
+        query = query + '{'
+        query = query + 'WITH conceptChildCUI, minSAB '
+        query = query + 'MATCH (codeChild:Code)<-[:CODE]-(conceptChild:Concept) '
+        query = query + 'WHERE conceptChild.CUI = conceptChildCUI '
+        query = query + 'AND ' + sab_case + ' = minSAB '
+        query = query + 'RETURN codeChild '
+        query = query + 'ORDER BY codeChild.CODE '
+        query = query + 'LIMIT 1'
+        query = query + '} '
+
+        # Get the term associated with the child concept code with the earliest SAB.
+        query = query + 'WITH codeChild '
+        query = query + 'MATCH (termChild:Term)<-[:PT]-(codeChild:Code) '
+        query = query + 'RETURN termChild.name AS term, codeChild.CODE as code,codeChild.SAB as sab'
+
+        # Execute Cypher query and return result.
+        with self.driver.session() as session:
+            recds: neo4j.Result = session.run(query)
+            for record in recds:
+                try:
+                    sabcodeterm: [SabCodeTerm] = SabCodeTerm(record.get('sab'), record.get('code'), record.get('term'))
+                    sabcodeterms.append(sabcodeterm)
+                except KeyError:
+                    pass
+
+        return sabcodeterms
+

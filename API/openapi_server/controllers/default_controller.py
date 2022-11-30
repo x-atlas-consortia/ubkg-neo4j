@@ -1,5 +1,8 @@
 import connexion
 import six
+from typing import Dict
+from typing import Tuple
+from typing import Union
 
 from openapi_server.models.codes_codes_obj import CodesCodesObj  # noqa: E501
 from openapi_server.models.concept_detail import ConceptDetail  # noqa: E501
@@ -10,8 +13,9 @@ from openapi_server.models.concept_term import ConceptTerm  # noqa: E501
 from openapi_server.models.path_item_concept_relationship_sab_prefterm import PathItemConceptRelationshipSabPrefterm  # noqa: E501
 from openapi_server.models.qqst import QQST  # noqa: E501
 from openapi_server.models.qconcept_tconcept_sab_rel import QconceptTconceptSabRel  # noqa: E501
+from openapi_server.models.sab_code_term import SabCodeTerm  # noqa: E501
 from openapi_server.models.sab_definition import SabDefinition  # noqa: E501
-from openapi_server.models.sab_relationship_concept_prefterm import SabRelationshipConceptPrefterm  # noqa: E501
+from openapi_server.models.sab_relationship_concept_term import SabRelationshipConceptTerm  # noqa: E501
 from openapi_server.models.semantic_stn import SemanticStn  # noqa: E501
 from openapi_server.models.sty_tui_stn import StyTuiStn  # noqa: E501
 from openapi_server.models.termtype_code import TermtypeCode  # noqa: E501
@@ -32,7 +36,7 @@ def codes_code_id_codes_get(code_id, sab=None):  # noqa: E501
     :param sab: One or more sources (SABs) to return
     :type sab: List[str]
 
-    :rtype: List[CodesCodesObj]
+    :rtype: Union[List[CodesCodesObj], Tuple[List[CodesCodesObj], int], Tuple[List[CodesCodesObj], int, Dict[str, str]]
     """
     return neo4jManager.codes_code_id_codes_get(code_id, sab)
 
@@ -45,7 +49,7 @@ def codes_code_id_concepts_get(code_id):  # noqa: E501
     :param code_id: The code identifier
     :type code_id: str
 
-    :rtype: List[ConceptDetail]
+    :rtype: Union[List[ConceptDetail], Tuple[List[ConceptDetail], int], Tuple[List[ConceptDetail], int, Dict[str, str]]
     """
     return neo4jManager.codes_code_id_concepts_get(code_id)
 
@@ -60,7 +64,7 @@ def concepts_concept_id_codes_get(concept_id, sab=None):  # noqa: E501
     :param sab: One or more sources (SABs) to return
     :type sab: List[str]
 
-    :rtype: List[str]
+    :rtype: Union[List[str], Tuple[List[str], int], Tuple[List[str], int, Dict[str, str]]
     """
     return neo4jManager.concepts_concept_id_codes_get(concept_id, sab)
 
@@ -73,7 +77,7 @@ def concepts_concept_id_concepts_get(concept_id):  # noqa: E501
     :param concept_id: The concept identifier
     :type concept_id: str
 
-    :rtype: List[SabRelationshipConceptPrefterm]
+    :rtype: Union[List[SabRelationshipConceptTerm], Tuple[List[SabRelationshipConceptTerm], int], Tuple[List[SabRelationshipConceptTerm], int, Dict[str, str]]
     """
     return neo4jManager.concepts_concept_id_concepts_get(concept_id)
 
@@ -86,7 +90,7 @@ def concepts_concept_id_definitions_get(concept_id):  # noqa: E501
     :param concept_id: The concept identifier
     :type concept_id: str
 
-    :rtype: List[SabDefinition]
+    :rtype: Union[List[SabDefinition], Tuple[List[SabDefinition], int], Tuple[List[SabDefinition], int, Dict[str, str]]
     """
     return neo4jManager.concepts_concept_id_definitions_get(concept_id)
 
@@ -99,54 +103,65 @@ def concepts_concept_id_semantics_get(concept_id):  # noqa: E501
     :param concept_id: The concept identifier
     :type concept_id: str
 
-    :rtype: List[StyTuiStn]
+    :rtype: Union[List[StyTuiStn], Tuple[List[StyTuiStn], int], Tuple[List[StyTuiStn], int, Dict[str, str]]
     """
     return neo4jManager.concepts_concept_id_semantics_get(concept_id)
 
 
-# https://github.com/OpenAPITools/openapi-generator/issues/6039
-def concepts_expand_post():  # noqa: E501
-    """concepts_expand_post
+def concepts_expand_post(concept_sab_rel_depth):  # noqa: E501
+    """Returns a unique list of concepts (Concept, Preferred Term) on all paths including starting concept (query_concept_id) restricted by list of relationship types (rel), list of relationship sources (sab), and depth of travel.
 
      # noqa: E501
 
-    :rtype: List[ConceptPrefterm]
+    :param concept_sab_rel_depth:
+    :type concept_sab_rel_depth: dict | bytes
+
+    :rtype: Union[List[ConceptPrefterm], Tuple[List[ConceptPrefterm], int], Tuple[List[ConceptPrefterm], int, Dict[str, str]]
     """
     if connexion.request.is_json:
         concept_sab_rel_depth = ConceptSabRelDepth.from_dict(connexion.request.get_json())  # noqa: E501
     return neo4jManager.concepts_expand_post(concept_sab_rel_depth)
 
 
-def concepts_path_post():  # noqa: E501
+def concepts_path_post(concept_sab_rel):  # noqa: E501
     """Return all paths of the relationship pattern specified within the selected sources
 
      # noqa: E501
 
-    :rtype: List[PathItemConceptRelationshipSabPrefterm]
+    :param concept_sab_rel:
+    :type concept_sab_rel: dict | bytes
+
+    :rtype: Union[List[PathItemConceptRelationshipSabPrefterm], Tuple[List[PathItemConceptRelationshipSabPrefterm], int], Tuple[List[PathItemConceptRelationshipSabPrefterm], int, Dict[str, str]]
     """
     if connexion.request.is_json:
         concept_sab_rel = ConceptSabRel.from_dict(connexion.request.get_json())  # noqa: E501
     return neo4jManager.concepts_path_post(concept_sab_rel)
 
 
-def concepts_shortestpaths_post():  # noqa: E501
+def concepts_shortestpaths_post(qconcept_tconcept_sab_rel):  # noqa: E501
     """Return all paths of the relationship pattern specified within the selected sources
 
      # noqa: E501
 
-    :rtype: List[PathItemConceptRelationshipSabPrefterm]
+    :param qconcept_tconcept_sab_rel:
+    :type qconcept_tconcept_sab_rel: dict | bytes
+
+    :rtype: Union[List[PathItemConceptRelationshipSabPrefterm], Tuple[List[PathItemConceptRelationshipSabPrefterm], int], Tuple[List[PathItemConceptRelationshipSabPrefterm], int, Dict[str, str]]
     """
     if connexion.request.is_json:
         qconcept_tconcept_sab_rel = QconceptTconceptSabRel.from_dict(connexion.request.get_json())  # noqa: E501
     return neo4jManager.concepts_shortestpaths_post(qconcept_tconcept_sab_rel)
 
 
-def concepts_trees_post():  # noqa: E501
+def concepts_trees_post(concept_sab_rel_depth):  # noqa: E501
     """Return all paths of the relationship pattern specified within the selected sources
 
      # noqa: E501
 
-    :rtype: List[PathItemConceptRelationshipSabPrefterm]
+    :param concept_sab_rel_depth:
+    :type concept_sab_rel_depth: dict | bytes
+
+    :rtype: Union[List[PathItemConceptRelationshipSabPrefterm], Tuple[List[PathItemConceptRelationshipSabPrefterm], int], Tuple[List[PathItemConceptRelationshipSabPrefterm], int, Dict[str, str]]
     """
     if connexion.request.is_json:
         concept_sab_rel_depth = ConceptSabRelDepth.from_dict(connexion.request.get_json())  # noqa: E501
@@ -161,7 +176,7 @@ def semantics_semantic_id_semantics_get(semantic_id):  # noqa: E501
     :param semantic_id: The semantic identifier
     :type semantic_id: str
 
-    :rtype: List[QQST]
+    :rtype: Union[List[QQST], Tuple[List[QQST], int], Tuple[List[QQST], int, Dict[str, str]]
     """
     return neo4jManager.semantics_semantic_id_semantics_get(semantic_id)
 
@@ -174,7 +189,7 @@ def terms_term_id_codes_get(term_id):  # noqa: E501
     :param term_id: The term identifier
     :type term_id: str
 
-    :rtype: List[TermtypeCode]
+    :rtype: Union[List[TermtypeCode], Tuple[List[TermtypeCode], int], Tuple[List[TermtypeCode], int, Dict[str, str]]
     """
     return neo4jManager.terms_term_id_codes_get(term_id)
 
@@ -187,7 +202,7 @@ def terms_term_id_concepts_get(term_id):  # noqa: E501
     :param term_id: The term identifier
     :type term_id: str
 
-    :rtype: List[str]
+    :rtype: Union[List[str], Tuple[List[str], int], Tuple[List[str], int, Dict[str, str]]
     """
     return neo4jManager.terms_term_id_concepts_get(term_id)
 
@@ -200,7 +215,7 @@ def terms_term_id_concepts_terms_get(term_id):  # noqa: E501
     :param term_id: The term identifier
     :type term_id: str
 
-    :rtype: List[ConceptTerm]
+    :rtype: Union[List[ConceptTerm], Tuple[List[ConceptTerm], int], Tuple[List[ConceptTerm], int, Dict[str, str]]
     """
     return neo4jManager.terms_term_id_concepts_terms_get(term_id)
 
@@ -213,6 +228,23 @@ def tui_tui_id_semantics_get(tui_id):  # noqa: E501
     :param tui_id: The TUI identifier
     :type tui_id: str
 
-    :rtype: List[SemanticStn]
+    :rtype: Union[List[SemanticStn], Tuple[List[SemanticStn], int], Tuple[List[SemanticStn], int, Dict[str, str]]
     """
     return neo4jManager.tui_tui_id_semantics_get(tui_id)
+
+
+def valueset_get(parent_sab, parent_code, child_sabs):  # noqa: E501
+    """Returns a valueset of concepts that are children (have as isa relationship) of another concept.
+
+     # noqa: E501
+
+    :param parent_sab: the SAB of the parent concept
+    :type parent_sab: str
+    :param parent_code: the code of the parent concept in the SAB (local ontology)
+    :type parent_code: str
+    :param child_sabs: the list of SABs for child concepts, in order of preference (in case of parent concepts with cross-references)
+    :type child_sabs: List[str]
+
+    :rtype: Union[List[SabCodeTerm], Tuple[List[SabCodeTerm], int], Tuple[List[SabCodeTerm], int, Dict[str, str]]
+    """
+    return neo4jManager.valueset_get(parent_sab, parent_code, child_sabs)

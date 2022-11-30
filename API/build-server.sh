@@ -59,9 +59,9 @@ openapi-generator generate -i ../ontology-api-spec.yaml -g python-flask -o .
 ./update_controller_and_manager.py
 
 touch openapi_server/__init__.py
-
-git checkout -- Dockerfile
-git checkout -- requirements.txt
+# JAS 29 Nov 2022 commented out fetches from Docker.
+# git checkout -- Dockerfile
+# git checkout -- requirements.txt
 
 git add openapi_server/models
 git add openapi_server/openapi/openapi.yaml

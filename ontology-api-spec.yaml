@@ -112,7 +112,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SabRelationshipConceptPrefterm'
+                  $ref: '#/components/schemas/SabRelationshipConceptTerm'
   /concepts/expand:
     post:
       operationId: concepts_expand_post
@@ -356,6 +356,45 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConceptTerm'
+  /valueset:
+    get:
+      operationId: valueset_get
+      summary: Returns a valueset of concepts that are children (have as isa relationship) of another concept.
+      parameters:
+        - name: parent_sab
+          in: query
+          required: true
+          description: the SAB of the parent concept
+          schema:
+            type: string
+            example: HUBMAP
+        - name: parent_code
+          in: query
+          required: true
+          description: the code of the parent concept in the SAB (local ontology)
+          schema:
+            type: string
+            example: C000530
+        - name: child_sabs
+          in: query
+          required: true
+          description: the list of SABs for child concepts, in order of preference (in case of parent concepts with cross-references)
+          schema:
+            type: array
+            uniqueItems: true
+            items:
+              type: string
+              example: HUSAT,SNOMEDCT_US
+            default: [ ]
+      responses:
+        '200':
+          description: A JSON array of preferred terms for child codes that have an isa relationship with the parent code
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SabCodeTerm'
 components:
   schemas:
     CodesCodesObj: # Schema name
@@ -497,7 +536,7 @@ components:
         definition:
           type: string
           example: A primary or metastatic malignant neoplasm involving the breast. The vast majority of cases are carcinomas arising from the breast parenchyma or the nipple. Malignant breast neoplasms occur more frequently in females than in males.
-    SabRelationshipConceptPrefterm: # Schema name
+    SabRelationshipConceptTerm: # Schema name
       type: object
       properties:
         sab:
@@ -542,3 +581,15 @@ components:
         code:
           type: string
           example: LNC LA14283-8
+    SabCodeTerm: # Schema name
+      type: object
+      properties:
+        sab:
+          type: string
+          example: NCI
+        code:
+          type: string
+          example: C16853
+        term:
+          type: string
+          example: Microscopy
