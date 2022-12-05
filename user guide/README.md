@@ -1,5 +1,5 @@
 # User Guide
-Adding assertions to the Unified Biomedical Knowledge Graph (UBKG)
+## Adding assertions to the Unified Biomedical Knowledge Graph (UBKG)
 
 # Objectives
 This guide describes how to format assertions as an ontology so that the ontology can be added to the Unified Biomedical Knowledge Graph database. The guide includes recommendations for optimizing and deepening the integration of an ontology into the UBKG to establish new relationships among entities and cross-references among ontologies.
