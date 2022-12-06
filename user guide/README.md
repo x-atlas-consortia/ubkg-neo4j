@@ -1,5 +1,5 @@
 # User Guide
-Adding assertions to the Unified Biomedical Knowledge Graph (UBKG)
+## Adding assertions to the Unified Biomedical Knowledge Graph (UBKG)
 
 # Objectives
 This guide describes how to format assertions as an ontology so that the ontology can be added to the Unified Biomedical Knowledge Graph database. The guide includes recommendations for optimizing and deepening the integration of an ontology into the UBKG to establish new relationships among entities and cross-references among ontologies.
@@ -22,7 +22,7 @@ An ontology can be integrated into the UBKG from one of the following sources:
 1. An OWL file that follows OBO principles. If the OWL file is published online, only the URL to the OWL is needed.
 2. A set of UBKG ingest files. 
 
-The rest of this guide focuses on ingest files.
+The ingestion of content of OWL files is straightforward. The rest of this guide focuses on ingest files.
 
 # Ingest Files and Content
 A set of UBKG ingest files describes the entities and relationships of an ontology that is to be integrated into the UBKG. 
@@ -34,8 +34,13 @@ An ingest file set consists of two Tab-Separated Variables (TSV) files:
 
 [This file](https://github.com/dbmi-pitt/UBKG/blob/main/user%20guide/Distillery_Ingest_format%20-%20Instructions.csv) provides added detail for OPTIONAL Data Distillery fields and examples, beyond the general UBKG requirements for which this guide is written.
 
+# Source Abbreviations (SABs) 
+The UBKG identifies a set of assertions by means of a _Source Abbreviation_ (SAB). SABs often correspond to abbreviations for ontologies (e.g., PATO) or vocabularies (e.g., ICD-10). 
+
+For new sets of assertions, define a preferred SAB to represent the initiative, project, or institution.
+
 # edges.tsv
-The edges file lists the triples that constitute the ontology.
+The edges file lists the _triples_ (subject node - predicate - object node) that constitute a set of assertions.
 
 ## Fields
 Field|Corresponding element in UBKG|Accepted formats|Examples
@@ -47,7 +52,21 @@ predicate|relationships|For hierarchical relationships, the IRI http://www.w3.or
  | | |Custom string | drinks milkshake of
  object|**Code** node|same as for subject
  
- # nodes.tsv
+ ## Recommendations for nodes
+ 
+Many nodes will correspond to entities that have already been identified in a standard biomedical ontology; for these, the IRI is preferred. 
+For entities that have not been encoded in an ontology, a suitable identifier is sufficient.
+
+For example, the UBKG includes information relating genes and gene products obtained from UniProtKB. Proteins are identified using their UniProtKB Entry ID, instead of an IRI.
+
+## Recommendations for edges
+The preferred source of relationship (predicate) information is the Relations Ontology (RO). Reasons for this include:
+1. RO is a general reference for relationships, and is therefore likely already to have a standard relationship defined that is suitable.
+2. RO defines inverse relationships, especially those that may not be obvious.
+
+It is possible, nevertheless, that RO does not contain a relationship that is specific enough for an assertion, so a custom relationship will be needed. When defining a custom relationship, we recommend that the label be short and consise. (We realize that this is easier said than done. Defining consise relationships is the hard part of modelling assertions.)
+
+# nodes.tsv
  The nodes.tsv file provides metadata on entities.
 
 ## Fields
@@ -66,19 +85,22 @@ region of ventricular system of brain|brain ventricles|cerebral ventricle
 ### Example for dbxrefs:
 umls:c0007799|fma:78447
 
-# Requirements for nodes and relationships
+# Requirements (business rules) for nodes and relationships
 1. A node identified in edges.tsv must satisfy one of the following criteria:
 - It is defined in nodes.tsv.
 - It already exists in the UBKG.
+
 The UBKG will not ingest nodes that do not satisfy at least one of the criteria.
 
-2. If a triple in edges.tsv refers to a node from a non-UMLS ontology, the non-UMLS ontology should be ingested first. For example, because the Mammalian Phenotype Ontology (MP) includes nodes from the Cell Ontology (CL), CL should be integrated into the UBKG before MP. This generally improves the cross-referencing because the general ontologies generally have deeper external-referencing to UMLS and other OBO sources.
+2. If a triple in edges.tsv refers to a node from a non-UMLS ontology, the non-UMLS ontology will need to be ingested into the UBKG first. For example, because the Mammalian Phenotype Ontology (MP) includes nodes from the Cell Ontology (CL), CL should be integrated into the UBKG before MP. This generally improves the cross-referencing because the general ontologies generally have deeper external-referencing to UMLS and other OBO sources.
 
-3. [This spreadsheet](https://github.com/dbmi-pitt/UBKG/blob/main/user%20guide/ontology%20neo4j%20SABs%20and%20sample%20codes%20-%20ontology%20neo4j%20SABs%20and%20sample%20codes.csv) lists the SABs and example codes for the ontologies that are currently represented in the UBKG. It should be used as the reference for formatting existing source abbreviations (SAB) and their codes. For additional details regarding the sources themselves, please consult [the UMLS reference](https://www.nlm.nih.gov/research/umls/sourcereleasedocs/index.html).
+3. [This spreadsheet](https://github.com/dbmi-pitt/UBKG/blob/main/user%20guide/ontology%20neo4j%20SABs%20and%20sample%20codes%20-%20ontology%20neo4j%20SABs%20and%20sample%20codes.csv) lists the SABs and example codes for the ontologies that are currently represented in the UBKG. It should be used as the reference for formatting existing source abbreviations (SAB) and their codes. In other words, if a SAB is already part of the UBKG, it should be sufficient to refer to the node by code. 
+
+For additional details regarding the UMLS SABs, please consult [the UMLS reference](https://www.nlm.nih.gov/research/umls/sourcereleasedocs/index.html).
 
 4. Some ontologies (including HGNC, GO, and HPC) include the SAB in codes (e.g., HGNC:9999) Nodes for concepts from these ontologies should be formatted as <SAB><space><SAB>: code-e.g., “HGNC HGNC:9999”.
-5. The UBKG ingestion will reformat relationships so that strings are delimited with underscores.
-6. The UBKG ultimately requires that two nodes be linked with both a relationship and its inverse. However, in an edges file each relationship should be represented only once (NOT with the original and inverse). The UBKG identifies and adds the inverse relationships using the RO as follows:
+5. The UBKG ingestion will reformat predicates so that strings are delimited with underscores.
+6. The UBKG ultimately requires that two nodes be linked with both a relationship and its inverse. However, in an edges file each relationship (predicate) should be represented only once (NOT with the original and inverse). The UBKG identifies and adds the inverse relationships using the RO as follows:
 
 predicate|form of inverse relationship|comment
 ---|---|---
