@@ -63,7 +63,9 @@ print('Reading OWLNETS files for ontology...')
 # Data Distillery ingestion. This would likely entail change to the upstream PheKnowLator-based
 # OWL-to-OWLNETS conversion script.
 
-node_metadata = pd.read_csv(owlnets_path("OWLNETS_node_metadata.txt"), sep='\t')
+# JAS 6 DEC 2022: Pass column headers to handle case of nodes files with more than 6 columns.
+# This was originally a response to problems encountered in ingesting EFO.
+node_metadata = pd.read_csv(owlnets_path("OWLNETS_node_metadata.txt"), sep='\t',usecols=['node_id','node_namespace','node_label','node_definition','node_synonyms','node_dbxrefs'])
 node_metadata = node_metadata.replace({'None': np.nan})
 node_metadata = node_metadata.dropna(subset=['node_id']).drop_duplicates(subset='node_id').reset_index(drop=True)
 

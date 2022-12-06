@@ -118,6 +118,10 @@
     "comment": "HubMAP application ontology, obtained from input spreadsheet in SimpleKnowledge format",
     "execute": "./skowlnets/skowlnets.py SimpleKnowledgeHuBMAP.xlsx HUBMAP"
   },
+  "SENNET": {
+    "comment": "SenNet application ontology, obtained from input spreadsheet in SimpleKnowledge format",
+    "execute": "./skowlnets/skowlnets.py SimpleKnowledgeSenNet.xlsx SENNET"
+  },
   "SWO": {
     "owl_url": "http://purl.obolibrary.org/obo/swo.owl",
     "home_url": "https://github.com/allysonlister/swo",
@@ -145,5 +149,10 @@
     "owl_url": "http://purl.obolibrary.org/obo/mondo.owl",
     "home_url": "https://obofoundry.org/ontology/mondo.html",
     "comment": "The Mondo Disease Ontology (MONDO): a global community effort to harmonize multiple disease resources to yield a coherent merged ontology"
+  },
+  "EFO": {
+    "owl_url": "https://data.bioontology.org/ontologies/EFO/submissions/244/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb",
+    "home_url": "https://bioportal.bioontology.org/ontologies/EFO",
+    "comment": "The Experimental Factor Ontology (EFO) is an application focused ontology modelling the experimental variables in multiple resources at the EBI and Open Targets."
   }
 }
