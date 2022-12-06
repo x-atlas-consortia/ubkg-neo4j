@@ -117,11 +117,14 @@ The recommended order of generation follows.
 * CHEBI 
 * MP 
 * ORDO 
-* PR 
+* UNIPROTKB
 * UO 
 * HUSAT 
 * HUBMAP 
-* UNIPROTKB
+* CCF
+* MONDO
+* EFO
+* SENNET
 
 The order appears to be of particular importance for custom ontologies such as HUBMAP and UNIPROTKB.
 
