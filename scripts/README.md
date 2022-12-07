@@ -205,16 +205,12 @@ A prerequisite for running this file is that python3 be installed. It is also co
 ### Processing
 
 The 'build_csv.py' file takes an optional parameter '-h' which allows you to see other parameters.
-In general it runs a loop over the Owl URI list specified in the 'OWL_URLS' variable, processing each Owl file as follows:
+
+
+The script runs a loop over the Owl URI list specified in the 'OWL_URLS' variable, processing each Owl file as follows:
 1. Run the 'owlnets_script/__main__.py' program over the OWL file after downloading it to the 'owl/&lt;OWL&gt;/' directory, and generating the .md5 file associated with it in that directory.
 2. Copy the .csv files found in '../neo4j/import/current' to a save directory at the same level (e.g., 'save.3/).
 3. Run the 'Jonathan/OWLNETS-UMLS-GRAPH.py' over the owlnets_script generated files in the 'owlnets_output/&lt;OWL&gt;/' directory. This will modify the .csv files found in the '../neo4j/import/current' with the output from step 1. for the Owl file processed there.
 
 This process repeats until all of the OWL files are processed.
 The resulting .csv files can then be used to create a new Neo4j database (see the README.md file in the neo4j directory).
-
-### Listing the OWL files (ontologies) that will be in Knowledge Graph database
-
-Currently (as stated previously) there is a variable 'OWL_URLS' in the 'build_csv.py' file that lists the Owl files that will be included in list order.
-
-In addition to this list, there is a 'owl_sab' parameter to the 'OWLNETS-UMLS-GRAPH.py' script which is usually the name of the owl file. In instances where this is not the case, the 'owl_sab' variable must be special cased. This is done at line 247.
