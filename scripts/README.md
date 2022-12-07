@@ -90,7 +90,8 @@ are equivalent to the call that combines the arguments
 ./build_csv.sh -v PATO UBERON
 ```
 
-### Order of ontology integration
+## References between ontologies and order of generation
+
 Nodes in an ontologies can refer to nodes in other ontologies in two ways:
 1. Via **relationships**--e.g., a node for a protein in UNIPROTKB has a _gene product of_ relationship with a gene node in HGNC.
 2. Via **equivalence classes** (cross-references)--e.g., a node in HUBMAP may be equivalent to a node in OBI.
@@ -103,7 +104,10 @@ one of two places:
 
 In other words, relationships between ontologies determines the order in which they are integrated.
 
-The recommended order of generation follows. 
+The content of a particular implementation of a UBKG database depends on the set of assertiions integrated. Different implementations may integrate different sets of assertions: for example, project one may include assertions from the set {PATO,UBERON,CL,DOID,EDAM}, while another may include {PATO,UBERON,CL,DOID,CHEBI,ORDO}.
+
+
+Following is the recommended order of generation if including all of the ontologies that the UBKG currently supports.
 * PATO 
 * UBERON 
 * CL 
@@ -125,8 +129,6 @@ The recommended order of generation follows.
 * MONDO
 * EFO
 * SENNET
-
-The order appears to be of particular importance for custom ontologies such as HUBMAP and UNIPROTKB.
 
 ### Triplet conversion times by ontology
 
