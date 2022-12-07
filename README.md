@@ -55,6 +55,8 @@ Ontology or Source | Description
 [HUBMAP](https://hubmapconsortium.org/)|the application ontology supporting the infrastructure of the HuBMAP Consortium
 [CCF](https://bioportal.bioontology.org/ontologies/CCF)|Human Reference Atlas Common Coordinate Framework Ontology
 [MONDO](https://bioportal.bioontology.org/ontologies/MONDO)|MONDO Disease Ontology
+[EFO](https://bioportal.bioontology.org/ontologies/EFO)|Experimental Factor Ontology
+[SENNET](https://sennetconsortium.org/)|the application ontology supporting the infrastructure of the SenNet Consortium
 
 The **generation framework** is a suite of scripts that:
 - extract information on assertions (also known as _triples_, or _subject-predicate-object_ relationships) found in ontologies or derived from other sources
