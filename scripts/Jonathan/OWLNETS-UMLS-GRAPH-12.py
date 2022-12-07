@@ -212,16 +212,24 @@ def codeReplacements(x):
     ret = np.where((OWL_SAB == 'MONDO' and x.str.contains('http://identifiers.org/hgnc')),
                    'HGNC HGNC:' + x.str.split('/').str[-1], ret)
 
-    # Special case:
-    # EDAM IRIs are in the format
-    # http://edamontology.org/<domain>_<id>
-    # e.g., http://edamontology.org/format_3750
-    # Force the SAB to be EDAM and restore the underscore delimiter between domain and id.
-    ret = np.where((OWL_SAB == 'EDAM' and x.str.contains('http://edamontology.org')),
-                   'EDAM ' + x.str.replace(':', ' ').str.replace('#', ' ').str.split('/').str[-1]
-                   , ret)
+    # Special cases: EDAM codes.
+    # 1. When obtained from edge file for source or object nodes, EDAM IRIs are in the format
+    #    http://edamontology.org/<domain>_<id>
+    #    e.g., http://edamontology.org/format_3750
+    # 2. When obtained from node file for dbxref, EDAM codes are in the format
+    #    EDAM:<domain>_<id>
 
-    # Special case:
+    # Force the SAB to be EDAM and restore the underscore delimiter between domain and id.
+    # ret = np.where((x.str.contains('http://edamontology.org')),
+                  # 'EDAM ' + x.str.replace(':', ' ').str.replace('#', ' ').str.split('/').str[-1]
+                   #, ret)
+
+    # Case 2
+    ret = np.where((x.str.contains('EDAM')), x.str.split(':').str[-1], ret)
+    # Case 1
+    ret = np.where((x.str.contains('edam')), 'EDAM ' + x.str.replace(' ', '_').str.split('/').str[-1], ret)
+
+# Special case:
     # HGNC codes in expected format--i.e., that did not need to be converted above.
     # This is currently the case for UNIPROTKB.
     ret = np.where(x.str.contains('HGNC HGNC:'), x, ret)
