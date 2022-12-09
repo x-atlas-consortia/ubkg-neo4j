@@ -18,9 +18,9 @@ services:
       - HOST_UID=${HOST_UID:-1001}
     volumes:
       # Persist the logging
-      - "./server/log:/usr/src/app/log"
+      - "./api/log:/usr/src/app/log"
       # Mount the neo4j connection file
-      - "./server/openapi_server/resources/app.properties:/usr/src/app/openapi_server/resources/app.properties"
+      - "./api/openapi_server/resources/app.properties:/usr/src/app/openapi_server/resources/app.properties"
     networks:
       - ubkg-api-network
 
