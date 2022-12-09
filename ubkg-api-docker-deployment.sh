@@ -2,7 +2,7 @@
 
 # Print a new line and the banner
 echo
-echo "==================== ONTOLOGY-API ===================="
+echo "==================== UBKG-API ===================="
 
 # This function sets DIR to the directory in which this script itself is found.
 # Thank you https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself                                                                      
@@ -21,8 +21,8 @@ function get_dir_of_this_script () {
 # Version number is from the VERSION file
 # Also remove newlines and leading/trailing slashes if present in that VERSION file
 function export_version() {
-    export ONTOLOGY_API_VERSION=$(tr -d "\n\r" < VERSION | xargs)
-    echo "ONTOLOGY_API_VERSION: $ONTOLOGY_API_VERSION"
+    export UBKG_API_VERSION=$(tr -d "\n\r" < VERSION | xargs)
+    echo "UBKG_API_VERSION: $UBKG_API_VERSION"
 }
 
 
@@ -39,11 +39,11 @@ else
         export_version
 
         if [ "$2" = "start" ]; then
-            docker-compose -f docker-compose.deployment.api.yml -p ontology-api up -d
+            docker-compose -f docker-compose.deployment.api.yml -p ubkg-api up -d
         elif [ "$2" = "stop" ]; then
-            docker-compose -f docker-compose.deployment.api.yml -p ontology-api stop
+            docker-compose -f docker-compose.deployment.api.yml -p ubkg-api stop
         elif [ "$2" = "down" ]; then
-            docker-compose -f docker-compose.deployment.api.yml -p ontology-api down
+            docker-compose -f docker-compose.deployment.api.yml -p ubkg-api down
         fi
     fi
 fi
