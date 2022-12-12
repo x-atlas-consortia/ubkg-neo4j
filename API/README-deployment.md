@@ -2,6 +2,7 @@
 
 ## Note
 This was the original README.md file for the ontology-api.
+It contains additional deployment instructions.
 
 The HuBMAP Ontology API contains a Neo4j graph loaded with the [UMLS](https://www.nlm.nih.gov/research/umls/index.html).
 The UMLS allows extensive cross-referencing across many biomedical vocabulary systems.
