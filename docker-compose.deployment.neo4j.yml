@@ -4,7 +4,7 @@ version: '3.7'
 services:
   ubkg-neo4j:
     hostname: ubkg-neo4j
-    container_name: ontology-neo4j
+    container_name: ubkg-neo4j
     # Will not publish the neo4j image to DockerHub
     build: neo4j
     environment:
@@ -44,12 +44,7 @@ services:
       resources:
         limits:
           memory: 8G
-    networks:
-      - ubkg-neo4j-network
 
 # Named volume
 volumes:
   ubkg-neo4j-data:
-
-networks:
-  ubkg-neo4j-network:

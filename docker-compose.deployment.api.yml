@@ -21,10 +21,3 @@ services:
       - "./api/log:/usr/src/app/log"
       # Mount the neo4j connection file
       - "./api/openapi_server/resources/app.properties:/usr/src/app/openapi_server/resources/app.properties"
-    networks:
-      - ubkg-api-network
-
-networks:
-  # This is the network created by gateway to enable communicaton between multiple docker-compose projects
-  ubkg-api-network:
-    external: true
