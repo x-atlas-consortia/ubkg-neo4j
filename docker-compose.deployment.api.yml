@@ -2,12 +2,12 @@ version: '3.7'
 # https://docs.docker.com/compose/compose-file/compose-file-v3/
 
 services:
-  ontology-api:
-    hostname: ontology-api
-    container_name: ontology-api
+  ubkg-api:
+    hostname: ubkg-api
+    container_name: ubkg-api
     # Use the published image from DockerHub instead of local build
-    # Exit with an error message containing err if ONTOLOGY_API_VERSION is unset or empty in the environment
-    image: hubmap/ontology-api:${ONTOLOGY_API_VERSION:?err}
+    # Exit with an error message containing err if UBKG_API_VERSION is unset or empty in the environment
+    image: ubkg-api:${UBKG_API_VERSION:?err}
     # Avoid accidentally creating zombie processes
     init: true
     # Specifying a restart policy to avoid downtime
@@ -18,13 +18,6 @@ services:
       - HOST_UID=${HOST_UID:-1001}
     volumes:
       # Persist the logging
-      - "./server/log:/usr/src/app/log"
+      - "./api/log:/usr/src/app/log"
       # Mount the neo4j connection file
-      - "./server/openapi_server/resources/app.properties:/usr/src/app/openapi_server/resources/app.properties"
-    networks:
-      - gateway_hubmap
-
-networks:
-  # This is the network created by gateway to enable communicaton between multiple docker-compose projects
-  gateway_hubmap:
-    external: true
+      - "./api/openapi_server/resources/app.properties:/usr/src/app/openapi_server/resources/app.properties"

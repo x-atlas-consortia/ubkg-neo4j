@@ -1,10 +1,10 @@
 openapi: 3.0.3
 info:
-  title: HuBMAP Ontology API
-  description: This document describes the HuBMAP Ontology API
+  title: UBKG API
+  description: This document describes the UBKG API
   version: 1.1.4
 servers:
-  - url: https://ontology.api.hubmapconsortium.org/
+  - url: https://ubkg.api.hubmapconsortium.org/
 paths:
   /codes/{code_id}/codes:
     get:

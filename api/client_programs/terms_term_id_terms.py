@@ -3,11 +3,11 @@
 import argparse
 from typing import Any, Dict, List, Optional, Union
 import time, json, sys
-sys.path.append('../hu-bmap-ontology-api-client')
-from hu_bmap_ontology_api_client import Client
-from hu_bmap_ontology_api_client.types import Response, Unset
-from hu_bmap_ontology_api_client.api.default import terms_term_id_terms_get
-from hu_bmap_ontology_api_client.models.term_resp_obj import TermRespObj
+sys.path.append('../openapi_client')
+from openapi_client import Client
+from openapi_client.types import Response, Unset
+from openapi_client.api.default import terms_term_id_terms_get
+from openapi_client.models.term_resp_obj import TermRespObj
 
 
 class RawTextArgumentDefaultsHelpFormatter(
@@ -19,7 +19,7 @@ class RawTextArgumentDefaultsHelpFormatter(
 
 # https://docs.python.org/3/howto/argparse.html
 parser = argparse.ArgumentParser(
-    description='Run term_ids in input file through HuBMAP Ontoloty API and output one line for each to stdout',
+    description='Run term_ids in input file through UBKG API and output one line for each to stdout',
     formatter_class=RawTextArgumentDefaultsHelpFormatter)
 parser.add_argument('term_id_file',
                     help='file from which to read the term_id(s) to search')

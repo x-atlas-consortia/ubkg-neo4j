@@ -2,15 +2,15 @@ version: '3.7'
 # https://docs.docker.com/compose/compose-file/compose-file-v3/
 
 services:
-  ontology-neo4j:
-    container_name: ontology-neo4j
+  ubkg-neo4j:
+    container_name: ubkg-neo4j
     build: neo4j
     restart: unless-stopped
     ports:
       - 7474:7474
       - 7687:7687
     volumes:
-      - neo4j-data:/data
+      - ubkg-neo4j-data:/data
     healthcheck:
       # https://docs.docker.com/engine/reference/builder/#healthcheck
       test: ["CMD", "curl", "--fail", "http://localhost:7474/", "||", "exit 1"]
@@ -39,16 +39,16 @@ services:
       # When the container has > 1G memory, set -XX:MaxRAMPercentage=75.0 is good (doesn't waste too many resources)
       - _JAVA_OPTIONS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0
 
-  ontology-api:
-    container_name: ontology-api
-    build: server
+  ubkg-api:
+    container_name: ubkg-api
+    build: api
     restart: unless-stopped
     environment:
       - HOST_GID=${HOST_GID:-1000}
       - HOST_UID=${HOST_UID:-1000}
     volumes:
       # Persist the logging
-      - "./server/log:/usr/src/app/log"
+      - "./api/log:/usr/src/app/log"
     deploy:
       resources:
         limits:
@@ -56,7 +56,6 @@ services:
     ports:
       - 8080:8080
 
-
 volumes:
-  neo4j-data:
+  ubkg-neo4j-data:
 

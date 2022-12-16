@@ -2,8 +2,8 @@
 
 These are programs that use the OpenAPI client interface to the server.
 The client is built (or rebuilt) at the same time as the server is built by the
-'server/build_server.py -c' script when the create client '-c' option is given.
-The client "module" is then placed in 'server/hu-bmap-ontoloty-api-client'.
+'api/build_server.py -c' script when the create client '-c' option is given.
+The client "module" is then placed in 'api/openapi_client'.
 The build process creates a general 'README.md' file which is of some use,
 but it is not completely instructive. The scripts located in this directory
 should serve as further examples as to how to process results returned
@@ -15,11 +15,11 @@ The following is some tips on getting started using the endpoints.
 
 ### Include the Module
 
-Since the 'hu-bmap-ontoloty-api-client' is not an official module and so
+Since the 'openapi_client' is not an official module and so
 can't be included in the 'requirements.txt' file you will need to specify
 its in order for it to be found like this.
 ```python
-sys.path.append('../hu-bmap-ontology-api-client')
+sys.path.append('../openapi_client')
 from hu_bmap_ontology_api_client import Client
 from hu_bmap_ontology_api_client.types import Response, Unset
 ```
@@ -32,8 +32,8 @@ that object.
 
 In the following we will include an endpoint that will be called, and the object in which the response data is contained.
 ```python
-from hu_bmap_ontology_api_client.api.default import terms_term_id_terms_get
-from hu_bmap_ontology_api_client.models.term_resp_obj import TermRespObj
+from openapi_client.api.default import terms_term_id_terms_get
+from openapi_client.models.term_resp_obj import TermRespObj
 ```
 
 A connection to the client is created by instantiating the server
