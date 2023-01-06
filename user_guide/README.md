@@ -32,8 +32,6 @@ An ingest file set consists of two Tab-Separated Variables (TSV) files:
 - **edges.tsv**: Describes the triples comprising the ontology
 - **nodes.tsv**: Describes metadata for entities
 
-[This file](https://github.com/dbmi-pitt/UBKG/blob/main/user%20guide/Distillery_Ingest_format%20-%20Instructions.csv) provides added detail for OPTIONAL Data Distillery fields and examples, beyond the general UBKG requirements for which this guide is written.
-
 # Source Abbreviations (SABs) 
 The UBKG identifies a set of assertions by means of a _Source Abbreviation_ (SAB). SABs often correspond to abbreviations for ontologies (e.g., PATO) or vocabularies (e.g., ICD-10). 
 
@@ -51,6 +49,7 @@ predicate|relationships|For hierarchical relationships, the IRI http://www.w3.or
  | | |For non-hierarchical relationships, an IRI for a relationship property in RO	|http://purl.obolibrary.org/obo/RO_0002292
  | | |Custom string | drinks milkshake of
  object|**Code** node|same as for subject
+ evidence_class (_optional_)|**string**|Statement specific to an SAB to classify evidence|-0.016084092
  
  ## Recommendations for nodes
  
@@ -78,6 +77,10 @@ node_label|**Term** node, _Preferred Term_ (PT) relationship|Text string|Ventric
 node_definition (_optional_)|**Definition** node, _DEF_ relationship |Text string|One of the system of communicating cavities in the brain ….
 node_synonyms (_optional_)|**Term** node; _Synonym_ (SYN) relationship|**Pipe-delimited** list of synonyms|Example for synonyms
 node_dbxrefs (_optional_)|Cross-references|Pipe-delimited list of references to cross-referenced concepts. Each cross-reference should be in format SAB:code or UMLS:CUI |Example for dbxrefs
+value (_optional_)|Numeric value|20
+lowerbound (_optional_)|Lower bound of range for values|5
+upperbound (_optional_)|Upper bound of range for values|100
+unit (_optional_)| Unit of measure for value. This is currently not encoded to a concept. | mm
 
 
 ### Example for synonyms: 
