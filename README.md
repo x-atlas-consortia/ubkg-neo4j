@@ -17,7 +17,7 @@ The UBKG database is populated from the load of a set of CSV files, using [**neo
 ### REST API (TO DO)
 
 ### Source framework
-The [**source framework**](https://github.com/dbmi-pitt/UBKG/tree/main/Source_framework) is a combination of manual and automated processes that obtain the base set of nodes (entities) and edges (relationships) of the UBKG graph.
+The [**source framework**](https://github.com/dbmi-pitt/ubkg/tree/main/source_framework) is a combination of manual and automated processes that obtain the base set of nodes (entities) and edges (relationships) of the UBKG graph.
 
 The source framework is also known as the **UMLS-Graph**.
 
