@@ -47,6 +47,6 @@ DBMI uses an Oracle 11 database.
 These files are in the NET subfolder of the MetamorphoSys output. The tasks to importing the Semantic Network files is similar to the tasks for importing Metathesaurus data files.
 
 ## Extract table data to UMLS CSVs
-Run the [UMLS-Graph_Extracts script](https://github.com/dbmi-pitt/UBKG/blob/main/Source_framework/UMLS-Graph-Extracts.py).
+Run the [UMLS-Graph_Extracts script](https://github.com/dbmi-pitt/ubkg/blob/main/source_framework/UMLS-Graph-Extracts.py).
 
 
