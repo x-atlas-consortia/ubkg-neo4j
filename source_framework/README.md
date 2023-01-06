@@ -4,7 +4,7 @@ This README.md contains references to other documentation in markdown files. In 
 ## Framework
 The following image describes the current source framework. The operation of the framework is also described in the general README.md for UBKG.
 
-DBMI's process for exrtracting source data from the UMLS is described [here](https://github.com/dbmi-pitt/UBKG/blob/main/Source_framework/UMLS%20Extraction%20Process.md).
+DBMI's process for exrtracting source data from the UMLS is described [here](https://github.com/dbmi-pitt/ubkg/blob/main/source_framework/UMLS%20Extraction%20Process.md).
 
 ![Source_framework](https://user-images.githubusercontent.com/10928372/202453373-6e2f73ba-e7ae-4d8f-9ece-31b0b0732a74.jpg)
 
