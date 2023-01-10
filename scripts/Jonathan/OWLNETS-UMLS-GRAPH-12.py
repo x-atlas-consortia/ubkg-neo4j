@@ -55,7 +55,7 @@ def update_columns_to_csv_header(file: str, new_columns: list):
             newline = ','.join(new_columns)
         else:
             # Strip the newline from the end of the current row and then reprint it.
-            newline = line.strip('\n')
+            newline = line.rstrip('\n')
         print(newline)
     return
 
