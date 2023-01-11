@@ -24,6 +24,9 @@
 
 # In[1]:
 
+# JAS 6 JANUARY 2023
+# Changes to accommodate files provided in UBKG edges/nodes format. The format includes optional
+# columns in the edges and nodes files.
 
 import sys
 import pandas as pd
@@ -31,6 +34,7 @@ import numpy as np
 import base64
 import json
 import os
+import fileinput
 
 
 def owlnets_path(file: str) -> str:
@@ -40,6 +44,20 @@ def owlnets_path(file: str) -> str:
 def csv_path(file: str) -> str:
     return os.path.join(sys.argv[2], file)
 
+
+def update_columns_to_csv_header(file: str, new_columns: list):
+    # JAS 6 January 2023
+    # Updates the header of a CSV file, adding new column names.
+
+    for line in fileinput.input(file, inplace=True):
+        if fileinput.isfirstline():
+            # Replace the header with the columns from the argument list.
+            newline = ','.join(new_columns)
+        else:
+            # Strip the newline from the end of the current row and then reprint it.
+            newline = line.rstrip('\n')
+        print(newline)
+    return
 
 # Asssignnment of SAB for CUI-CUI relationships (edgelist) - typically use file name before .owl in CAPS
 OWL_SAB = sys.argv[3].upper()
@@ -59,13 +77,27 @@ pd.set_option('display.max_colwidth', None)
 
 print('Reading OWLNETS files for ontology...')
 
-# JAS 9 NOV 2022 TO DO: Parameterize file names to allow for both OWLNETS-based ingestion and
-# Data Distillery ingestion. This would likely entail change to the upstream PheKnowLator-based
-# OWL-to-OWLNETS conversion script.
+# JAS 6 JAN 2023
+# The node file will be in one of two formats:
+# 1. OWLNETS
+# 2. UBKG edge/nodes
 
-# JAS 6 DEC 2022: Pass column headers to handle case of nodes files with more than 6 columns.
-# This was originally a response to problems encountered in ingesting EFO.
-node_metadata = pd.read_csv(owlnets_path("OWLNETS_node_metadata.txt"), sep='\t',usecols=['node_id','node_namespace','node_label','node_definition','node_synonyms','node_dbxrefs'])
+nodepath = "OWLNETS_node_metadata.txt"
+if not os.path.exists(owlnets_path(nodepath)):
+    nodepath = "nodes.txt"
+
+
+# JAS 6 JAN 2023 add optional columns (value, lowerbound, upperbound, unit) for UBKG edges/nodes files.
+# JAS 6 JAN 2023 skip bad rows. (There is at least one in line 6814 of the node_metadata file generated from EFO.)
+node_metadata = pd.read_csv(owlnets_path(nodepath), sep='\t', on_bad_lines='skip')
+if 'value' not in node_metadata.columns:
+    node_metadata['value'] = np.nan
+    node_metadata['lowerbound'] = np.nan
+    node_metadata['upperbound'] = np.nan
+    node_metadata['unit'] = np.nan
+node_metadata = node_metadata[['node_id', 'node_namespace', 'node_label', 'node_definition', 'node_synonyms',
+                                     'node_dbxrefs', 'value', 'lowerbound', 'upperbound', 'unit']]
+
 node_metadata = node_metadata.replace({'None': np.nan})
 node_metadata = node_metadata.dropna(subset=['node_id']).drop_duplicates(subset='node_id').reset_index(drop=True)
 
@@ -106,10 +138,26 @@ else:
 
 # In[4]:
 
-edgelist = pd.read_csv(owlnets_path("OWLNETS_edgelist.txt"), sep='\t')
-edgelist = edgelist.replace({'None': np.nan})
-edgelist = edgelist.dropna().drop_duplicates().reset_index(drop=True)
+# JAS 6 JAN 2023
+# The edgelist file will be in one of two formats:
+# 1. OWLNETS
+# 2. UBKG edge/nodes
 
+edgepath = "OWLNETS_edgelist.txt"
+if not os.path.exists(owlnets_path(edgepath)):
+    edgepath = "edges.txt"
+
+# JAS 6 JAN 2023 - add evidence_class; limit columns.
+edgelist = pd.read_csv(owlnets_path(edgepath), sep='\t')
+if 'evidence_class' not in edgelist.columns:
+    edgelist['evidence_class'] = np.nan
+edgelist = edgelist[['subject', 'predicate', 'object', 'evidence_class']]
+
+
+# JAS 6 JAN 2023 - Add subset because evidence_class is optional.
+subset = ['subject', 'predicate', 'object']
+edgelist = edgelist.dropna(subset=subset).drop_duplicates(subset=subset).reset_index(drop=True)
+edgelist = edgelist.replace({'None': np.nan})
 # #### Delete self-referential edges in edgelist - CUI self-reference also avoided (later) by unique CUIs for node_ids
 
 # In[5]:
@@ -134,23 +182,24 @@ print('Number of nodes in node_metadata.txt', nodecount)
 if edgecount > 500000 or nodecount > 500000:
     print('WARNING: Large OWLNETS files may cause the script to terminate from memory issues.')
 
+
 # JAS 15 NOV 2022
 # Deprecating checks related to PR.
 # --------
-    # if OWL_SAB == 'PR':
-        # if ORGANISM == '':
-            # The script will fail. Exit gracefully.
-            # raise SystemExit('Because of the size of the PR ontology, it is necessary to specify a species. Use the '
-                            # '-p parameter in the call to the generation script.')
-        # print(
-            # f'For the PR ontology, this script will select a subset of nodes that correspond to proteins that are '
-            # f'unambiguously for the organism: {ORGANISM}.')
+# if OWL_SAB == 'PR':
+# if ORGANISM == '':
+# The script will fail. Exit gracefully.
+# raise SystemExit('Because of the size of the PR ontology, it is necessary to specify a species. Use the '
+# '-p parameter in the call to the generation script.')
+# print(
+# f'For the PR ontology, this script will select a subset of nodes that correspond to proteins that are '
+# f'unambiguously for the organism: {ORGANISM}.')
 
-        # Case-insensitive search of the node definition, ignoring null values.
-        # node_metadata = node_metadata[
-            # node_metadata['node_definition'].fillna(value='').str.lower().str.contains(ORGANISM.lower())]
-        # nodecount = len(node_metadata.index)
-        # print(f'Node count for {ORGANISM}:{nodecount}')
+# Case-insensitive search of the node definition, ignoring null values.
+# node_metadata = node_metadata[
+# node_metadata['node_definition'].fillna(value='').str.lower().str.contains(ORGANISM.lower())]
+# nodecount = len(node_metadata.index)
+# print(f'Node count for {ORGANISM}:{nodecount}')
 # ---------
 
 # ### Define codeReplacements function - modifies known code and xref formats to CodeID format
@@ -159,7 +208,6 @@ if edgecount > 500000 or nodecount > 500000:
 
 
 def codeReplacements(x):
-
     # JAS 15 Nov 2022 - Refactor
 
     # This function converts strings that correspond to either codes or CUIs for concepts to a format
@@ -221,15 +269,15 @@ def codeReplacements(x):
 
     # Force the SAB to be EDAM and restore the underscore delimiter between domain and id.
     # ret = np.where((x.str.contains('http://edamontology.org')),
-                  # 'EDAM ' + x.str.replace(':', ' ').str.replace('#', ' ').str.split('/').str[-1]
-                   #, ret)
+    # 'EDAM ' + x.str.replace(':', ' ').str.replace('#', ' ').str.split('/').str[-1]
+    # , ret)
 
     # Case 2
     ret = np.where((x.str.contains('EDAM')), x.str.split(':').str[-1], ret)
     # Case 1
     ret = np.where((x.str.contains('edam')), 'EDAM ' + x.str.replace(' ', '_').str.split('/').str[-1], ret)
 
-# Special case:
+    # Special case:
     # HGNC codes in expected format--i.e., that did not need to be converted above.
     # This is currently the case for UNIPROTKB.
     ret = np.where(x.str.contains('HGNC HGNC:'), x, ret)
@@ -238,15 +286,15 @@ def codeReplacements(x):
 
     # original code
     # return x.str.replace('NCIT ', 'NCI ', regex=False).str.replace('MESH ', 'MSH ', regex=False) \
-        # .str.replace('GO ', 'GO GO:', regex=False) \
-        #.str.replace('NCBITaxon ', 'NCBI ', regex=False) \
-        # .str.replace('.*UMLS.*\s', 'UMLS ', regex=True) \
-        # .str.replace('.*SNOMED.*\s', 'SNOMEDCT_US ', regex=True) \
-        # .str.replace('HP ', 'HPO HP:', regex=False) \
-        # .str.replace('^fma', 'FMA ', regex=True) \
-        # .str.replace('Hugo.owl HGNC ', 'HGNC ', regex=False) \
-        # .str.replace('HGNC ', 'HGNC HGNC:', regex=False) \
-        # .str.replace('gene symbol report?hgnc id=', 'HGNC HGNC:', regex=False)
+    # .str.replace('GO ', 'GO GO:', regex=False) \
+    # .str.replace('NCBITaxon ', 'NCBI ', regex=False) \
+    # .str.replace('.*UMLS.*\s', 'UMLS ', regex=True) \
+    # .str.replace('.*SNOMED.*\s', 'SNOMEDCT_US ', regex=True) \
+    # .str.replace('HP ', 'HPO HP:', regex=False) \
+    # .str.replace('^fma', 'FMA ', regex=True) \
+    # .str.replace('Hugo.owl HGNC ', 'HGNC ', regex=False) \
+    # .str.replace('HGNC ', 'HGNC HGNC:', regex=False) \
+    # .str.replace('gene symbol report?hgnc id=', 'HGNC HGNC:', regex=False)
 
 
 # return x.str.replace('NCIT ', 'NCI ', regex=False).str.replace('MESH ', 'MSH ', regex=False).str.replace('GO ', 'GO GO:', regex=False).str.replace('NCBITaxon ', 'NCBI ', regex=False).str.replace('.*UMLS.*\s', 'UMLS ', regex=True).str.replace('.*SNOMED.*\s', 'SNOMEDCT_US ', regex=True).str.replace('HP ', 'HPO HP:', regex=False).str.replace('^fma','FMA ', regex=True)
@@ -267,8 +315,9 @@ if relations_file_exists:
     # 1. The label for a relationship property in RO.
     # 2. The label for a relationship not defined in RO, including relationships defined in
     #    other ontologies.
+    # JAS 6 JAN 2023 Add evidence_class
     edgelist = edgelist.merge(relations, how='left', left_on='predicate', right_on='relation_id')
-    edgelist = edgelist[['subject', 'predicate', 'object', 'relation_label']].rename(
+    edgelist = edgelist[['subject', 'predicate', 'object', 'relation_label', 'evidence_class']].rename(
         columns={"relation_label": "relation_label_from_file"})
 else:
     edgelist['relation_label_from_file'] = np.NaN
@@ -281,7 +330,7 @@ else:
 # Format subject node information.
 # JAS string replacements moved to codeReplacements function.
 # edgelist['subject'] = \
-    #edgelist['subject'].str.replace(':', ' ').str.replace('#', ' ').str.replace('_', ' ').str.split('/').str[-1]
+# edgelist['subject'].str.replace(':', ' ').str.replace('#', ' ').str.replace('_', ' ').str.split('/').str[-1]
 edgelist['subject'] = codeReplacements(edgelist['subject'])
 
 # JAS 15 NOV 2022
@@ -311,15 +360,15 @@ edgelist['object'] = codeReplacements(edgelist['object'])
 # new code:
 
 # If the nodes are not from HGNC, replace delimiters with space.
-#edgelist['object'] = np.where(edgelist['object'].str.contains('HGNC') == True, \
-                              #edgelist['object'], \
-                              #edgelist['object'].str.replace(':', ' ').str.replace('#', ' ').str.replace('_',
-                                                                                                         #' ').str.split(
-                                  #'/').str[-1])
+# edgelist['object'] = np.where(edgelist['object'].str.contains('HGNC') == True, \
+# edgelist['object'], \
+# edgelist['object'].str.replace(':', ' ').str.replace('#', ' ').str.replace('_',
+# ' ').str.split(
+# '/').str[-1])
 # If the nodes are not from HGNC, align code SABs with UMLS.
-#edgelist['object'] = np.where(edgelist['object'].str.contains('HGNC') == True, \
-                              #edgelist['object'], \
-                              #codeReplacements(edgelist['object']))
+# edgelist['object'] = np.where(edgelist['object'].str.contains('HGNC') == True, \
+# edgelist['object'], \
+# codeReplacements(edgelist['object']))
 # ------------- DEPRECATED
 
 
@@ -454,8 +503,10 @@ dfrelationtriples = dfrelationtriples.drop(columns='inverse_IRI')
 # Check for relationships in RO, considering the edgelist predicate as a *full IRI*.
 edgelist = edgelist.merge(dfrelationtriples, how='left', left_on='predicate',
                           right_on='IRI').drop_duplicates().reset_index(drop=True)
+# JAS 6 JAN 2023 add optional evidence_class
 edgelist = edgelist[
-    ['subject', 'predicate', 'object', 'relation_label_from_file', 'relation_label_RO', 'inverse_RO']].rename(
+    ['subject', 'predicate', 'object', 'evidence_class', 'relation_label_from_file', 'relation_label_RO',
+     'inverse_RO']].rename(
     columns={'relation_label_RO': 'relation_label_RO_fromIRIjoin', 'inverse_RO': 'inverse_RO_fromIRIjoin'})
 
 # Check for relationships in RO by label, considering the edgelist predicate as *a label*--e.g.,
@@ -466,8 +517,11 @@ edgelist = edgelist[
 edgelist['predicate'] = edgelist['predicate'].str.replace(' ', '_').str.replace('#', '/').str.split('/').str[-1]
 edgelist = edgelist.merge(dfrelationtriples, how='left', left_on='predicate',
                           right_on='relation_label_RO').drop_duplicates().reset_index(drop=True)
-edgelist = edgelist[['subject', 'predicate', 'object', 'relation_label_from_file', 'relation_label_RO_fromIRIjoin',
-                     'inverse_RO_fromIRIjoin', 'relation_label_RO', 'inverse_RO']].rename(
+
+# JAS 6 JAN 2023 add optional evidence_class
+edgelist = edgelist[
+    ['subject', 'predicate', 'object', 'evidence_class', 'relation_label_from_file', 'relation_label_RO_fromIRIjoin',
+     'inverse_RO_fromIRIjoin', 'relation_label_RO', 'inverse_RO']].rename(
     columns={'relation_label_RO': 'relation_label_RO_frompredicatejoinlabel',
              'inverse_RO': 'inverse_RO_frompredicatejoinlabel'})
 
@@ -475,10 +529,12 @@ edgelist = edgelist[['subject', 'predicate', 'object', 'relation_label_from_file
 # OWLNETS_relations.txt file that corresponds to the predicate (if available).
 if relations_file_exists:
     edgelist['relation_label_from_file'] = \
-    edgelist['relation_label_from_file'].str.replace(' ', '_').str.replace('#', '/').str.split('/').str[-1]
+        edgelist['relation_label_from_file'].str.replace(' ', '_').str.replace('#', '/').str.split('/').str[-1]
     edgelist = edgelist.merge(dfrelationtriples, how='left', left_on='relation_label_from_file',
                               right_on='relation_label_RO').drop_duplicates().reset_index(drop=True)
-    edgelist = edgelist[['subject', 'predicate', 'object', 'relation_label_from_file', 'relation_label_RO_fromIRIjoin',
+    # JAS 6 JAN 2023 add optional evidence_class
+    edgelist = edgelist[['subject', 'predicate', 'object', 'evidence_class', 'relation_label_from_file',
+                         'relation_label_RO_fromIRIjoin',
                          'inverse_RO_fromIRIjoin', 'relation_label_RO_frompredicatejoinlabel',
                          'inverse_RO_frompredicatejoinlabel', 'relation_label_RO', 'inverse_RO']].rename(
         columns={'relation_label_RO': 'relation_label_RO_fromfilelabeljoinlabel',
@@ -501,12 +557,18 @@ if relations_file_exists:
 # 6. 'subClassOf' predicates converted to 'isa'
 
 edgelist['relation_label'] = edgelist['relation_label_RO_fromIRIjoin']
-edgelist['relation_label'] = np.where(edgelist['relation_label'].isnull(),edgelist['relation_label_RO_frompredicatejoinlabel'],edgelist['relation_label'])
+edgelist['relation_label'] = np.where(edgelist['relation_label'].isnull(),
+                                      edgelist['relation_label_RO_frompredicatejoinlabel'], edgelist['relation_label'])
 if relations_file_exists:
-    edgelist['relation_label'] = np.where(edgelist['relation_label'].isnull(),edgelist['relation_label_RO_fromfilelabeljoinlabel'],edgelist['relation_label'])
-    edgelist['relation_label'] = np.where(edgelist['relation_label'].isnull(),edgelist['relation_label_from_file'],edgelist['relation_label'])
-edgelist['relation_label'] = np.where(edgelist['relation_label'].isnull(),edgelist['predicate'],edgelist['relation_label'])
-edgelist['relation_label'] = np.where(edgelist['predicate'].str.contains('subClassOf'),'isa', edgelist['relation_label'])
+    edgelist['relation_label'] = np.where(edgelist['relation_label'].isnull(),
+                                          edgelist['relation_label_RO_fromfilelabeljoinlabel'],
+                                          edgelist['relation_label'])
+    edgelist['relation_label'] = np.where(edgelist['relation_label'].isnull(), edgelist['relation_label_from_file'],
+                                          edgelist['relation_label'])
+edgelist['relation_label'] = np.where(edgelist['relation_label'].isnull(), edgelist['predicate'],
+                                      edgelist['relation_label'])
+edgelist['relation_label'] = np.where(edgelist['predicate'].str.contains('subClassOf'), 'isa',
+                                      edgelist['relation_label'])
 
 # The algorithm for inverses is simpler: if one was derived from RO, use it; else leave empty, and
 # the script will create a pseudo-inverse.
@@ -541,8 +603,8 @@ print('Cleaning up node metadata...')
 # CodeID
 # CodeID
 # JAS 15 November string replacements moved to codeReplacements function.
-#node_metadata['node_id'] = \
-    #node_metadata['node_id'].str.replace(':', ' ').str.replace('#', ' ').str.replace('_', ' ').str.split('/').str[-1]
+# node_metadata['node_id'] = \
+# node_metadata['node_id'].str.replace(':', ' ').str.replace('#', ' ').str.replace('_', ' ').str.split('/').str[-1]
 node_metadata['node_id'] = codeReplacements(node_metadata['node_id'])
 
 # synonyms .loc of notna to control for owl with no syns
@@ -701,7 +763,8 @@ print('Assembling CUI-CUI relationships...')
 # e.g.,
 # CUI1 isa CUI2 inverse_isa
 
-# JAS 20 OCT 2022 Trim objnode1 and objnode2 DataFrames to reduce memory demand. (This is an issue for large ontologies, such as PR.)
+# JAS 20 OCT 2022 Trim objnode1 and objnode2 DataFrames to reduce memory demand. (This is an issue for large
+# ontologies, such as PR.)
 if OWL_SAB == 'PR':
     # The node_metadata DataFrame has been filtered to proteins from a specified organism.
     # The edgelist DataFrame also needs to be filtered via merging.
@@ -712,8 +775,9 @@ else:
 
 # Assign CUIs to subject nodes.
 edgelist = edgelist.merge(node_metadata, how=mergehow, left_on='subject', right_on='node_id')
-edgelist = edgelist[['CUI', 'relation_label', 'object', 'inverse']]
-edgelist.columns = ['CUI1', 'relation_label', 'object', 'inverse']
+# JAS 6 JANUARY 2023 - add evidence_class
+edgelist = edgelist[['CUI', 'relation_label', 'object', 'inverse', 'evidence_class']]
+edgelist.columns = ['CUI1', 'relation_label', 'object', 'inverse', 'evidence_class']
 
 # Assign CUIs to object nodes.
 
@@ -743,17 +807,20 @@ edgelist.columns = ['CUI1', 'relation_label', 'object', 'inverse']
 
 # Check first for object nodes in node_metadata--i.e., of type 1.
 # Matching CUIs will be in a field named 'CUI'.
+# JAS 6 JANUARY 2023 - add evidence_class
 objnode1 = edgelist.merge(node_metadata, how=mergehow, left_on='object', right_on='node_id')
-objnode1 = objnode1[['object', 'CUI1', 'relation_label', 'inverse', 'CUI']]
+objnode1 = objnode1[['object', 'CUI1', 'relation_label', 'inverse', 'CUI', 'evidence_class']]
 
 # Check for object nodes in CUI_CODEs--i.e., of type 2. Matching CUIs will be in a field named ':END_ID'.
 objnode2 = edgelist.merge(CUI_CODEs, how=mergehow, left_on='object', right_on=':END_ID')
-objnode2 = objnode2[['object', 'CUI1', 'relation_label', 'inverse', ':START_ID']]
+# JAS 6 JANUARY 2023 - add evidence_class
+objnode2 = objnode2[['object', 'CUI1', 'relation_label', 'inverse', ':START_ID', 'evidence_class']]
 
 # Union (pd.concat with drop_duplicates) objNode1 and objNode2 to allow for conditional
 # selection of CUI.
 # The union will result in a DataFrame with columns for each node:
 # object CUI1 relation_label inverse CUI :START_ID
+
 objnode = pd.concat([objnode1, objnode2]).drop_duplicates()
 
 # If CUI is non-null, then the node is of the first type; otherwise, it is likely of the second type.
@@ -762,7 +829,8 @@ objnode['CUIMatch'] = objnode[':START_ID'].where(objnode['CUI'].isna(), objnode[
 # original code
 # edgelist = edgelist.merge(node_metadata, how='left', left_on='object', right_on='node_id')
 
-edgelist = objnode[['CUI1', 'relation_label', 'CUIMatch', 'inverse']]
+# JAS 6 JANUARY 2023 - add evidence_class
+edgelist = objnode[['CUI1', 'relation_label', 'CUIMatch', 'inverse', 'evidence_class']]
 
 # Merge object nodes with subject nodes.
 
@@ -770,8 +838,11 @@ edgelist = objnode[['CUI1', 'relation_label', 'CUIMatch', 'inverse']]
 # edgelist = edgelist.dropna().drop_duplicates().reset_index(drop=True)
 # edgelist = edgelist[['CUI1','relation_label','CUI','inverse']]
 
-edgelist.columns = ['CUI1', 'relation_label', 'CUI2', 'inverse']
-edgelist = edgelist.dropna().drop_duplicates().reset_index(drop=True)
+# JAS 6 JANUARY 2023 - Add evidence_class
+edgelist.columns = ['CUI1', 'relation_label', 'CUI2', 'inverse', 'evidence_class']
+# JAS 6 JANUARY 2023 - subset to account for optional evidence_class
+subset = ['CUI1', 'relation_label', 'CUI2', 'inverse']
+edgelist = edgelist.dropna(subset=subset).drop_duplicates(subset=subset).reset_index(drop=True)
 
 edgelist['SAB'] = OWL_SAB
 
@@ -779,34 +850,54 @@ edgelist['SAB'] = OWL_SAB
 
 # ### Test existence when appropriate in original csvs and then add data for each csv
 
-# #### Write CUI-CUIs (':START_ID', ':END_ID', ':TYPE', 'SAB') (no prior-existance-check because want them in this SAB)
+# #### Write CUI-CUIs (':START_ID', ':END_ID', ':TYPE', 'SAB', 'evidence_class') (no prior-existence-check because want them in this SAB)
 
 # In[19]:
 print('Appending to CUI-CUIs.csv...')
 
+
 # TWO WRITES comment out during development
 
+# JAS 6 JAN 2023 Add evidence_class column to file.
+print('Adding evidence_class column to CUI-CUIs.csv...')
+fcsv = csv_path('CUI-CUIs.csv')
+new_header_columns = [':START_ID', ':END_ID', ':TYPE,SAB', 'evidence_class']
+update_columns_to_csv_header(fcsv,new_header_columns)
+
 # forward ones
-edgelist.columns = [':START_ID', ':TYPE', ':END_ID', 'inverse', 'SAB']
-edgelist[[':START_ID', ':END_ID', ':TYPE', 'SAB']].to_csv(csv_path('CUI-CUIs.csv'), mode='a', header=False, index=False)
+# JAS 6 JAN 2023 Add evidence_class. (The SAB column was added after evidence_class above.)
+edgelist.columns = [':START_ID', ':TYPE', ':END_ID', 'inverse', 'evidence_class', 'SAB']
+edgelist[[':START_ID', ':END_ID', ':TYPE', 'SAB', 'evidence_class']].to_csv(csv_path('CUI-CUIs.csv'), mode='a',
+                                                                            header=False, index=False)
 
 # reverse ones
-edgelist.columns = [':END_ID', 'relation_label', ':START_ID', ':TYPE', 'SAB']
-edgelist[[':START_ID', ':END_ID', ':TYPE', 'SAB']].to_csv(csv_path('CUI-CUIs.csv'), mode='a', header=False, index=False)
-
+# JAS 6 JAN 2023 Add evidence_class. (The SAB column was added after evidence_class above.)
+edgelist.columns = [':END_ID', 'relation_label', ':START_ID', ':TYPE', 'evidence_class', 'SAB']
+edgelist[[':START_ID', ':END_ID', ':TYPE', 'SAB', 'evidence_class']].to_csv(csv_path('CUI-CUIs.csv'), mode='a',
+                                                                             header=False, index=False)
 del edgelist
 
-# #### Write CODEs (CodeID:ID,SAB,CODE) - with existence check against CUI-CODE.csv
+# #### Write CODEs (CodeID:ID,SAB,CODE,value,lowerbound,upperbound,unit) - with existence check against CUI-CODE.csv
 
 # In[20]:
 
 print('Appending to CODEs.csv...')
-newCODEs = node_metadata[['node_id', 'SAB', 'CODE', 'CUI_CODEs']]
+
+# JAS 6 JAN 2023 Add value, lowerbound, upperbound, unit column to file.
+print('Adding value, lowerbound, upperbound, unit columns to CODES.csv...')
+fcsv = csv_path('CODEs.csv')
+new_header_columns = ['CodeID:ID','SAB','CODE','value', 'lowerbound', 'upperbound', 'unit']
+update_columns_to_csv_header(fcsv,new_header_columns)
+
+# JAS 6 JAN 2023 add value, lowerbound, upperbound, unit
+newCODEs = node_metadata[['node_id', 'SAB', 'CODE', 'CUI_CODEs', 'value', 'lowerbound', 'upperbound', 'unit']]
 newCODEs = newCODEs[newCODEs['CUI_CODEs'].isnull()]
 newCODEs = newCODEs.drop(columns=['CUI_CODEs'])
 newCODEs = newCODEs.rename({'node_id': 'CodeID:ID'}, axis=1)
 
-newCODEs = newCODEs.dropna().drop_duplicates().reset_index(drop=True)
+# JAS 6 JAN 2023 add subset to ignore optional columns. Add fillna to remove NaNs from optional columns.
+subset = subset = ['CodeID:ID', 'SAB', 'CODE']
+newCODEs = newCODEs.dropna(subset=subset).drop_duplicates(subset=subset).reset_index(drop=True).fillna('')
 # write/append - comment out during development
 newCODEs.to_csv(csv_path('CODEs.csv'), mode='a', header=False, index=False)
 

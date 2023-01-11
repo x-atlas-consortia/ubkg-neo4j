@@ -61,6 +61,9 @@ UMLS_GRAPH_SCRIPT: str = './Jonathan/OWLNETS-UMLS-GRAPH-12.py'
 # Drop PR; remove organism argument; add new release of CCF, MONDO
 # $ ./build_csv.sh -v PATO UBERON CL DOID OBI EDAM HSAPDV SBO MI CHEBI MP ORDO UNIPROTKB UO HUSAT HUBMAP CCF MONDO
 
+# January 2023 - Alan Simmons
+# for SenNet, add parameters EFO, SENNET
+
 
 # TODO https://douroucouli.wordpress.com/2019/03/14/biological-knowledge-graph-modeling-design-patterns/
 
