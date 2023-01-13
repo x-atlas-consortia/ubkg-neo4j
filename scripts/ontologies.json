@@ -168,5 +168,10 @@
     "owl_url": "https://ftp.uniprot.org/pub/databases/uniprot/current_release/rdf/core.owl",
     "home_url": "https://ftp.uniprot.org/pub/databases/uniprot/README",
     "comment": "UniProt"
+  },
+  "GLYCORDF": {
+    "owl_url": "https://raw.githubusercontent.com/glycoinfo/GlycoRDF/master/ontology/glycan.rdf",
+    "home_url": "https://github.com/glycoinfo/GlycoRDF",
+    "comment": "GlycoRDF OWL in RDF/XML"
   }
-  }
+}
