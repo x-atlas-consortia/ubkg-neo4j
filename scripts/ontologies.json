@@ -163,5 +163,10 @@
     "owl_url": "https://data.bioontology.org/ontologies/FALDO/submissions/18/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb",
     "home_url": "https://bioportal.bioontology.org/ontologies/FALDO",
     "comment": "FALDO is the Feature Annotation Location Description Ontology. (Part of GlyGen ingestion)"
+  },
+  "UNIPROT": {
+    "owl_url": "https://ftp.uniprot.org/pub/databases/uniprot/current_release/rdf/core.owl",
+    "home_url": "https://ftp.uniprot.org/pub/databases/uniprot/README",
+    "comment": "UniProt"
   }
   }
