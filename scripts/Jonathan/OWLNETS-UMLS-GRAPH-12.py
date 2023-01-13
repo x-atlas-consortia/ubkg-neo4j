@@ -59,6 +59,7 @@ def update_columns_to_csv_header(file: str, new_columns: list):
         print(newline)
     return
 
+
 # Asssignnment of SAB for CUI-CUI relationships (edgelist) - typically use file name before .owl in CAPS
 OWL_SAB = sys.argv[3].upper()
 
@@ -86,7 +87,6 @@ nodepath = "OWLNETS_node_metadata.txt"
 if not os.path.exists(owlnets_path(nodepath)):
     nodepath = "nodes.txt"
 
-
 # JAS 6 JAN 2023 add optional columns (value, lowerbound, upperbound, unit) for UBKG edges/nodes files.
 # JAS 6 JAN 2023 skip bad rows. (There is at least one in line 6814 of the node_metadata file generated from EFO.)
 node_metadata = pd.read_csv(owlnets_path(nodepath), sep='\t', on_bad_lines='skip')
@@ -96,7 +96,7 @@ if 'value' not in node_metadata.columns:
     node_metadata['upperbound'] = np.nan
     node_metadata['unit'] = np.nan
 node_metadata = node_metadata[['node_id', 'node_namespace', 'node_label', 'node_definition', 'node_synonyms',
-                                     'node_dbxrefs', 'value', 'lowerbound', 'upperbound', 'unit']]
+                               'node_dbxrefs', 'value', 'lowerbound', 'upperbound', 'unit']]
 
 node_metadata = node_metadata.replace({'None': np.nan})
 node_metadata = node_metadata.dropna(subset=['node_id']).drop_duplicates(subset='node_id').reset_index(drop=True)
@@ -152,7 +152,6 @@ edgelist = pd.read_csv(owlnets_path(edgepath), sep='\t')
 if 'evidence_class' not in edgelist.columns:
     edgelist['evidence_class'] = np.nan
 edgelist = edgelist[['subject', 'predicate', 'object', 'evidence_class']]
-
 
 # JAS 6 JAN 2023 - Add subset because evidence_class is optional.
 subset = ['subject', 'predicate', 'object']
@@ -282,6 +281,16 @@ def codeReplacements(x):
     # This is currently the case for UNIPROTKB.
     ret = np.where(x.str.contains('HGNC HGNC:'), x, ret)
 
+    # JAS 12 JAN 2023 - Force SAB to uppercase.
+    # The CodeId will be in format SAB <space> <other string>, and <other string> can be mixed case.
+    # <other string> can also have spaces.
+    print(ret)
+    # ret is now an numpy array.
+    # Split each element; convert the SAB portion to uppercase; and rejoin.
+    for idx, x in np.ndenumerate(ret):
+        x2 = x.split(sep= ' ',maxsplit=1)
+        x2[0] = x2[0].upper()
+        ret[idx] = ' '.join(x2)
     return ret
 
     # original code
@@ -329,6 +338,7 @@ else:
 
 # Format subject node information.
 # JAS string replacements moved to codeReplacements function.
+
 # edgelist['subject'] = \
 # edgelist['subject'].str.replace(':', ' ').str.replace('#', ' ').str.replace('_', ' ').str.split('/').str[-1]
 edgelist['subject'] = codeReplacements(edgelist['subject'])
@@ -622,7 +632,8 @@ explode_dbxrefs = node_metadata.explode('node_dbxrefs')[['node_id', 'node_dbxref
 explode_dbxrefs['node_dbxrefs'] = codeReplacements(explode_dbxrefs['node_dbxrefs'])
 
 # Add SAB and CODE columns
-node_metadata['SAB'] = node_metadata['node_id'].str.split(' ').str[0]
+# JAS 12 JAN 2023 - force uppercase for SAB
+node_metadata['SAB'] = node_metadata['node_id'].str.split(' ').str[0].str.upper()
 node_metadata['CODE'] = node_metadata['node_id'].str.split(' ').str[-1]
 del node_metadata['node_namespace']
 # del explode_dbxrefs - not deleted here because we need it later
@@ -855,14 +866,13 @@ edgelist['SAB'] = OWL_SAB
 # In[19]:
 print('Appending to CUI-CUIs.csv...')
 
-
 # TWO WRITES comment out during development
 
 # JAS 6 JAN 2023 Add evidence_class column to file.
 print('Adding evidence_class column to CUI-CUIs.csv...')
 fcsv = csv_path('CUI-CUIs.csv')
 new_header_columns = [':START_ID', ':END_ID', ':TYPE,SAB', 'evidence_class']
-update_columns_to_csv_header(fcsv,new_header_columns)
+update_columns_to_csv_header(fcsv, new_header_columns)
 
 # forward ones
 # JAS 6 JAN 2023 Add evidence_class. (The SAB column was added after evidence_class above.)
@@ -874,7 +884,7 @@ edgelist[[':START_ID', ':END_ID', ':TYPE', 'SAB', 'evidence_class']].to_csv(csv_
 # JAS 6 JAN 2023 Add evidence_class. (The SAB column was added after evidence_class above.)
 edgelist.columns = [':END_ID', 'relation_label', ':START_ID', ':TYPE', 'evidence_class', 'SAB']
 edgelist[[':START_ID', ':END_ID', ':TYPE', 'SAB', 'evidence_class']].to_csv(csv_path('CUI-CUIs.csv'), mode='a',
-                                                                             header=False, index=False)
+                                                                            header=False, index=False)
 del edgelist
 
 # #### Write CODEs (CodeID:ID,SAB,CODE,value,lowerbound,upperbound,unit) - with existence check against CUI-CODE.csv
@@ -886,8 +896,8 @@ print('Appending to CODEs.csv...')
 # JAS 6 JAN 2023 Add value, lowerbound, upperbound, unit column to file.
 print('Adding value, lowerbound, upperbound, unit columns to CODES.csv...')
 fcsv = csv_path('CODEs.csv')
-new_header_columns = ['CodeID:ID','SAB','CODE','value', 'lowerbound', 'upperbound', 'unit']
-update_columns_to_csv_header(fcsv,new_header_columns)
+new_header_columns = ['CodeID:ID', 'SAB', 'CODE', 'value', 'lowerbound', 'upperbound', 'unit']
+update_columns_to_csv_header(fcsv, new_header_columns)
 
 # JAS 6 JAN 2023 add value, lowerbound, upperbound, unit
 newCODEs = node_metadata[['node_id', 'SAB', 'CODE', 'CUI_CODEs', 'value', 'lowerbound', 'upperbound', 'unit']]
