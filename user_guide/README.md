@@ -37,6 +37,8 @@ The UBKG identifies a set of assertions by means of a _Source Abbreviation_ (SAB
 
 For new sets of assertions, define a preferred SAB to represent the initiative, project, or institution.
 
+SABs are uppercase in the UBKG. 
+
 # edges.tsv
 The edges file lists the _triples_ (subject node - predicate - object node) that constitute a set of assertions.
 
