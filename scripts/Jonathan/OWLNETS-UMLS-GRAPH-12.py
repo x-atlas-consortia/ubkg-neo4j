@@ -277,6 +277,19 @@ def codeReplacements(x):
     # Case 1
     ret = np.where((x.str.contains('edam')), 'EDAM ' + x.str.replace(' ', '_').str.split('/').str[-1], ret)
 
+    # JAS JAN 2023 - Special case: Glyco Glycan
+    # Glycan node IRIs are in format:
+    # http://purl.jp/bio/12/glyco/glycan#(code delimited with underscore)
+    # Force the SAB to be GLYCO.GLYCAN and restore the underscore delimiter between domain and id.
+    ret = np.where((x.str.contains('http://purl.jp/bio/12/glyco/glycan')), 'GLYCO.GLYCAN ' + x.str.replace(' ', '_').str.replace('#', '/').str.split('/').str[-1], ret)
+
+    # JAS JAN 2023 - Special case: Glyco Conjugate
+    # Glycan node IRIs are in format:
+    # http://purl.jp/bio/12/glyco/conjugate#(code delimited with underscore)
+    # Force the SAB to be GLYCO.CONJUGATE and restore the underscore delimiter between domain and id.
+    ret = np.where((x.str.contains('http://purl.jp/bio/12/glyco/conjugate')),
+                   'GLYCO.CONJUGATE ' + x.str.replace(' ', '_').str.replace('#', '/').str.split('/').str[-1], ret)
+
     # Special case:
     # HGNC codes in expected format--i.e., that did not need to be converted above.
     # This is currently the case for UNIPROTKB.

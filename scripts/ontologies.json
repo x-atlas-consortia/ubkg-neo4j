@@ -173,5 +173,10 @@
     "owl_url": "https://raw.githubusercontent.com/glycoinfo/GlycoRDF/master/ontology/glycan.rdf",
     "home_url": "https://github.com/glycoinfo/GlycoRDF",
     "comment": "GlycoRDF OWL in RDF/XML"
+  },
+  "GLYCOCOO": {
+    "owl_url": "https://raw.githubusercontent.com/glycoinfo/GlycoCoO/master/ontology/glycocoo.owl",
+    "home_url": "https://github.com/glycoinfo/GlycoCoO",
+    "comment": "GlycoCoO in Turtle"
   }
 }
