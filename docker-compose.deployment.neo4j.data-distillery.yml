@@ -1,0 +1,50 @@
+version: '3.7'
+# https://docs.docker.com/compose/compose-file/compose-file-v3/
+
+services:
+  ubkg-neo4j:
+    hostname: ubkg-neo4j
+    container_name: ubkg-neo4j
+    # Will not publish the neo4j image to DockerHub
+    build: neo4j
+    environment:
+      - NEO4J_USER=${NEO4J_USER:-neo4j}
+      # Used for setting the initial neo4j password, defaut to HappyG0at
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-HappyG0at}
+      # Allow the JVM to read cgroup limits
+      # -XX:+UseContainerSupport is enabled by default on linux machines,
+      # this feature was introduced in java10 then backported to Java-8u191, the base image comes with OpenJDK(build 1.8.0_232-b09)
+      # -XX:MaxRAMPercentage (double) is depending on the max memory limit assigned to the contaienr
+      # When the container has > 1G memory, set -XX:MaxRAMPercentage=75.0 is good (doesn't waste too many resources)
+      - _JAVA_OPTIONS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0
+    # Avoid accidentally creating zombie processes
+    init: true
+    # Specifying a restart policy to avoid downtime
+    restart: always
+    ports:
+      - 7478:7474
+      - 7689:7687
+    healthcheck:
+      # https://docs.docker.com/engine/reference/builder/#healthcheck
+      test: ["CMD", "curl", "--fail", "http://localhost:7474/"]
+      # test: curl --fail -s http://localhost:7474/ || exit 1
+      # test: perl -MIO::Socket::INET -e 'exit(! defined( IO::Socket::INET->new("localhost:7687")))'
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      # Logging mount
+      - "./neo4j/logs:/usr/src/app/neo4j/logs"
+      # Data mount using named voulme
+      - data-distillery-ubkg-neo4j-data:/usr/src/app/neo4j/data
+    # By default this `deploy` key only takes effect when deploying to a swarm with docker stack deploy, and is ignored by docker-compose up
+    # However, we can use the `--compatibility` flag within `docker-compose --compatibility up`
+    # The `--compatibility` flag will attempt to convert deploy keys in docker-compose v3 to their non-Swarm equivalent
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+# Named volume
+volumes:
+  ubkg-neo4j-data:
