@@ -3,8 +3,8 @@ version: '3.7'
 
 services:
   ubkg-api:
-    hostname: ubkg-api
-    container_name: ubkg-api
+    hostname: hubmap-ubkg-api
+    container_name: hubmap-ubkg-api
     # Use the published image from DockerHub instead of local build
     # Exit with an error message containing err if UBKG_API_VERSION is unset or empty in the environment
     image: ubkg-api:${UBKG_API_VERSION:?err}
