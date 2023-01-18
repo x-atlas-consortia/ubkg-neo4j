@@ -6,7 +6,7 @@ services:
     hostname: ubkg-neo4j
     container_name: ubkg-neo4j
     # Will not publish the neo4j image to DockerHub
-    build: neo4j
+    image: hubmap-ubkg-neo4j
     environment:
       - NEO4J_USER=${NEO4J_USER:-neo4j}
       # Used for setting the initial neo4j password, defaut to HappyG0at
@@ -22,8 +22,8 @@ services:
     # Specifying a restart policy to avoid downtime
     restart: always
     ports:
-      - 7478:7474
-      - 7689:7687
+      - 7477:7474
+      - 7688:7687
     healthcheck:
       # https://docs.docker.com/engine/reference/builder/#healthcheck
       test: ["CMD", "curl", "--fail", "http://localhost:7474/"]
@@ -36,7 +36,7 @@ services:
       # Logging mount
       - "./neo4j/logs:/usr/src/app/neo4j/logs"
       # Data mount using named voulme
-      - data-distillery-ubkg-neo4j-data:/usr/src/app/neo4j/data
+      - hubmap-ubkg-neo4j-data:/usr/src/app/neo4j/data
     # By default this `deploy` key only takes effect when deploying to a swarm with docker stack deploy, and is ignored by docker-compose up
     # However, we can use the `--compatibility` flag within `docker-compose --compatibility up`
     # The `--compatibility` flag will attempt to convert deploy keys in docker-compose v3 to their non-Swarm equivalent

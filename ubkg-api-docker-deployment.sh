@@ -39,11 +39,11 @@ else
         export_version
 
         if [ "$2" = "start" ]; then
-            docker-compose -f docker-compose.deployment.api.yml -p ubkg-api up -d
+            docker-compose -f docker-compose.deployment.api.yml up -d
         elif [ "$2" = "stop" ]; then
-            docker-compose -f docker-compose.deployment.api.yml -p ubkg-api stop
+            docker-compose -f docker-compose.deployment.api.yml stop
         elif [ "$2" = "down" ]; then
-            docker-compose -f docker-compose.deployment.api.yml -p ubkg-api down
+            docker-compose -f docker-compose.deployment.api.yml down
         fi
     fi
 fi
