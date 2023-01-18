@@ -223,6 +223,7 @@ def codeReplacements(x):
     # 1. Account for special cases of
     #   a. MONDO
     #   b. EDAM
+    #   c. JAS 13 JAN 2023 - UNIPROT
     # 2. Consolidate some string handling.
     # 3. Break up the original string replacement for ease of debugging.
 
@@ -276,16 +277,32 @@ def codeReplacements(x):
     # Case 1
     ret = np.where((x.str.contains('edam')), 'EDAM ' + x.str.replace(' ', '_').str.split('/').str[-1], ret)
 
+    # JAS JAN 2023 - Special case: Glyco Glycan
+    # Glycan node IRIs are in format:
+    # http://purl.jp/bio/12/glyco/glycan#(code delimited with underscore)
+    # Force the SAB to be GLYCO.GLYCAN and restore the underscore delimiter between domain and id.
+    ret = np.where((x.str.contains('http://purl.jp/bio/12/glyco/glycan')), 'GLYCO.GLYCAN ' + x.str.replace(' ', '_').str.replace('#', '/').str.split('/').str[-1], ret)
+
+    # JAS JAN 2023 - Special case: Glyco Conjugate
+    # Glycan node IRIs are in format:
+    # http://purl.jp/bio/12/glyco/conjugate#(code delimited with underscore)
+    # Force the SAB to be GLYCO.CONJUGATE and restore the underscore delimiter between domain and id.
+    ret = np.where((x.str.contains('http://purl.jp/bio/12/glyco/conjugate')),
+                   'GLYCO.CONJUGATE ' + x.str.replace(' ', '_').str.replace('#', '/').str.split('/').str[-1], ret)
+
     # Special case:
     # HGNC codes in expected format--i.e., that did not need to be converted above.
     # This is currently the case for UNIPROTKB.
     ret = np.where(x.str.contains('HGNC HGNC:'), x, ret)
 
+    # JAS 13 JAN 2023 - Special case: UNIPROT (not to be confused with UNIPROTKB).
+    # The Uniprot OWL node IRIs do not conform to OBO, so set SAB explicitly.
+    ret = np.where(x.str.contains('http://purl.uniprot.org'), 'UNIPROT ' + x.str.split('/').str[-1], ret)
+
     # JAS 12 JAN 2023 - Force SAB to uppercase.
     # The CodeId will be in format SAB <space> <other string>, and <other string> can be mixed case.
     # <other string> can also have spaces.
-    print(ret)
-    # ret is now an numpy array.
+    # ret is now a numpy array.
     # Split each element; convert the SAB portion to uppercase; and rejoin.
     for idx, x in np.ndenumerate(ret):
         x2 = x.split(sep= ' ',maxsplit=1)
@@ -565,6 +582,7 @@ if relations_file_exists:
 # 4. label from OWLNETS_relations.txt, not joined against RO
 # 5. predicate from edgelist
 # 6. 'subClassOf' predicates converted to 'isa'
+# 7. JAS 13 JAN 2023 - 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' converted to 'isa'
 
 edgelist['relation_label'] = edgelist['relation_label_RO_fromIRIjoin']
 edgelist['relation_label'] = np.where(edgelist['relation_label'].isnull(),
@@ -580,6 +598,9 @@ edgelist['relation_label'] = np.where(edgelist['relation_label'].isnull(), edgel
 edgelist['relation_label'] = np.where(edgelist['predicate'].str.contains('subClassOf'), 'isa',
                                       edgelist['relation_label'])
 
+# JAS 13 JAN 2023 - 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' converted to 'isa'
+edgelist['relation_label'] = np.where(edgelist['predicate'].str.contains('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'), 'isa',
+                                      edgelist['relation_label'])
 # The algorithm for inverses is simpler: if one was derived from RO, use it; else leave empty, and
 # the script will create a pseudo-inverse.
 edgelist['inverse'] = edgelist['inverse_RO_fromIRIjoin']

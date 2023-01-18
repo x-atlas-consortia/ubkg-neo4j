@@ -5,6 +5,8 @@ import os
 import pkt_kg as pkt
 import psutil
 import re
+
+import rdflib.exceptions
 from rdflib import Graph
 from rdflib.namespace import OWL, RDF, RDFS
 from tqdm import tqdm
@@ -18,6 +20,9 @@ import subprocess
 import hashlib
 from typing import Dict
 import pandas as pd
+
+# JAS Jan 2023 - to handle errors from parsing OWL files in Turtle format
+from xml.parsers.expat import ParserCreate, ExpatError, errors
 
 # Setup and running the script...
 #
@@ -335,7 +340,32 @@ if args.verbose:
 
 search_owl_file_for_imports(owl_file)
 
-graph = Graph().parse(owl_file, format='xml')
+# JAS January 2023
+# The original logic assumed that OWL files were in RDF/XML format. Almost all of the OWL files that have been
+# encountered up to January 2023 have been in RDF/XML. (The exception is GlycoRDF, which is available in both
+# RDF/XML and OWL/XML serializations.)
+#
+# Some ontologies are available only in non-RDF/XML serializations. For example, GlycoCoO is only available in Turtle.
+# Attempt to parse in Turtle; serialize to RDF/XML; and then reparse the RDF/XML.
+try:
+    graph = Graph().parse(owl_file, format='xml')
+except:
+    # Note: If the file is not in RDF/XML, the exception will be from xml (ExpatError), not rdflib.
+    # Exception handling does not seem able to catch this lower-level error, so this logic uses the generic
+    # exception handler.
+
+    # This logic does not handle the use case of an input file being in some format other than RDF/XML or Turtle--
+    # in particular, if the file is OWL/RDF.
+    # It is assumed that such a case would be properly addressed--i.e., either don't use the file as input or
+    # modify this logic further to account for the other formats.
+
+    print_and_logger_info(f'Error parsing {owl_file}. The file may not be in RDF/XML format. Assuming Turtle format. Attempting to convert...')
+    graph = Graph().parse(owl_file, format='n3')
+    convertedpath = os.path.join(owl_dir,'converted.owl')
+    print_and_logger_info(f'Serializing {owl_file} to RDF/XML format in file {convertedpath}')
+    v = graph.serialize(format='xml', destination=convertedpath)
+    graph2 = Graph().parse(convertedpath, format='xml')
+    graph = graph2
 
 logger.info('Extract Node Metadata')
 ont_classes = pkt.utils.gets_ontology_classes(graph)
