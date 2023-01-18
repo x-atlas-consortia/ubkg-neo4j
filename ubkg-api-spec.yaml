@@ -2,9 +2,9 @@ openapi: 3.0.3
 info:
   title: UBKG API
   description: This document describes the UBKG API
-  version: 1.1.4
+  version: 1.2.0
 servers:
-  - url: https://ubkg.api.hubmapconsortium.org/
+  - url: https://ontology.api.hubmapconsortium.org/
 paths:
   /codes/{code_id}/codes:
     get:
