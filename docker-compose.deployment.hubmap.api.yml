@@ -2,7 +2,7 @@ version: '3.7'
 # https://docs.docker.com/compose/compose-file/compose-file-v3/
 
 services:
-  ubkg-api:
+  hubmap-ubkg-api:
     hostname: hubmap-ubkg-api
     container_name: hubmap-ubkg-api
     # Use the published image from DockerHub instead of local build

@@ -2,7 +2,7 @@ version: '3.7'
 # https://docs.docker.com/compose/compose-file/compose-file-v3/
 
 services:
-  ubkg-api:
+  data-distillery-ubkg-api:
     hostname: data-distillery-ubkg-api
     container_name: data-distillery-ubkg-api
     # Use the published image from DockerHub instead of local build

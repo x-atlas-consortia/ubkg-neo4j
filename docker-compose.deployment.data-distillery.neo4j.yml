@@ -2,9 +2,9 @@ version: '3.7'
 # https://docs.docker.com/compose/compose-file/compose-file-v3/
 
 services:
-  ubkg-neo4j:
-    hostname: ubkg-neo4j
-    container_name: ubkg-neo4j
+  data-distillery-ubkg-neo4j:
+    hostname: data-distillery-ubkg-neo4j
+    container_name: data-distillery-ubkg-neo4j
     # Will not publish the neo4j image to DockerHub
     image: data-distillery-ubkg-neo4j
     environment:
@@ -47,4 +47,4 @@ services:
 
 # Named volume
 volumes:
-  ubkg-neo4j-data:
+  data-distillery-ubkg-neo4j-data:
