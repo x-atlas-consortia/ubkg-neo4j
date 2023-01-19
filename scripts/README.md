@@ -106,29 +106,8 @@ In other words, relationships between ontologies determines the order in which t
 
 The content of a particular implementation of a UBKG database depends on the set of assertiions integrated. Different implementations may integrate different sets of assertions: for example, project one may include assertions from the set {PATO,UBERON,CL,DOID,EDAM}, while another may include {PATO,UBERON,CL,DOID,CHEBI,ORDO}.
 
-
-Following is the recommended order of generation if including all of the ontologies that the UBKG currently supports.
-* PATO 
-* UBERON 
-* CL 
-* DOID 
-* CCFASCTB 
-* OBI 
-* EDAM 
-* HSAPDV 
-* SBO 
-* MI 
-* CHEBI 
-* MP 
-* ORDO 
-* UNIPROTKB
-* UO 
-* HUSAT 
-* HUBMAP 
-* CCF
-* MONDO
-* EFO
-* SENNET
+The file README-PARAMETER ORDER for generation.md provides the most current recommendations for generating different
+instances of the UBKG.
 
 ### Triplet conversion times by ontology
 

@@ -234,6 +234,7 @@ def codeReplacements(x):
     # Convert SABs to expected values.
     # NCI
     ret = ret.str.replace('NCIT ', 'NCI ', regex=False)
+
     # MSH
     ret = ret.str.replace('MESH ', 'MSH ', regex=False)
     # GO
@@ -298,6 +299,10 @@ def codeReplacements(x):
     # JAS 13 JAN 2023 - Special case: UNIPROT (not to be confused with UNIPROTKB).
     # The Uniprot OWL node IRIs do not conform to OBO, so set SAB explicitly.
     ret = np.where(x.str.contains('http://purl.uniprot.org'), 'UNIPROT ' + x.str.split('/').str[-1], ret)
+
+    # JAS JAN 2023 - Special case: HRAVS
+    ret = np.where(x.str.contains('http://purl.humanatlas.io/valueset/'),'HRAVS '+ x.str.split('/').str[-1], ret)
+    ret = np.where(x.str.contains('Thesaurus.owl'),'NCI '+ x.str.split('#').str[-1], ret)
 
     # JAS 12 JAN 2023 - Force SAB to uppercase.
     # The CodeId will be in format SAB <space> <other string>, and <other string> can be mixed case.
