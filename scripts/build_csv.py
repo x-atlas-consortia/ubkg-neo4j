@@ -64,6 +64,10 @@ UMLS_GRAPH_SCRIPT: str = './Jonathan/OWLNETS-UMLS-GRAPH-12.py'
 # January 2023 - Alan Simmons
 # for SenNet, add parameters EFO, SENNET
 
+# January 2023 - Alan Simmons
+# Replaced HUSAT with HRAVS. HRAVS depends on OBIB, XCO, and HRAVS.
+# GENERATION ARGUMENTS MOVED TO SEPARATE README: README-PARAMETER ORDER for generation.md
+
 
 # TODO https://douroucouli.wordpress.com/2019/03/14/biological-knowledge-graph-modeling-design-patterns/
 
