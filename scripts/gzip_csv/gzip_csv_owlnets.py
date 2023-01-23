@@ -98,7 +98,7 @@ def getROproperty(sab: str, col_header: str)-> tuple[str, str]:
     if response.status_code == 200:
         responsejson = response.json()
         totalCount = responsejson.get('totalCount')
-        if totalCount > 0:
+        if totalCount is not None and totalCount > 0:
             prop = responsejson.get('collection')[0]
             propIRI= prop.get('@id')
 
@@ -109,12 +109,14 @@ def getROproperty(sab: str, col_header: str)-> tuple[str, str]:
         response = requests.get(urlRO, headers=headers)
         if response.status_code == 200:
             responsejson = response.json()
-            graphs = responsejson.get('graphs')[0]
-            nodes = graphs.get('nodes')
-            for node in nodes:
-                id = node.get('id')
-                if id == propIRI:
-                    proplbl = node.get('lbl')
+            all_graphs = responsejson.get('graphs')
+            if all_graphs is not None and len(all_graphs) > 0:
+                graphs = all_graphs[0]
+                nodes = graphs.get('nodes')
+                for node in nodes:
+                    id = node.get('id')
+                    if id == propIRI:
+                        proplbl = node.get('lbl')
 
     return (propIRI, proplbl)
 
@@ -136,8 +138,13 @@ os.system(f"mkdir -p {owl_dir}")
 # Download GZip from BioPortal.
 request = Request(args.owl_url)
 request.add_header('Accept-encoding', 'gzip')
-response = urllib.request.urlopen(request)
-zip_path = os.path.join(owl_dir, args.owl_sab + '.GZ')
+try:
+    response = urllib.request.urlopen(request)
+    zip_path = os.path.join(owl_dir, args.owl_sab + '.GZ')
+except Exception as e:
+    print_and_logger_info('Error downloading GZIP from BioPortal.')
+    raise
+
 with open(zip_path, 'wb') as fzip:
     while True:
         data = response.read()
