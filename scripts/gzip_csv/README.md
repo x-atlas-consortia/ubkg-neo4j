@@ -1,6 +1,6 @@
-# HUSAT to OWLNETS converter
+# CSV to OWLNETS converter
 
-Uses the CSV file for the HUSAT ontology (available in a GZ archive in BioPortal to generate a set of text files that 
+Uses the CSV file for an ontology (available in a GZ archive in BioPortal to generate a set of text files that 
 comply with the OWLNETS format, as described in [https://github.com/callahantiff/PheKnowLator/blob/master/notebooks/OWLNETS_Example_Application.ipynb].
 
 ## Arguments
