@@ -291,6 +291,17 @@ def codeReplacements(x):
     ret = np.where((x.str.contains('http://purl.jp/bio/12/glyco/conjugate')),
                    'GLYCO.CONJUGATE ' + x.str.replace(' ', '_').str.replace('#', '/').str.split('/').str[-1], ret)
 
+    # JAS JAN 2023 - Special case: NCBI's GENE database
+    # Node IRIs for genes in NCBI GENE are in format
+    # http: // www.ncbi.nlm.nih.gov / gene / 19091
+    ret = np.where(x.str.contains('http://www.ncbi.nlm.nih.gov/gene'), 'GENE' + x.str.split('/').str[-1], ret)
+
+    # JAS JAN 2023 - Special case: NIFSTD
+    # As with EDAM, Node IRIs for codes from NIFSTD show domains--e.g.,
+    # http://uri.neuinfo.org/nif/nifstd/nlx_149264, where "nlx" is the domain
+    # Unify codes under the SAB NIFSTD and restore the underscore delimiter between domain and id.
+    ret = np.where(x.str.contains('http://uri.neuinfo.org/nif/nifstd'), 'NIFSTD' + x.str.replace(' ', '_').str.split('/').str[-1], ret)
+
     # Special case:
     # HGNC codes in expected format--i.e., that did not need to be converted above.
     # This is currently the case for UNIPROTKB.
@@ -302,7 +313,7 @@ def codeReplacements(x):
 
     # JAS JAN 2023 - Special case: HRAVS
     ret = np.where(x.str.contains('http://purl.humanatlas.io/valueset/'),'HRAVS '+ x.str.split('/').str[-1], ret)
-    ret = np.where(x.str.contains('Thesaurus.owl'),'NCI '+ x.str.split('#').str[-1], ret)
+    ret = np.where(x.str.contains('Thesaurus.owl'), 'NCI ' + x.str.split('#').str[-1], ret)
 
     # JAS 12 JAN 2023 - Force SAB to uppercase.
     # The CodeId will be in format SAB <space> <other string>, and <other string> can be mixed case.
@@ -672,8 +683,9 @@ print('ASSIGNING CUIs TO NODES, including for nodes that are cross-references...
 
 explode_dbxrefs['nodeXrefCodes'] = explode_dbxrefs['node_dbxrefs'].str.split(' ').str[-1]
 
+# JAS JAN 2023 - added group_keys=False to silence the FutureWarning from Pandas.
 explode_dbxrefs_UMLS = \
-    explode_dbxrefs[explode_dbxrefs['node_dbxrefs'].str.contains('UMLS C') == True].groupby('node_id', sort=False)[
+    explode_dbxrefs[explode_dbxrefs['node_dbxrefs'].str.contains('UMLS C') == True].groupby('node_id', sort=False, group_keys=False)[
         'nodeXrefCodes'].apply(list).reset_index(name='nodeCUIs')
 node_metadata = node_metadata.merge(explode_dbxrefs_UMLS, how='left', on='node_id')
 del explode_dbxrefs_UMLS
