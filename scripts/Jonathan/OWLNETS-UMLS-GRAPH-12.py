@@ -739,7 +739,8 @@ del node_metadata[':END_ID']
 # New code uses upper.
 node_xref_cui = explode_dbxrefs.merge(CUI_CODEs, how='inner', left_on='node_dbxrefs',
                                       right_on=CUI_CODEs[':END_ID'].str.upper())
-node_xref_cui = node_xref_cui.groupby('node_id', sort=False)[':START_ID'].apply(list).reset_index(name='XrefCUIs')
+# JAS FEB 2023 Adding group_keys=False to silence the FutureWarning.
+node_xref_cui = node_xref_cui.groupby('node_id', sort=False,group_keys=False)[':START_ID'].apply(list).reset_index(name='XrefCUIs')
 node_xref_cui['XrefCUIs'] = node_xref_cui['XrefCUIs'].apply(lambda x: pd.unique(x)).apply(list)
 node_metadata = node_metadata.merge(node_xref_cui, how='left', on='node_id')
 del node_xref_cui
