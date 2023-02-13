@@ -7,7 +7,8 @@ This guide describes how to format assertions as an ontology so that the ontolog
 # Audience
 This guide is intended for users who are subject matter experts in what biomedical assertions they might want to represent (e.g., genes and their products), as an ontology, but not necessarily conversant with either ontological concepts or knowledge graphs.
 
-[Concepts.md](https://github.com/dbmi-pitt/UBKG/blob/main/user%20guide/Concepts.md) describes terms that this guide uses that are relevant to ontologies or knowledge graphs. 
+# Glossary
+[GLOSSARY.md](https://github.com/dbmi-pitt/ubkg/blob/main/user_guide/GLOSSARY.md) describes terms that this guide uses that are relevant to ontologies or knowledge graphs. 
 
 # Guiding Principles for Integration
 An important goal of the UBKG is to establish connections between ontologies. For example,if information on the relationships between proteins and genes described in one ontology can be connected to information on the relationships between genes and diseases described in another ontology, it may be possible to identify previously unknown relationships between proteins and diseases.
@@ -24,7 +25,7 @@ An ontology can be integrated into the UBKG from one of the following sources:
 
 The ingestion of content of OWL files is straightforward. The rest of this guide focuses on ingest files.
 
-# Ingest Files and Content
+# Ingest Files: Format and Content
 A set of UBKG ingest files describes the entities and relationships of an ontology that is to be integrated into the UBKG. 
 
 An ingest file set consists of two Tab-Separated Variables (TSV) files:
@@ -32,17 +33,17 @@ An ingest file set consists of two Tab-Separated Variables (TSV) files:
 - **edges.tsv**: Describes the triples comprising the ontology
 - **nodes.tsv**: Describes metadata for entities
 
-# Source Abbreviations (SABs) 
+## Source Abbreviations (SABs) 
 The UBKG identifies a set of assertions by means of a _Source Abbreviation_ (SAB). SABs often correspond to abbreviations for ontologies (e.g., PATO) or vocabularies (e.g., ICD-10). 
 
 For new sets of assertions, define a preferred SAB to represent the initiative, project, or institution.
 
 SABs are uppercase in the UBKG. 
 
-# edges.tsv
+## edges.tsv
 The edges file lists the _triples_ (subject node - predicate - object node) that constitute a set of assertions.
 
-## Fields
+###  Fields
 Field|Corresponding element in UBKG|Accepted formats|Examples
 ---|---|---|---
 subject|**Code** node|IRI for a concept in a published ontology|http://purl.obolibrary.org/obo/UBERON_0004086
@@ -53,24 +54,24 @@ predicate|relationships|For hierarchical relationships, the IRI http://www.w3.or
  object|**Code** node|same as for subject
  evidence_class (_optional_)|**string**|Statement specific to an SAB to classify evidence|-0.016084092
  
- ## Recommendations for nodes
+ ###  Recommendations for nodes
  
 Many nodes will correspond to entities that have already been identified in a standard biomedical ontology; for these, the IRI is preferred. 
 For entities that have not been encoded in an ontology, a suitable identifier is sufficient.
 
 For example, the UBKG includes information relating genes and gene products obtained from UniProtKB. Proteins are identified using their UniProtKB Entry ID, instead of an IRI.
 
-## Recommendations for edges
+###  Recommendations for edges
 The preferred source of relationship (predicate) information is the Relations Ontology (RO). Reasons for this include:
 1. RO is a general reference for relationships, and is therefore likely already to have a standard relationship defined that is suitable.
 2. RO defines inverse relationships, especially those that may not be obvious.
 
 It is possible, nevertheless, that RO does not contain a relationship that is specific enough for an assertion, so a custom relationship will be needed. When defining a custom relationship, we recommend that the label be short and consise. (We realize that this is easier said than done. Defining consise relationships is the hard part of modelling assertions.)
 
-# nodes.tsv
+## nodes.tsv
  The nodes.tsv file provides metadata on entities.
 
-## Fields
+### Fields
 Field|Corresponding element in UBKG|Accepted formats|Examples
 ---|---|---|---
 node_id|**Code** node|IRI for a concept in a published ontology|http://purl.obolibrary.org/obo/UBERON_0004086
@@ -85,13 +86,13 @@ upperbound (_optional_)|Upper bound of range for values|100
 unit (_optional_)| Unit of measure for value. This is currently not encoded to a concept. | mm
 
 
-### Example for synonyms: 
+#### Example for synonyms: 
 region of ventricular system of brain|brain ventricles|cerebral ventricle
-### Example for dbxrefs:
+#### Example for dbxrefs:
 umls:c0007799|fma:78447
 
 # Requirements (business rules) for nodes and relationships
-1. A node identified in edges.tsv must satisfy one of the following criteria:
+1. A node identified in edges.tsv must satisfy **at least one** of the following criteria:
 - It is defined in nodes.tsv.
 - It already exists in the UBKG.
 
