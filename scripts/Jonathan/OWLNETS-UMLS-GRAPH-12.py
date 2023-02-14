@@ -44,6 +44,18 @@ def owlnets_path(file: str) -> str:
 def csv_path(file: str) -> str:
     return os.path.join(sys.argv[2], file)
 
+def identify_source_file(file_names: list) -> str:
+    # Checks for the existence of source files (edges or nodes).
+
+    # Source files can be named in various ways--e.g., OWLNETS_node_metadata.txt, nodes.tsv, nodes.txt
+
+    for f in file_names:
+        if os.path.exists(owlnets_path(f)):
+            return f
+
+    # Error case: no file found with name in argument list.
+    lfile = ','.join(str(f) for f in file_names)
+    raise FileNotFoundError('No file found with name in list: ' + lfile)
 
 def update_columns_to_csv_header(file: str, new_columns: list):
     # JAS 6 January 2023
@@ -83,13 +95,8 @@ print('Reading OWLNETS files for ontology...')
 # 1. OWLNETS
 # 2. UBKG edge/nodes
 
-nodepath = "OWLNETS_node_metadata.txt"
-if not os.path.exists(owlnets_path(nodepath)):
-    nodepath = "nodes.txt"
-if not os.path.exists(owlnets_path(nodepath)):
-    nodepath = "nodes.tsv"
-if not os.path.exists(owlnets_path(nodepath)):
-    raise FileNotFoundError('No node file with name OWLNETS_node_metadata.txt, nodes.tsv, or nodes.txt found.')
+nodefilelist = ['OWLNETS_node_metadata.txt','nodes.txt','nodes.tsv']
+nodepath = identify_source_file(nodefilelist)
 
 # JAS 6 JAN 2023 add optional columns (value, lowerbound, upperbound, unit) for UBKG edges/nodes files.
 # JAS 6 JAN 2023 skip bad rows. (There is at least one in line 6814 of the node_metadata file generated from EFO.)
@@ -150,14 +157,8 @@ else:
 # 1. OWLNETS
 # 2. UBKG edge/nodes
 
-edgepath = "OWLNETS_edgelist.txt"
-if not os.path.exists(owlnets_path(edgepath)):
-    edgepath = "edges.txt"
-if not os.path.exists(owlnets_path(edgepath)):
-    edgepath = "edges.tsv"
-if not os.path.exists(owlnets_path(edgepath)):
-    raise FileNotFoundError('No edge file with name OWLNETS_edgelist.txt, edges.tsv, or edges.txt found.')
-
+edgefilelist = ['OWLNETS_edgelist.txt','edges.txt','edges.tsv']
+edgepath = identify_source_file(edgefilelist)
 
 # JAS 6 JAN 2023 - add evidence_class; limit columns.
 edgelist = pd.read_csv(owlnets_path(edgepath), sep='\t')
