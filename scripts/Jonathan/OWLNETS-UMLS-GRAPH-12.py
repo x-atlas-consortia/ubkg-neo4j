@@ -86,6 +86,10 @@ print('Reading OWLNETS files for ontology...')
 nodepath = "OWLNETS_node_metadata.txt"
 if not os.path.exists(owlnets_path(nodepath)):
     nodepath = "nodes.txt"
+if not os.path.exists(owlnets_path(nodepath)):
+    nodepath = "nodes.tsv"
+if not os.path.exists(owlnets_path(nodepath)):
+    raise FileNotFoundError('No node file with name OWLNETS_node_metadata.txt, nodes.tsv, or nodes.txt found.')
 
 # JAS 6 JAN 2023 add optional columns (value, lowerbound, upperbound, unit) for UBKG edges/nodes files.
 # JAS 6 JAN 2023 skip bad rows. (There is at least one in line 6814 of the node_metadata file generated from EFO.)
@@ -95,7 +99,10 @@ if 'value' not in node_metadata.columns:
     node_metadata['lowerbound'] = np.nan
     node_metadata['upperbound'] = np.nan
     node_metadata['unit'] = np.nan
-node_metadata = node_metadata[['node_id', 'node_namespace', 'node_label', 'node_definition', 'node_synonyms',
+# JAS Feb 2023 ignore 'node_namespace'.
+#node_metadata = node_metadata[['node_id', 'node_namespace', 'node_label', 'node_definition', 'node_synonyms',
+                               #'node_dbxrefs', 'value', 'lowerbound', 'upperbound', 'unit']]
+node_metadata = node_metadata[['node_id', 'node_label', 'node_definition', 'node_synonyms',
                                'node_dbxrefs', 'value', 'lowerbound', 'upperbound', 'unit']]
 
 node_metadata = node_metadata.replace({'None': np.nan})
@@ -146,6 +153,11 @@ else:
 edgepath = "OWLNETS_edgelist.txt"
 if not os.path.exists(owlnets_path(edgepath)):
     edgepath = "edges.txt"
+if not os.path.exists(owlnets_path(edgepath)):
+    edgepath = "edges.tsv"
+if not os.path.exists(owlnets_path(edgepath)):
+    raise FileNotFoundError('No edge file with name OWLNETS_edgelist.txt, edges.tsv, or edges.txt found.')
+
 
 # JAS 6 JAN 2023 - add evidence_class; limit columns.
 edgelist = pd.read_csv(owlnets_path(edgepath), sep='\t')
@@ -294,7 +306,11 @@ def codeReplacements(x):
     # JAS JAN 2023 - Special case: NCBI's GENE database
     # Node IRIs for genes in NCBI GENE are in format
     # http: // www.ncbi.nlm.nih.gov / gene / 19091
-    ret = np.where(x.str.contains('http://www.ncbi.nlm.nih.gov/gene'), 'GENE' + x.str.split('/').str[-1], ret)
+    # FEB 2023
+    # NCBI Gene IDs are currently stored in the NCI SAB obtained from UMLS, with code IDs that
+    # prepend a 'C' to the Gene ID.
+    # Until we ingest NCBI Gene directly, map to NCI format.
+    ret = np.where(x.str.contains('http://www.ncbi.nlm.nih.gov/gene'), 'NCI' + 'C' + x.str.split('/').str[-1], ret)
 
     # JAS JAN 2023 - Special case: NIFSTD
     # As with EDAM, Node IRIs for codes from NIFSTD show domains--e.g.,
@@ -314,6 +330,7 @@ def codeReplacements(x):
     # JAS JAN 2023 - Special case: HRAVS
     ret = np.where(x.str.contains('http://purl.humanatlas.io/valueset/'),'HRAVS '+ x.str.split('/').str[-1], ret)
     ret = np.where(x.str.contains('Thesaurus.owl'), 'NCI ' + x.str.split('#').str[-1], ret)
+
 
     # JAS 12 JAN 2023 - Force SAB to uppercase.
     # The CodeId will be in format SAB <space> <other string>, and <other string> can be mixed case.
@@ -672,7 +689,7 @@ explode_dbxrefs['node_dbxrefs'] = codeReplacements(explode_dbxrefs['node_dbxrefs
 # JAS 12 JAN 2023 - force uppercase for SAB
 node_metadata['SAB'] = node_metadata['node_id'].str.split(' ').str[0].str.upper()
 node_metadata['CODE'] = node_metadata['node_id'].str.split(' ').str[-1]
-del node_metadata['node_namespace']
+#del node_metadata['node_namespace']
 # del explode_dbxrefs - not deleted here because we need it later
 
 
@@ -910,7 +927,8 @@ print('Appending to CUI-CUIs.csv...')
 # JAS 6 JAN 2023 Add evidence_class column to file.
 print('Adding evidence_class column to CUI-CUIs.csv...')
 fcsv = csv_path('CUI-CUIs.csv')
-new_header_columns = [':START_ID', ':END_ID', ':TYPE,SAB', 'evidence_class']
+# evidence_class should be a number.
+new_header_columns = [':START_ID', ':END_ID', ':TYPE,SAB', 'evidence_class:float']
 update_columns_to_csv_header(fcsv, new_header_columns)
 
 # forward ones
@@ -935,7 +953,8 @@ print('Appending to CODEs.csv...')
 # JAS 6 JAN 2023 Add value, lowerbound, upperbound, unit column to file.
 print('Adding value, lowerbound, upperbound, unit columns to CODES.csv...')
 fcsv = csv_path('CODEs.csv')
-new_header_columns = ['CodeID:ID', 'SAB', 'CODE', 'value', 'lowerbound', 'upperbound', 'unit']
+# value, lowerbound, and upperbound should be numbers.
+new_header_columns = ['CodeID:ID', 'SAB', 'CODE', 'value:float', 'lowerbound:float', 'upperbound:float', 'unit']
 update_columns_to_csv_header(fcsv, new_header_columns)
 
 # JAS 6 JAN 2023 add value, lowerbound, upperbound, unit

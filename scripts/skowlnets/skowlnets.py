@@ -116,7 +116,13 @@ def codeReplacements(x):
     # JAS JAN 2023 - Special case: NCBI's GENE database
     # Node IRIs for genes in NCBI GENE are in format
     # http: // www.ncbi.nlm.nih.gov / gene / 19091
-    ret = np.where(x.str.contains('http://www.ncbi.nlm.nih.gov/gene'), 'GENE' + x.str.split('/').str[-1], ret)
+    # FEB 2023
+    # NCBI Gene IDs are currently stored in the NCI SAB obtained from UMLS, with code IDs that
+    # prepend a 'C' to the Gene ID.
+    # Until we ingest NCBI Gene directly, map to NCI format.
+    ret = np.where(x.str.contains('http://www.ncbi.nlm.nih.gov/gene'), 'NCI' + 'C' + x.str.split('/').str[-1], ret)
+
+    # ret = np.where(x.str.contains('http://www.ncbi.nlm.nih.gov/gene'), 'GENE' + x.str.split('/').str[-1], ret)
 
     # JAS JAN 2023 - Special case: NIFSTD
     # As with EDAM, Node IRIs for codes from NIFSTD show domains--e.g.,
