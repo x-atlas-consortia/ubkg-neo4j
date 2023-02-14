@@ -56,6 +56,12 @@ A Data Distillery KG **will** include assertions from:
 - GLYCORDF
 - GLYCOCOO
 
+### SPARC
+- NPO
+
+### Others
+- LINCS
+
 ## To generate a HubMAP/SenNet knowledge graph (in one line)
 ```
 ./build_csv.sh -v -s PATO UBERON CL DOID CCFASCTB OBI EDAM HSAPDV SBO MI CHEBI MP ORDO UNIPROTKB UO OBIB XCO HRAVS HUBMAP CCF MONDO EFO SENNET 
@@ -63,5 +69,5 @@ A Data Distillery KG **will** include assertions from:
 
 ## To generate a minimal Data Distillery knowledge graph (in one line)
 ```
-./build_csv.sh -v -s PATO UBERON CL DOID CCFASCTB OBI EDAM HSAPDV SBO MI CHEBI MP ORDO UNIPROTKB UO FALDO UNIPROT GLYCORDF GLYCOCOO
+./build_csv.sh -v -s PATO UBERON CL DOID CCFASCTB OBI EDAM HSAPDV SBO MI CHEBI MP ORDO UNIPROTKB UO FALDO UNIPROT GLYCORDF GLYCOCOO NPO LINCS
 ```
