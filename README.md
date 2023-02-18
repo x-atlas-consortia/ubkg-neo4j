@@ -13,7 +13,6 @@ The primary components of the UBKG are:
 
 The UBKG database is populated from the load of a set of CSV files, using [**neo4j-admin import**] (https://neo4j.com/docs/operations-manual/current/tutorial/neo4j-admin-import/). The set of CSV import files is the product of two _generation frameworks_. 
 
-### Graph database (TO DO)
 ### UBKG API
 The UBKG prohibits direct Cypher access to the neo4j knowledge graph database. 
 The UBKG API is a REST API with endpoints that can be used to return information from the UBKG.

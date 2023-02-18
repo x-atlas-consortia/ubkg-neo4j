@@ -106,10 +106,10 @@ In other words, relationships between ontologies determines the order in which t
 
 The content of a particular implementation of a UBKG database depends on the set of assertiions integrated. Different implementations may integrate different sets of assertions: for example, project one may include assertions from the set {PATO,UBERON,CL,DOID,EDAM}, while another may include {PATO,UBERON,CL,DOID,CHEBI,ORDO}.
 
-The file README-PARAMETER ORDER for generation.md provides the most current recommendations for generating different
+The file [README-PARAMETER ORDER for generation.md](https://github.com/dbmi-pitt/ubkg/blob/main/scripts/README-PARAMETER%20ORDER%20for%20generation.md) provides the most current recommendations for generating different
 instances of the UBKG.
 
-### Triplet conversion times by ontology
+### Sample triplet conversion times by ontology
 
 The build script is run on a local development machine. The bulk of the processing involves the PheKnowLator conversion of OWL files to OWLNETS triple store files.
 
@@ -164,15 +164,6 @@ It writes to the '../neo4j/import/current' directory.
 Its changes to the files in that directory are cumulative between runs, so when starting a run a freshly downloaded set of UMLS files should be placed there.
 The script that coordinates the running of this process will copy the current .csv files to a numbered save directory (e.g., 'save.1') so that the results of intermediate iterations can be examined.
 In the end, it is only the final set of .csv files that is used as a basis for the neo4j graph.
-
-### Adding command line arguments to OWLNETS-UMLS-GRAPH.py
-
-(JAS 13 October 2022 - Deprecated. Changes are now made directly to 
-OWLNETS-UMLS-GRAPH12.py.)
-
-~~The 'OWLNETS-UMLS-GRAPH.py' is generated from the notebook 'OWLNETS-UMLS-GRAPH.ipynb' found in the same directory.
-In order to make the 'OWLNETS-UMLS-GRAPH.py' functional for this processing, a transform script 'transorm.py' is run over it.
-This script will allow it to take command line parameters necessary for processing here.~~
 
 ## Coordination
 
