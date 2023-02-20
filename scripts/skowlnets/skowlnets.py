@@ -28,6 +28,7 @@ import logging.config
 # JAS FEB 2023
 # Replaced the light version of the codeReplacements function with the one from OWLNETS-UMLS-GRAPH-12.py.
 
+
 def codeReplacements(x):
     # JAS 15 Nov 2022 - Refactor
 
@@ -166,6 +167,7 @@ def codeReplacements(x):
     # .str.replace('HGNC ', 'HGNC HGNC:', regex=False) \
     # .str.replace('gene symbol report?hgnc id=', 'HGNC HGNC:', regex=False)
 
+
 # Parse an argument that identifies the version of the UMLS in Neptune from which to build
 # the CSV files.
 class RawTextArgumentDefaultsHelpFormatter(
@@ -279,7 +281,7 @@ with open(edgelist_path, 'w') as out:
                     listobjects = objects.split(',')
                     for obj in listobjects:
                         if col == 4:
-                            objcode = cr.codeReplacements(obj)
+                            objcode = codeReplacements(obj)
                         else:
                             # Match object terms with their respective codes (Column A),
                             # which will result in a dataframe of one row.

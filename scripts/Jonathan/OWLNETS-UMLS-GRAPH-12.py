@@ -359,7 +359,6 @@ def codeReplacements(x):
 
 # return x.str.replace('NCIT ', 'NCI ', regex=False).str.replace('MESH ', 'MSH ', regex=False).str.replace('GO ', 'GO GO:', regex=False).str.replace('NCBITaxon ', 'NCBI ', regex=False).str.replace('.*UMLS.*\s', 'UMLS ', regex=True).str.replace('.*SNOMED.*\s', 'SNOMEDCT_US ', regex=True).str.replace('HP ', 'HPO HP:', regex=False).str.replace('^fma','FMA ', regex=True)
 
-
 # ### Join relation_label in edgelist, convert subClassOf to isa and space to _, CodeID formatting
 
 # In[7]:
