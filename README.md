@@ -13,8 +13,11 @@ The primary components of the UBKG are:
 
 The UBKG database is populated from the load of a set of CSV files, using [**neo4j-admin import**] (https://neo4j.com/docs/operations-manual/current/tutorial/neo4j-admin-import/). The set of CSV import files is the product of two _generation frameworks_. 
 
-### Graph database (TO DO)
-### REST API (TO DO)
+### UBKG API
+The UBKG prohibits direct Cypher access to the neo4j knowledge graph database. 
+The UBKG API is a REST API with endpoints that can be used to return information from the UBKG.
+
+The UBKG API is described in [this SmartAPI page](https://smart-api.info/ui/33a83dc8f62b4a9aaecd32a24cb8563c#/).
 
 ### Source framework
 The [**source framework**](https://github.com/dbmi-pitt/ubkg/tree/main/source_framework) is a combination of manual and automated processes that obtain the base set of nodes (entities) and edges (relationships) of the UBKG graph.
