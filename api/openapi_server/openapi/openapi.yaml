@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  description: This document describes the HuBMAP Ontology API
-  title: HuBMAP Ontology API
-  version: 1.1.4
+  description: This document describes the UBKG API
+  title: UBKG API
+  version: 1.2.0
 servers:
 - url: https://ontology.api.hubmapconsortium.org/
 paths:
@@ -302,6 +302,144 @@ paths:
                 type: array
           description: "A JSON array of {Sty, Tui, Stn} dictionaries"
       summary: "Returns a list of semantic_types {Sty, Tui, Stn} of the concept"
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /datasets:
+    get:
+      operationId: dataset_get
+      parameters:
+      - description: Required filter to indicate application context.
+        explode: true
+        in: query
+        name: application_context
+        required: true
+        schema:
+          enum:
+          - HUBMAP
+          - SENNET
+          - hubmap
+          - sennet
+          - HuBMAP
+          - SenNet
+          type: string
+        style: form
+      - description: Optional filter for data_type
+        explode: true
+        in: query
+        name: data_type
+        required: false
+        schema:
+          example: AF
+          type: string
+        style: form
+      - description: Optional filter for display name. Use URL-encoding (space = %20).
+        explode: true
+        in: query
+        name: description
+        required: false
+        schema:
+          example: Autofluorescence%20Microscopy
+          type: string
+        style: form
+      - description: "Optional filter for a single element in the alt-names list--i.e.,\
+          \ return datasets for which alt-names includes a value that matches the\
+          \ parameter. Although the field is named 'alt-names', the parameter uses\
+          \ 'alt_name'. Use URL-encoding (space = %20)"
+        explode: true
+        in: query
+        name: alt_name
+        required: false
+        schema:
+          example: Light%20Sheet
+          type: string
+        style: form
+      - description: Optional filter to filter to primary (true) or derived (false)
+          assay.
+        explode: true
+        in: query
+        name: primary
+        required: false
+        schema:
+          enum:
+          - "true"
+          - "false"
+          type: string
+        style: form
+      - description: "Optional filter for whether the dataset contains Patient Identifying\
+          \ Information (PII). Although the field is named 'contains-pii', use 'contains_pii'\
+          \ as an argument."
+        explode: true
+        in: query
+        name: contains_pii
+        required: false
+        schema:
+          enum:
+          - "true"
+          - "false"
+          type: string
+        style: form
+      - description: "Optional filter for whether datasets are visualization only\
+          \ (true). Although the field is named 'vis-only', use 'vis_only' as an argument."
+        explode: true
+        in: query
+        name: vis_only
+        required: false
+        schema:
+          enum:
+          - "true"
+          - "false"
+          type: string
+        style: form
+      - description: "Optional filter for a single element in the vitessce_hint list--i.e.,\
+          \ return datasets for which vitessce_hints includes a value that matches\
+          \ the parameter. Although the field is named 'vitessce-hints', use 'vitessce_hint'\
+          \ as an argument."
+        explode: true
+        in: query
+        name: vitessce_hint
+        required: false
+        schema:
+          enum:
+          - pyramid
+          - anndata
+          - is_image
+          - is_tiled
+          - is_sc
+          - rna
+          - atac
+          - sprm
+          - codex
+          - maldi
+          type: string
+        style: form
+      - description: Optional filter to identify the dataset provider - IEC (iec)  or
+          external (lab)
+        explode: true
+        in: query
+        name: dataset_provider
+        required: false
+        schema:
+          enum:
+          - iec
+          - IEC
+          - external
+          - External
+          - lab
+          - Lab
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DatasetPropertyInfo'
+                type: array
+          description: "A JSON array of dataset types with properties, optionally\
+            \ filtered by parameters"
+      summary: "Returns information on a set of HuBMAP or SenNet dataset types, with\
+        \ options to filter the list to those with specific property values. Filters\
+        \ are additive (i.e., boolean AND)"
       x-openapi-router-controller: openapi_server.controllers.default_controller
   /semantics/{semantic_id}/semantics:
     get:
@@ -827,4 +965,80 @@ components:
           title: term
           type: string
       title: SabCodeTerm
+      type: object
+    DatasetPropertyInfo:
+      description: "Properties of a HuBMAP/SenNet Dataset. Where applicable, key names\
+        \ match those found in the original assay_types.yaml."
+      example:
+        alt-names:
+        - MALDI-IMS-pos
+        - MALDI-IMS-neg
+        dataset_provider: HuBMAP IEC
+        data_type: bulk-RNA
+        description: Bulk RNA-seq
+        vitessce-hints:
+        - "[\"pyramid\",\"anndata\",\"is_image\",\"is_tiled\",\"is_sc\",\"rna\",\"\
+          atac\",\"sprm\",\"codex\",\"maldi\"]"
+        - "[\"pyramid\",\"anndata\",\"is_image\",\"is_tiled\",\"is_sc\",\"rna\",\"\
+          atac\",\"sprm\",\"codex\",\"maldi\"]"
+        vis-only:
+        - "true"
+        - "true"
+        contains-pii: "true"
+        primary: "true"
+      properties:
+        alt-names:
+          description: Alternative/deprecated synonyms of data_type that may still
+            be associated with dataset entities
+          example:
+          - MALDI-IMS-pos
+          - MALDI-IMS-neg
+          items:
+            type: string
+          title: alt-names
+          type: array
+        contains-pii:
+          description: Whether the dataset contains Patient Identifying Information
+            (PII)
+          example: "true"
+          title: contains-pii
+          type: string
+        data_type:
+          description: Data type for the dataset; used to characterize dataset entities
+            in provenance hierarchy
+          example: bulk-RNA
+          title: data_type
+          type: string
+        dataset_provider:
+          description: Identifies the provider of the dataset. 'External Provider'
+            also referred to as 'lab-processed'.
+          example: HuBMAP IEC
+          title: dataset_provider
+          type: string
+        description:
+          description: How datasets of the data type are named in the Data Portal.
+          example: Bulk RNA-seq
+          title: description
+          type: string
+        primary:
+          description: Indicates whether the assay is primary (true) or derived (false)
+          example: "true"
+          title: primary
+          type: string
+        vis-only:
+          description: Indicates whether for visualization only
+          items:
+            example: "true"
+            type: string
+          title: vis-only
+          type: array
+        vitessce-hints:
+          description: Flags for Vitessce visualization
+          items:
+            example: "[\"pyramid\",\"anndata\",\"is_image\",\"is_tiled\",\"is_sc\"\
+              ,\"rna\",\"atac\",\"sprm\",\"codex\",\"maldi\"]"
+            type: string
+          title: vitessce-hints
+          type: array
+      title: DatasetPropertyInfo
       type: object
