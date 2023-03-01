@@ -395,6 +395,111 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SabCodeTerm'
+  /datasets: # JAS FEB 2023 - note that parameters use underscores, even when the corresponding key in the response uses dashes--e.g., alt_names, alt-names
+    get:
+      operationId: dataset_get
+      summary: Returns information on a set of HuBMAP or SenNet dataset types, with options to filter the list to those with specific property values. Filters are additive (i.e., boolean AND)
+      parameters:
+        - name: application_context
+          in: query
+          required: true
+          description: Required filter to indicate application context.
+          schema:
+            type: string
+            enum:
+              - HUBMAP
+              - SENNET
+              - hubmap
+              - sennet
+              - HuBMAP
+              - SenNet
+        - name: data_type
+          in: query
+          required: false
+          description: Optional filter for data_type
+          schema:
+            type: string
+            example: AF
+        - name: description
+          in: query
+          required: false
+          description: Optional filter for display name. Use URL-encoding (space = %20).
+          schema:
+            type: string
+            example: Autofluorescence%20Microscopy
+        - name: alt_name
+          in: query
+          required: false
+          description: Optional filter for a single element in the alt-names list--i.e., return datasets for which alt-names includes a value that matches the parameter. Although the field is named 'alt-names', the parameter uses 'alt_name'. Use URL-encoding (space = %20)
+          schema:
+            type: string
+            example: Light%20Sheet
+        - name: primary
+          in: query
+          required: false
+          description: Optional filter to filter to primary (true) or derived (false) assay.
+          schema:
+            type: string
+            enum:
+              - true
+              - false
+        - name: contains_pii
+          in: query
+          required: false
+          description: Optional filter for whether the dataset contains Patient Identifying Information (PII). Although the field is named 'contains-pii', use 'contains_pii' as an argument.
+          schema:
+            type: string
+            enum:
+              - true
+              - false
+        - name: vis_only
+          in: query
+          required: false
+          description: Optional filter for whether datasets are visualization only (true). Although the field is named 'vis-only', use 'vis_only' as an argument.
+          schema:
+            type: string
+            enum:
+              - true
+              - false
+        - name: vitessce_hint
+          in: query
+          required: false
+          description: Optional filter for a single element in the vitessce_hint list--i.e., return datasets for which vitessce_hints includes a value that matches the parameter. Although the field is named 'vitessce-hints', use 'vitessce_hint' as an argument.
+          schema:
+            type: string
+            enum:
+              - pyramid
+              - anndata
+              - is_image
+              - is_tiled
+              - is_sc
+              - rna
+              - atac
+              - sprm
+              - codex
+              - maldi
+        - name: dataset_provider
+          in: query
+          required: false
+          description: Optional filter to identify the dataset provider - IEC (iec)  or external (lab)
+          schema:
+            type: string
+            enum:
+              - iec
+              - IEC
+              - external
+              - External
+              - lab
+              - Lab
+      responses:
+        '200':
+          description: A JSON array of dataset types with properties, optionally filtered by parameters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DatasetPropertyInfo'
 components:
   schemas:
     CodesCodesObj: # Schema name
@@ -593,3 +698,45 @@ components:
         term:
           type: string
           example: Microscopy
+    DatasetPropertyInfo: # Schema name JAS FEB 2023. Note that GET parameters use underscores, even when the corresponding key in the response uses dashes--e.g., alt_names, alt-names.
+      type: object
+      description: Properties of a HuBMAP/SenNet Dataset. Where applicable, key names match those found in the original assay_types.yaml.
+      properties:
+        alt-names:
+          type: array
+          description: Alternative/deprecated synonyms of data_type that may still be associated with dataset entities
+          items:
+            type: string
+          example: [ "MALDI-IMS-pos", "MALDI-IMS-neg" ]
+        contains-pii:
+          type: string
+          description: Whether the dataset contains Patient Identifying Information (PII)
+          example: true
+        data_type:
+          type: string
+          description: Data type for the dataset; used to characterize dataset entities in provenance hierarchy
+          example: bulk-RNA
+        dataset_provider:
+          type: string
+          description: Identifies the provider of the dataset. 'External Provider' also referred to as 'lab-processed'.
+          example: HuBMAP IEC
+        description:
+          type: string
+          description: How datasets of the data type are named in the Data Portal.
+          example: Bulk RNA-seq
+        primary:
+          type: string
+          description: Indicates whether the assay is primary (true) or derived (false)
+          example: true
+        vis-only:
+          type: string
+          description: Indicates whether for visualization only
+          items:
+            type: string
+            example: true
+        vitessce-hints:
+          type: array
+          description: Flags for Vitessce visualization
+          items:
+            type: string
+            example: ["pyramid","anndata","is_image","is_tiled","is_sc","rna","atac","sprm","codex","maldi"]

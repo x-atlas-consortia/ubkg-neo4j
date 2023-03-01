@@ -53,8 +53,8 @@ fi
 
 echo "*** Using python3 venv in ${VENV}"
 source ${VENV}/bin/activate
-
-openapi-generator generate -i ../ontology-api-spec.yaml -g python-flask -o .
+# JAS FEB 2023 Change reference to spec file from ontology-api-spec to ubkg-api-spec.
+openapi-generator generate -i ../ubkg-api-spec.yaml -g python-flask -o .
 
 ./update_controller_and_manager.py
 
@@ -68,6 +68,17 @@ git add openapi_server/openapi/openapi.yaml
 git add setup.py
 
 # NOTE: setup.py has the wrong version should match that of the .yml file
+
+
+# JAS FEB 2023 There is a mystery issue in which some task in this script either removes the following items from
+# requirements.txt or replaces requirments.txt with a version that does not have it. I cannot find where this
+# occurs.
+# neo4j == 4.2.1
+# openapi-python-client >= 0.10.8
+
+# This causes the build script to fail when run with -r because it is not possible to import neo4j.
+# One workaround is to add the above lines to the requirements.txt in the local repo before running the script with -R.
+# Alternatively, one can rollback changes to requirements.txt immediately after running the script.
 
 if [ $CLIENT ]; then
   echo "Building Python Client..."

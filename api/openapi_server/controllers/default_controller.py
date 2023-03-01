@@ -10,6 +10,7 @@ from openapi_server.models.concept_prefterm import ConceptPrefterm  # noqa: E501
 from openapi_server.models.concept_sab_rel import ConceptSabRel  # noqa: E501
 from openapi_server.models.concept_sab_rel_depth import ConceptSabRelDepth  # noqa: E501
 from openapi_server.models.concept_term import ConceptTerm  # noqa: E501
+from openapi_server.models.dataset_property_info import DatasetPropertyInfo  # noqa: E501
 from openapi_server.models.path_item_concept_relationship_sab_prefterm import PathItemConceptRelationshipSabPrefterm  # noqa: E501
 from openapi_server.models.qqst import QQST  # noqa: E501
 from openapi_server.models.qconcept_tconcept_sab_rel import QconceptTconceptSabRel  # noqa: E501
@@ -166,6 +167,35 @@ def concepts_trees_post(concept_sab_rel_depth):  # noqa: E501
     if connexion.request.is_json:
         concept_sab_rel_depth = ConceptSabRelDepth.from_dict(connexion.request.get_json())  # noqa: E501
     return neo4jManager.concepts_trees_post(concept_sab_rel_depth)
+
+
+def dataset_get(application_context, data_type=None, description=None, alt_name=None, primary=None, contains_pii=None, vis_only=None, vitessce_hint=None, dataset_provider=None):  # noqa: E501
+    """Returns information on a set of HuBMAP or SenNet dataset types, with options to filter the list to those with specific property values. Filters are additive (i.e., boolean AND)
+
+     # noqa: E501
+
+    :param application_context: Required filter to indicate application context.
+    :type application_context: str
+    :param data_type: Optional filter for data_type
+    :type data_type: str
+    :param description: Optional filter for display name. Use URL-encoding (space &#x3D; %20).
+    :type description: str
+    :param alt_name: Optional filter for a single element in the alt-names list--i.e., return datasets for which alt-names includes a value that matches the parameter. Although the field is named &#39;alt-names&#39;, the parameter uses &#39;alt_name&#39;. Use URL-encoding (space &#x3D; %20)
+    :type alt_name: str
+    :param primary: Optional filter to filter to primary (true) or derived (false) assay.
+    :type primary: str
+    :param contains_pii: Optional filter for whether the dataset contains Patient Identifying Information (PII). Although the field is named &#39;contains-pii&#39;, use &#39;contains_pii&#39; as an argument.
+    :type contains_pii: str
+    :param vis_only: Optional filter for whether datasets are visualization only (true). Although the field is named &#39;vis-only&#39;, use &#39;vis_only&#39; as an argument.
+    :type vis_only: str
+    :param vitessce_hint: Optional filter for a single element in the vitessce_hint list--i.e., return datasets for which vitessce_hints includes a value that matches the parameter. Although the field is named &#39;vitessce-hints&#39;, use &#39;vitessce_hint&#39; as an argument.
+    :type vitessce_hint: str
+    :param dataset_provider: Optional filter to identify the dataset provider - IEC (iec)  or external (lab)
+    :type dataset_provider: str
+
+    :rtype: Union[List[DatasetPropertyInfo], Tuple[List[DatasetPropertyInfo], int], Tuple[List[DatasetPropertyInfo], int, Dict[str, str]]
+    """
+    return neo4jManager.dataset_get(application_context, data_type, description, alt_name, primary, contains_pii, vis_only, vitessce_hint, dataset_provider)
 
 
 def semantics_semantic_id_semantics_get(semantic_id):  # noqa: E501

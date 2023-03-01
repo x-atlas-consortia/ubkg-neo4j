@@ -22,10 +22,10 @@ REQUIRES = [
 setup(
     name=NAME,
     version=VERSION,
-    description="HuBMAP Ontology API",
+    description="UBKG API",
     author_email="",
     url="",
-    keywords=["OpenAPI", "HuBMAP Ontology API"],
+    keywords=["OpenAPI", "UBKG API"],
     install_requires=REQUIRES,
     packages=find_packages(),
     package_data={'': ['openapi/openapi.yaml']},
@@ -33,7 +33,7 @@ setup(
     entry_points={
         'console_scripts': ['openapi_server=openapi_server.__main__:main']},
     long_description="""\
-    This document describes the HuBMAP Ontology API
+    This document describes the UBKG API
     """
 )
 
