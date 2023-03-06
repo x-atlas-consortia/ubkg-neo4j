@@ -32,6 +32,8 @@ the following ontologies:
 - ORDO 
 - UNIPROTKB 
 - UO
+- MONDO
+- EFO
 
 ## HubMAP/SenNet ontologies
 The HubMAP/SenNet knowledge graph should also include assertions from:
@@ -40,15 +42,14 @@ The HubMAP/SenNet knowledge graph should also include assertions from:
 - XCO 
 - HRAVS 
 - HUBMAP 
-- CCF 
-- MONDO 
-- EFO 
+- CCF  
 - SENNET
 
 ## Data Distillery
 
 Instances of the Data Distillery knowledge graph may not necessarily include ontologies specific to HubMAP/SenNET.
 A Data Distillery KG **will** include assertions from:
+
 
 ### Glygen ontologies
 - FALDO
