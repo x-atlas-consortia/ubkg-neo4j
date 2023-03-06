@@ -6,6 +6,55 @@ info:
 servers:
 - url: https://ontology.api.hubmapconsortium.org/
 paths:
+  /assaytype/{name}:
+    get:
+      operationId: assaytype_name_get
+      parameters:
+      - description: AssayType name
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          example: bulk-RNA
+          type: string
+        style: simple
+      - description: Filter to indicate application context
+        explode: true
+        in: query
+        name: application_context
+        required: false
+        schema:
+          default: HUBMAP
+          enum:
+          - HUBMAP
+          - SENNET
+          - hubmap
+          - sennet
+          - HuBMAP
+          - SenNet
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                name: bulk-RNA
+                primary: true
+                description: Bulk RNA-seq
+                vitessce-hints:
+                - pyramid
+                - anndata
+                contains-pii: true
+                vis-only: true
+              schema:
+                $ref: '#/components/schemas/AssayTypePropertyInfo'
+          description: A JSON array of the assay type name
+      summary: "Returns information on a set of HuBMAP or SenNet dataset types, with\
+        \ options to filter the list to those with specific property values. Filters\
+        \ are additive (i.e., boolean AND)"
+      x-openapi-router-controller: openapi_server.controllers.default_controller
   /codes/{code_id}/codes:
     get:
       operationId: codes_code_id_codes_get
@@ -976,11 +1025,7 @@ components:
         dataset_provider: HuBMAP IEC
         data_type: bulk-RNA
         description: Bulk RNA-seq
-        vitessce-hints:
-        - "[\"pyramid\",\"anndata\",\"is_image\",\"is_tiled\",\"is_sc\",\"rna\",\"\
-          atac\",\"sprm\",\"codex\",\"maldi\"]"
-        - "[\"pyramid\",\"anndata\",\"is_image\",\"is_tiled\",\"is_sc\",\"rna\",\"\
-          atac\",\"sprm\",\"codex\",\"maldi\"]"
+        vitessce-hints: Microscopy
         vis-only:
         - "true"
         - "true"
@@ -1034,6 +1079,7 @@ components:
           type: array
         vitessce-hints:
           description: Flags for Vitessce visualization
+          example: Microscopy
           items:
             example: "[\"pyramid\",\"anndata\",\"is_image\",\"is_tiled\",\"is_sc\"\
               ,\"rna\",\"atac\",\"sprm\",\"codex\",\"maldi\"]"
@@ -1041,4 +1087,60 @@ components:
           title: vitessce-hints
           type: array
       title: DatasetPropertyInfo
+      type: object
+    AssayTypePropertyInfo:
+      description: Properties of a HuBMAP/SenNet AssayType. 'DatasetPropertyInfo.data_type'
+        matches key in original assay_types.yaml.
+      example:
+        name: bulk-RNA
+        description: Bulk RNA-seq
+        vitessce-hints:
+        - "[\"pyramid\",\"anndata\",\"is_image\",\"is_tiled\",\"is_sc\",\"rna\",\"\
+          atac\",\"sprm\",\"codex\",\"maldi\"]"
+        - "[\"pyramid\",\"anndata\",\"is_image\",\"is_tiled\",\"is_sc\",\"rna\",\"\
+          atac\",\"sprm\",\"codex\",\"maldi\"]"
+        vis-only:
+        - true
+        - true
+        primary: true
+        contains-pii: true
+      properties:
+        name:
+          description: AssayType name; used to characterize dataset entities in provenance
+            hierarchy
+          example: bulk-RNA
+          title: name
+          type: string
+        primary:
+          description: Indicates whether the assay is primary (true) or derived (false)
+          example: true
+          title: primary
+          type: boolean
+        description:
+          description: How datasets of the data type are named in the Data Portal.
+          example: Bulk RNA-seq
+          title: description
+          type: string
+        vitessce-hints:
+          description: Flags for Vitessce visualization
+          items:
+            example: "[\"pyramid\",\"anndata\",\"is_image\",\"is_tiled\",\"is_sc\"\
+              ,\"rna\",\"atac\",\"sprm\",\"codex\",\"maldi\"]"
+            type: string
+          title: vitessce-hints
+          type: array
+        contains-pii:
+          description: Whether the dataset contains Patient Identifying Information
+            (PII) (true or false)
+          example: true
+          title: contains-pii
+          type: boolean
+        vis-only:
+          description: Indicates whether for visualization only (true or false)
+          items:
+            example: true
+            type: boolean
+          title: vis-only
+          type: array
+      title: AssayTypePropertyInfo
       type: object

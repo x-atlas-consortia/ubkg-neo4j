@@ -5,6 +5,7 @@ import re
 from neo4j.exceptions import CypherSyntaxError
 import json
 
+from openapi_server.models.assay_type_property_info import AssayTypePropertyInfo  # noqa: E501
 from openapi_server.models.codes_codes_obj import CodesCodesObj  # noqa: E501
 from openapi_server.models.concept_detail import ConceptDetail  # noqa: E501
 from openapi_server.models.concept_prefterm import ConceptPrefterm  # noqa: E501
@@ -886,3 +887,31 @@ class Neo4jManager(object):
                         pass
 
         return datasets
+
+    def assaytype_name_get(self, name: str, application_context: str = 'HUBMAP') -> AssayTypePropertyInfo:
+        """
+        This is intended to be a drop in replacement for the same endpoint in search-api.
+
+        The only difference is the optional application_contect to make it consistent with a HUBMAP or SENNET
+        environment.
+        """
+        # datasets: List[DatasetPropertyInfo] = self.dataset_get(application_context, name)
+
+        # Build the Cypher query that will return the table of data.
+        query = self.__query_cypher_dataset_info(application_context)
+
+        # Execute Cypher query and return result.
+        with self.driver.session() as session:
+            recds: neo4j.Result = session.run(query)
+            for record in recds:
+                if record.get('data_type') == name:
+                    # Accessing the record by .get('str') does not appear to work?! :-(
+                    return AssayTypePropertyInfo(
+                        record[0],
+                        record[3],
+                        record[1],
+                        record[7],
+                        record[6],
+                        record[5]
+                    )
+        return AssayTypePropertyInfo()
