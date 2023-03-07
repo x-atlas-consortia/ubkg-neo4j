@@ -907,11 +907,11 @@ class Neo4jManager(object):
                 if record.get('data_type') == name:
                     # Accessing the record by .get('str') does not appear to work?! :-(
                     return AssayTypePropertyInfo(
-                        record[0],
-                        record[3],
-                        record[1],
-                        record[7],
-                        record[6],
-                        record[5]
+                        record['data_type'],
+                        record['primary'],
+                        record['description'],
+                        record['vitessce_hints'],
+                        record['contains_pii'],
+                        record['vis_only']
                     )
         return AssayTypePropertyInfo()
