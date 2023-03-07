@@ -198,5 +198,9 @@
   "LINCS": {
     "comment": "LINCS data in edges/nodes format",
     "execute": "./UBKG_edges_nodes/UBKG_edges_nodes.py LINCS"
+  },
+  "AZ": {
+    "comment": "Azimuth annotations, obtained from input spreadsheet in SimpleKnowledge format",
+    "execute": "./skowlnets/skowlnets.py SimpleKnowledgeAzimuth.xlsx AZ"
   }
 }
