@@ -4,6 +4,7 @@ from typing import Dict
 from typing import Tuple
 from typing import Union
 
+from openapi_server.models.assay_type_property_info import AssayTypePropertyInfo  # noqa: E501
 from openapi_server.models.codes_codes_obj import CodesCodesObj  # noqa: E501
 from openapi_server.models.concept_detail import ConceptDetail  # noqa: E501
 from openapi_server.models.concept_prefterm import ConceptPrefterm  # noqa: E501
@@ -25,6 +26,21 @@ from openapi_server.managers.neo4j_manager import Neo4jManager
 
 
 neo4jManager = Neo4jManager()
+
+
+def assaytype_name_get(name, application_context=None):  # noqa: E501
+    """Returns information on a set of HuBMAP or SenNet dataset types, with options to filter the list to those with specific property values. Filters are additive (i.e., boolean AND)
+
+     # noqa: E501
+
+    :param name: AssayType name
+    :type name: str
+    :param application_context: Filter to indicate application context
+    :type application_context: str
+
+    :rtype: Union[AssayTypePropertyInfo, Tuple[AssayTypePropertyInfo, int], Tuple[AssayTypePropertyInfo, int, Dict[str, str]]
+    """
+    return neo4jManager.assaytype_name_get(name, application_context)
 
 
 def codes_code_id_codes_get(code_id, sab=None):  # noqa: E501
