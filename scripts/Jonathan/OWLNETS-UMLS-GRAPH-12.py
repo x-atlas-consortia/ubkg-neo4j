@@ -954,6 +954,7 @@ newCUI_SUIs.to_csv(csv_path('CUI-SUIs.csv'), mode='a', header=False, index=False
 # In[26]:
 
 print('Appending to CODE-SUIs.csv...')
+
 CODE_SUIs = pd.read_csv(csv_path("CODE-SUIs.csv"))
 CODE_SUIs = CODE_SUIs[((CODE_SUIs[':TYPE'] == 'PT') | (CODE_SUIs[':TYPE'] == 'SY'))]
 CODE_SUIs = CODE_SUIs.dropna().drop_duplicates().reset_index(drop=True)
@@ -963,12 +964,50 @@ CODE_SUIs = CODE_SUIs.dropna().drop_duplicates().reset_index(drop=True)
 # In[27]:
 
 
-# This does NOT (yet) address two different owl files asserting two different SUIs as PT with the same CUI,CodeID by choosing the first one in the build process (by comparing only three columns in the existence check) - a Code/CUI would thus have only one PT relationship (to only one SUI) so that is not guaranteed right now (its good practice in query to deduplicate anyway results - because for example even fully addressed two PT relationships could exist between a CODE and SUI if they are asserted on different CUIs) - to assert a vocabulary-specific relationship type as vocabulary-specific preferred term (an ingest parameter perhaps) one would create a PT (if it doesn't have one) and a SAB_PT - that is the solution for an SAB that wants to assert PT on someone else's Code (CCF may want this so there could be CCF_PT Terms on UBERON codes) - note that for SY later, this is not an issue because SY are expected to be multiple and so we use all four columns in the existence check there too but intend to keep that one that way.
+# JAS MARCH 2023 - change to address issue #42.
 
-# get the SUIs matches
-newCODE_SUIs = node_metadata.merge(SUIs, how='left', left_on='node_label', right_on='name')[
-    ['SUI:ID', 'node_id', 'CUI']].dropna().drop_duplicates().reset_index(drop=True)
+# JCS original comment:
+# This does NOT (yet) address two different owl files asserting two different SUIs as PT with the same CUI,CodeID
+# by choosing the first one in the build process (by comparing only three columns in the existence check)
+# - a Code/CUI would thus have only one PT relationship (to only one SUI) so that is not guaranteed right now
+# (its good practice in query to deduplicate anyway results - because for example even fully addressed
+# two PT relationships could exist between a CODE and SUI if they are asserted on different CUIs) -
+# to assert a vocabulary-specific relationship type as vocabulary-specific preferred term (an ingest parameter perhaps)
+# one would create a PT (if it doesn't have one) and a SAB_PT - that is the solution for an SAB that wants
+# to assert PT on someone else's Code (CCF may want this so there could be CCF_PT Terms on UBERON codes) -
+# note that for SY later, this is not an issue because SY are expected to be multiple and so we use all
+# four columns in the existence check there too but intend to keep that one that way.
+
+# JAS March 2023
+# Assign terms for codes of nodes indicated in the nodes file:
+#   If the SAB for the assertion set/ontology is the same as the SAB for the code, then PT
+#   else <SAB>_PT
+# get the SUIs matches for SUIs
+newCODE_SUIs = node_metadata.merge(SUIs, how='left', left_on='node_label', right_on='name')[['SUI:ID', 'node_id', 'CUI']].dropna().drop_duplicates().reset_index(drop=True)
+
 newCODE_SUIs.insert(2, ':TYPE', 'PT')
+
+# Change: if a term is being associated with a code by an ontology/set of assertions, it should be a PT only
+# if the code belongs to the ontology; otherwise, the term should be a "SAB PT".
+# For example, suppose that the following order of ingestion occurs:
+# PATO, MP, UBERON
+# The MP ontology uses codes from PATO, UBERON, and MP.
+
+# 1. MP codes will have a PT term.
+# 2. PATO codes will have terms with the following relationships:
+#    a. PT - from the ingestion of PATO
+#    b. MP_PT - from the ingestion of MP
+# 3. UBERON codes will have terms with the following relationships:
+#    a. PT - from the ingestion of UBERON
+#    b. PATO_PT - from the ingestion of PATO
+#    c. MP_PT - from the ingestion of MP
+
+# If terms for codes are different in the different ontologies (e.g. MP, UBERON, and PATO used different terms to
+# describe the same UBERON code, then there would be multiple terms. If, however, all ontologies use the same term,
+# there would be just one term, but with multiple relationships.
+
+newCODE_SUIs[':TYPE'] = np.where((OWL_SAB == newCODE_SUIs['node_id'].str.upper().str.split(' ').str[0]),'PT',OWL_SAB+'_PT')
+
 newCODE_SUIs.columns = [':END_ID', ':START_ID', ':TYPE', 'CUI']
 
 # Here we isolate only the rows not already matching in existing files
