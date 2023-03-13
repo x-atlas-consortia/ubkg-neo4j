@@ -10,7 +10,8 @@ WORKDIR /usr/src/app
 COPY . .
 
 # Install dependencies with pip (pip3 also works)
-RUN pip install --upgrade pip -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
 
 # The EXPOSE instruction informs Docker that the container listens on the specified network ports at runtime.
 # EXPOSE does not make the ports of the container accessible to the host.
