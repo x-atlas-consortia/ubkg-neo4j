@@ -27,7 +27,7 @@ args = parser.parse_args()
 
 
 def break_method(line: str):
-    m = re.match(r' *def ([a-z_]+)\(([^)]+)\)', line)
+    m = re.match(r' *def ([a-z_]+)\(([^)]*)\)', line)
     method_name: str = m[1]
     method_args: str = m[2]
     p = r'=[^,)]+'
@@ -43,6 +43,7 @@ methods_in_controller: List[dict] = []
 lines: List[str] = []
 lines_total = None
 model_includes_in_controller = []
+models_as_parameters: List[str] = []
 with open(args.controller, "r") as file:
     lines: List[str] = file.readlines()
     lines = [line.rstrip() for line in lines]
@@ -77,6 +78,12 @@ with open(args.controller, "r") as file:
             'neo4jManager = Neo4jManager()'
         ]
 
+    pattern_param_from_model = re.compile(r'(?<!^)(?=[A-Z])')
+    for model_include_str in model_includes_in_controller:
+        model: str = model_include_str.split(' ')[3]
+        param: str = pattern_param_from_model.sub('_', model).lower()
+        models_as_parameters.append(param)
+
     lines_total = len(lines)
     if args.verbose is True:
         print(f"lines in controller: {lines_total}")
@@ -87,10 +94,21 @@ with open(args.controller, "r") as file:
     method_args = None
     while line_i < lines_total-1:
         line_i += 1
-        #print(f"line[{line_i}]: {lines[line_i]}")
-        if lines[line_i].find('def ') == 0:
-            method_name, method_args = break_method(lines[line_i])
+        line: str = lines[line_i]
+        # print(f"line[{line_i}]: {line}")
+        if line.find('def ') == 0:
+            method_name, method_args = break_method(line)
             method_args_list = method_args.split(', ')
+            # This is to get around a well known bug in 'openapi-generator' where the request
+            # body is included as a parameter in the function's formal parameter list.
+            # Here we check for puts and posts where the first formal parameter is a model parameter
+            if method_name.split('_')[-1] in ['put', 'post'] and\
+                    len(method_args_list) > 0 and\
+                    method_args_list[0] in models_as_parameters:
+                # method_args_list = method_args_list[1:]
+                line_list: List[str] = line.split(' ')
+                # NOTE: The ':param model' line still shows up in the function documentation string
+                lines[line_i] = f"{line_list[0]} {method_name}({','.join(method_args_list[1:])}):  {line_list[3]} {line_list[4]} {line_list[5]}"
             methods_in_controller.append({'name': method_name, 'args': method_args_list, 'found': False})
             def_found = True
             continue
