@@ -125,7 +125,7 @@ def concepts_concept_id_semantics_get(concept_id):  # noqa: E501
     return neo4jManager.concepts_concept_id_semantics_get(concept_id)
 
 
-def concepts_expand_post(concept_sab_rel_depth):  # noqa: E501
+def concepts_expand_post():  # noqa: E501
     """Returns a unique list of concepts (Concept, Preferred Term) on all paths including starting concept (query_concept_id) restricted by list of relationship types (rel), list of relationship sources (sab), and depth of travel.
 
      # noqa: E501
@@ -140,7 +140,7 @@ def concepts_expand_post(concept_sab_rel_depth):  # noqa: E501
     return neo4jManager.concepts_expand_post(concept_sab_rel_depth)
 
 
-def concepts_path_post(concept_sab_rel):  # noqa: E501
+def concepts_path_post():  # noqa: E501
     """Return all paths of the relationship pattern specified within the selected sources
 
      # noqa: E501
@@ -155,7 +155,7 @@ def concepts_path_post(concept_sab_rel):  # noqa: E501
     return neo4jManager.concepts_path_post(concept_sab_rel)
 
 
-def concepts_shortestpaths_post(qconcept_tconcept_sab_rel):  # noqa: E501
+def concepts_shortestpaths_post():  # noqa: E501
     """Return all paths of the relationship pattern specified within the selected sources
 
      # noqa: E501
@@ -170,7 +170,7 @@ def concepts_shortestpaths_post(qconcept_tconcept_sab_rel):  # noqa: E501
     return neo4jManager.concepts_shortestpaths_post(qconcept_tconcept_sab_rel)
 
 
-def concepts_trees_post(concept_sab_rel_depth):  # noqa: E501
+def concepts_trees_post():  # noqa: E501
     """Return all paths of the relationship pattern specified within the selected sources
 
      # noqa: E501
