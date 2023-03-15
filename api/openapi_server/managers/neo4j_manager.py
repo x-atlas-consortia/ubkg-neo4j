@@ -5,6 +5,7 @@ import re
 from neo4j.exceptions import CypherSyntaxError
 import json
 
+from openapi_server.models.assay_name_request import AssayNameRequest  # noqa: E501
 from openapi_server.models.assay_type_property_info import AssayTypePropertyInfo  # noqa: E501
 from openapi_server.models.codes_codes_obj import CodesCodesObj  # noqa: E501
 from openapi_server.models.concept_detail import ConceptDetail  # noqa: E501
@@ -888,15 +889,7 @@ class Neo4jManager(object):
 
         return datasets
 
-    def assaytype_name_get(self, name: str, application_context: str = 'HUBMAP') -> AssayTypePropertyInfo:
-        """
-        This is intended to be a drop in replacement for the same endpoint in search-api.
-
-        The only difference is the optional application_contect to make it consistent with a HUBMAP or SENNET
-        environment.
-        """
-        # datasets: List[DatasetPropertyInfo] = self.dataset_get(application_context, name)
-
+    def _get_data_type_by_query(self, name: str, application_context: str) -> AssayTypePropertyInfo:
         # Build the Cypher query that will return the table of data.
         query = self.__query_cypher_dataset_info(application_context)
 
@@ -915,3 +908,24 @@ class Neo4jManager(object):
                         record['vis_only']
                     )
         return AssayTypePropertyInfo()
+
+    def assaytype_name_get(self, name: str, application_context: str = 'HUBMAP') -> AssayTypePropertyInfo:
+        """
+        This is intended to be a drop in replacement for the same endpoint in search-api.
+
+        The only difference is the optional application_contect to make it consistent with a HUBMAP or SENNET
+        environment.
+        """
+        # datasets: List[DatasetPropertyInfo] = self.dataset_get(application_context, name)
+
+        return self._get_data_type_by_query(name, application_context)
+
+    def assayname_post(self, assay_name_request: AssayNameRequest) -> AssayTypePropertyInfo:
+        """
+        assay_type_request.name can be either the canonical name of an assay or an alternate name.
+
+        All names are simple strings, but some alt-names are ordered lists of
+        simple strings, e.g. ['IMC', 'image_pyramid'].
+        """
+        logger.info(f'assayname_post; Request Body: {assay_name_request.to_dict()}')
+        return self._get_data_type_by_query(assay_name_request.name, assay_name_request.application_context)

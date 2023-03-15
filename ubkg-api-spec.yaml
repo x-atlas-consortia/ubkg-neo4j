@@ -503,7 +503,7 @@ paths:
   /assaytype/{name}: # CPK MAR 2023 - replacement for search-api endpoint of the same name
     get:
       operationId: assaytype_name_get
-      summary: Returns information on a set of HuBMAP or SenNet dataset types, with options to filter the list to those with specific property values. Filters are additive (i.e., boolean AND)
+      summary: Replacement for the same endpoint in search-api with the addition of application_context
       parameters:
         - name: name
           in: path
@@ -526,6 +526,33 @@ paths:
               - sennet
               - HuBMAP
               - SenNet
+      responses:
+        '200':
+          description: A JSON array of the assay type name
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssayTypePropertyInfo'
+              example:
+                name: bulk-RNA
+                primary: true
+                description: Bulk RNA-seq
+                vitessce-hints: ["pyramid","anndata"]
+                contains-pii: true
+                vis-only: true
+  /assayname: # CPK MAR 2023 - replacement for search-api endpoint of the same name
+    post:
+      operationId: assayname_post
+      summary: Replacement for the same endpoint in search-api
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssayNameRequest"
+            example:
+              name: [ PAS, Image Pyramid ]
+              application_context: HUBMAP
       responses:
         '200':
           description: A JSON array of the assay type name
@@ -813,3 +840,25 @@ components:
           items:
             type: boolean
             example: true
+    AssayNameRequest: # Schema name CPK MR 2023.
+      type: object
+      description: Request body for assaytype POST request
+      properties:
+        name:
+          anyOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: AssayType name which can be a string or an array of strings
+          example: [ PAS, Image Pyramid ]
+        application_context:
+          type: string
+          default: HUBMAP
+          enum:
+            - HUBMAP
+            - SENNET
+            - hubmap
+            - sennet
+            - HuBMAP
+            - SenNet

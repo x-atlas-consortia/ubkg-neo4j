@@ -16,6 +16,7 @@ scripts/venv
 scripts/.python-version
 scripts/robot
 scripts/.openapi-generator
+api/.openapi-generator/*
 
 # config file
 api/openapi_server/resources/app.properties
