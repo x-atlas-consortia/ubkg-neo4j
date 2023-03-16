@@ -6,6 +6,38 @@ info:
 servers:
 - url: https://ontology.api.hubmapconsortium.org/
 paths:
+  /assayname:
+    post:
+      operationId: assayname_post
+      requestBody:
+        content:
+          application/json:
+            example:
+              name:
+              - PAS
+              - Image Pyramid
+              application_context: HUBMAP
+            schema:
+              $ref: '#/components/schemas/AssayNameRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                name: bulk-RNA
+                primary: true
+                description: Bulk RNA-seq
+                vitessce-hints:
+                - pyramid
+                - anndata
+                contains-pii: true
+                vis-only: true
+              schema:
+                $ref: '#/components/schemas/AssayTypePropertyInfo'
+          description: A JSON array of the assay type name
+      summary: Replacement for the same endpoint in search-api
+      x-openapi-router-controller: openapi_server.controllers.default_controller
   /assaytype/{name}:
     get:
       operationId: assaytype_name_get
@@ -51,9 +83,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/AssayTypePropertyInfo'
           description: A JSON array of the assay type name
-      summary: "Returns information on a set of HuBMAP or SenNet dataset types, with\
-        \ options to filter the list to those with specific property values. Filters\
-        \ are additive (i.e., boolean AND)"
+      summary: Replacement for the same endpoint in search-api with the addition of
+        application_context
       x-openapi-router-controller: openapi_server.controllers.default_controller
   /codes/{code_id}/codes:
     get:
@@ -1144,3 +1175,37 @@ components:
           type: array
       title: AssayTypePropertyInfo
       type: object
+    AssayNameRequest:
+      description: Request body for assaytype POST request
+      example:
+        name:
+        - PAS
+        - Image Pyramid
+        application_context: HUBMAP
+      properties:
+        name:
+          $ref: '#/components/schemas/AssayNameRequest_name'
+        application_context:
+          default: HUBMAP
+          enum:
+          - HUBMAP
+          - SENNET
+          - hubmap
+          - sennet
+          - HuBMAP
+          - SenNet
+          title: application_context
+          type: string
+      title: AssayNameRequest
+      type: object
+    AssayNameRequest_name:
+      anyOf:
+      - type: string
+      - items:
+          type: string
+        type: array
+      description: AssayType name which can be a string or an array of strings
+      example:
+      - PAS
+      - Image Pyramid
+      title: AssayNameRequest_name
