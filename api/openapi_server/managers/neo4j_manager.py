@@ -1,3 +1,4 @@
+from flask import abort
 import neo4j
 import configparser
 from typing import List
@@ -889,7 +890,13 @@ class Neo4jManager(object):
 
         return datasets
 
-    def _get_data_type_by_query(self, name: str, application_context: str) -> AssayTypePropertyInfo:
+    def _get_data_type_by_query(self, name: str or List, application_context: str) -> AssayTypePropertyInfo:
+        """
+        Return the AssayTypePropertyInfo associated with the record information associated with name.
+        The 'name' parameter as passed by 'assayname_post' can be a string or list. If it is a string it's a
+        'data_type'; as a list it would be an 'alt_name'. This behavior is that of the endpoint in search-api
+        that this code is replacing.
+        """
         # Build the Cypher query that will return the table of data.
         query = self.__query_cypher_dataset_info(application_context)
 
@@ -897,7 +904,8 @@ class Neo4jManager(object):
         with self.driver.session() as session:
             recds: neo4j.Result = session.run(query)
             for record in recds:
-                if record.get('data_type') == name:
+                if (isinstance(name, List) and record.get('alt_names') == name) or \
+                        (isinstance(name, str) and record.get('data_type') == name):
                     # Accessing the record by .get('str') does not appear to work?! :-(
                     return AssayTypePropertyInfo(
                         record['data_type'],
@@ -907,7 +915,7 @@ class Neo4jManager(object):
                         record['contains_pii'],
                         record['vis_only']
                     )
-        return AssayTypePropertyInfo()
+        abort(400, f'No such assay_type {name}, even as alternate name')
 
     def assaytype_name_get(self, name: str, application_context: str = 'HUBMAP') -> AssayTypePropertyInfo:
         """
@@ -926,6 +934,8 @@ class Neo4jManager(object):
 
         All names are simple strings, but some alt-names are ordered lists of
         simple strings, e.g. ['IMC', 'image_pyramid'].
+
+        Note: the default value of 'assay_name_request.application_context' is defined in the OpenAPI .yaml file.
         """
         logger.info(f'assayname_post; Request Body: {assay_name_request.to_dict()}')
         return self._get_data_type_by_query(assay_name_request.name, assay_name_request.application_context)
