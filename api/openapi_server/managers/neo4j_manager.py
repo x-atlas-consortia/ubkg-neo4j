@@ -906,7 +906,6 @@ class Neo4jManager(object):
             for record in recds:
                 if (isinstance(name, List) and record.get('alt_names') == name) or \
                         (isinstance(name, str) and record.get('data_type') == name):
-                    # Accessing the record by .get('str') does not appear to work?! :-(
                     return AssayTypePropertyInfo(
                         record['data_type'],
                         record['primary'],
