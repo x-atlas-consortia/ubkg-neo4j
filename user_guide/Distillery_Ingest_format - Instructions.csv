@@ -1,9 +1,0 @@
-"General instructions here include how to complete each field in both ""tabs"".","These are submitted as a complete set of assertions (a vocabulary, also called SAB or source abbreviation) in two TSV files (nodes.tsv and edges.tsv).",One DCC will likely want to submit multiple vocabularies.,The other two tabs here show examples,Required titles and required value descriptions are bolded.,,,,,
-,,,,,,,,,
-nodes.tsv,,,,,,,,,
-node_id,node_namespace,node_label,node_definition,node_synonyms,node_dbxrefs,value,lowerbound,upperbound,units
-This is the unique code in the submitted vocabulary. It accepts generally IRIs (e.g. purl) or SAB<space>CODE which is preferred (required).,This is the SAB (optional - if can't be easily determined from node_id),This is the preferred term (required).,This is the definition (optional).,These are text synonyms (optional) separated by vertical bars.,These are external references which are used as much as possible and in same format as node_id (optional),This is a numeric decimal value (optional).,This is a numeric decimal value (optional).,This is a numeric decimal value (optional).,This is units (optional and NOT referenced to standard vocabulary).
-,,,,,,,,,
-edges.tsv,,,,,,,,,
-subject_id,relationship,object_id,evidence_class,,,,,,
-This is in form of node_id and must exist in submitted nodes file or already existing node in KG ingestion (required).,"This is a string or a IRI of a Relation Ontology relationship type (required). For subClass ""isa"" is used.",This is in form of node_id and must exist in submitted nodes file or already existing node in KG ingestion (required).,This is an optionsl string specific to an SAB to classify evidence with custom nominal values (optional).,,,,,,
