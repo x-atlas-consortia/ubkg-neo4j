@@ -1,9 +1,14 @@
+# JetBrains
 .idea/
+
+# Mac OSX
 .DS_Store
 
 **/*.bak
 \#*\#
 **~
+
+# specific to neo4j instance
 neo4j/import*
 neo4j/data/
 
