@@ -16,20 +16,27 @@ Help()
    echo "Syntax: ./run.sh [-option1] [argument1] [-option2] [argument2]..."
    echo "options (in any order)"
    echo "p     password for the neo4j account (REQUIRED)"
-   echo "u     username used to connect to the neo4j database (OPTIONAL; default=neo4j)"
-   echo "c     path to the directory in the local repository containing the ontology CSV files (OPTIONAL; default=current directory)"
-   echo "n     port to expose the neo4j browser/UI on (OPTIONAL; default=7474)"
-   echo "b     port to expose the neo4j/bolt:// interface on (OPTIONAL; default=7687)"
+   echo "d     name for the Docker container (OPTIONAL; default = ubkg-neo4j"
+   echo "u     username used to connect to the neo4j database (OPTIONAL; default = neo4j)"
+   echo "c     path to the directory in the local repository containing the ontology CSV files (OPTIONAL; default = current directory)"
+   echo "n     port to expose the neo4j browser/UI on (OPTIONAL; default = 7474)"
+   echo "b     port to expose the neo4j/bolt:// interface on (OPTIONAL; default = 7687)"
    echo "h     print this help"
    echo "example: './run.sh -p pwd -n 9999' creates a neo4j instance with password 'pwd' and browser port 9999 "
 }
 ######
 # Set defaults
 neo4j_password=""
+docker_name="ubkg-neo4j"
 neo4j_user="neo4j"
-csv_dir=""
 ui_port="7474"
 neo4j_port="7687"
+
+# The default CSV path is ../neo4j/import
+csv_dir="$(dirname -- "${BASH_SOURCE[0]}")" # relative
+csv_dir="$(cd -- "$csv_dir" && pwd -P;)"    # absolute
+csv_dir="$(dirname -- "$csv_dir")"          # parent
+csv_dir+="/neo4j/import"
 
 ######
 # Get the options
@@ -64,14 +71,36 @@ then
   exit 1;
 fi
 
-# Check for existence of CSV directory.
-if [ ! -d $csv_dir ]
+# Check for Docker container name (in case it was cleared via parameter)
+if [ "$docker_name" == ""]
 then
-  echo "Error: no path $csv_dir exists. Call this script with option c and an argument that specifies the path to the directory that contains the ontology CSV files."
+  echo "Error: no Docker container name. Either accept the default (ubkg-neo4j) or specify the Docker name with the -d option."
+  exit 1;
 fi
 
-echo "password: $neo4j_password"
-echo "user: $neo4j_user"
-echo "csv_dir: $csv_dir"
-echo "ui_port: $ui_port"
-echo "bolt port: $neo4j_port"
+# Check for existence of CSV directory.
+if [ ! -d "$csv_dir" ]
+then
+  echo "Error: no path '$csv_dir' exists. Either accept the default (/neo4j/import) or specify the the directory that contains the ontology CSV files with the -c option."
+  exit 1;
+fi
+
+# Check for CSV files in CSV directory.
+csvlist=("CODE-SUIs" "CODEs" "CUI-CODEs" "CUI-CUIs" "CUI-SUIs" "CUI-TUIs" "CUIs" "DEFrel" "DEFs" "SUIs" "TUIrel" "TUIs")
+for str in "${csvlist[@]}"; do
+  testcsv=$csv_dir$"/"$str$".csv"
+  if [ ! -e "$testcsv" ]
+  then
+    echo "Error: No file named $str.csv in directory '$csv_dir'."
+    exit 1;
+  fi
+done
+echo "***********"
+echo "All 12 required ontology CSV files were found in directory '$csv_dir'."
+echo ""
+echo "A Docker container for a neo4j instance will be created using the following parameters:"
+echo "  - neo4j account name: $neo4j_user"
+echo "  - neo4j account password: $neo4j_password"
+echo "  - CSV directory: $csv_dir"
+echo "  - neo4j browser/UI port: $ui_port"
+echo "  - neo4j bolt port: $neo4j_port"

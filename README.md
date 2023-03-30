@@ -20,14 +20,15 @@ a Docker container for the neo4j host of the ontology knowledge graph.
 ## Parameters for run.sh
 
 
-| Parameter name | required | Description                                                                        | Default  |
-|----------------|----------|------------------------------------------------------------------------------------|----------|
-| p              | yes      | password for the neo4j account                                                     |          |
-| u              |no| the username used to connect to the neo4j database                                 | neo4j    |
-| c              |no| the path to the directory in the local repository containing the ontology CSV files | neo4j/import |
-| n              |no| the port to expose the **neo4j browser/UI** on                                     |7474|
-| b              |no| the port to expose the **neo4j/bolt://** interface on                              |7687|     
-| h              |no|help||
+| Parameter name | required | Description                                                                         | Default      |
+|----------------|----------|-------------------------------------------------------------------------------------|--------------|
+| p              | yes      | password for the neo4j account                                                      |              |
+| d              | no       | name of the neo4j container                                                         | ubkg-neo4j   |
+| u              | no       | the username used to connect to the neo4j database                                  | neo4j        |
+| c              | no       | the path to the directory in the local repository containing the ontology CSV files | neo4j/import |
+| n              | no       | the port to expose the **neo4j browser/UI** on                                      | 7474         |
+| b              | no       | the port to expose the **neo4j/bolt://** interface on                               | 7687         |     
+| h              | no       | help                                                                                ||
 
 Parameters are options--i.e., not positional.
 
@@ -44,28 +45,28 @@ Creates a Docker container for an ontology database with an account named **geor
 The **run.sh** script will:
 1. Obtain a neo4j image from DockerHub.
 2. Copy the ontology CSVs from the neo4j/import path of the local repo to the image.
-3. Execute the Dockerfile in the docker path of the local repository.
+3. Execute the Dockerfile in the _**docker**_ path of the local repository.
 
 ## Dockerfile actions
 The Dockerfile will:
-1. Instantiate a Docker container running neo4j.
+1. Instantiate a Docker container running neo4j. The Docker container is based on an image obtained from DockerHub.
 2. Populate a database named **ontology** [^1] in the neo4j instance by importing from the ontology CSVs.
 3. Set the password for the **neo4j** account of the neo4j instance.
 4. Expose ports for the Dockerized neo4j instance.
 5. Set constraints for the **ontology** database.
 6. Set the **ontology** database to read-only.
 
-[^1]The neo4j database must be named **ontology**. The ubkg API expects to connect to a neo4j database with that name.
+[^1]The neo4j database must be named **ontology**. The ubkg API currently expects to connect to a neo4j database with that name.
 
 # Dependencies
 1. The machine that hosts the local repository must be running Docker.
 2. A complete set of ontology CSVs must be in the neo4j/import path of the local repository.
 
 # Files in the set of ontology CSVs 
-1. CODE-CUIs.csv 
-2. CODEs.csv 
-3. CUI-CODEs.csv 
-4. CUI-CUIs.csv 
+1. CODE-SUIs.csv
+2. CODEs.csv
+3. CUI-CODEs.csv
+4. CUI-CUIs.csv
 5. CUI-SUIs.csv
 6. CUI-TUIs.csv
 7. CUIs.csv
