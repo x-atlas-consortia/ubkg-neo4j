@@ -3,7 +3,7 @@
 # Unified Biomedical Knowledge Graph (UBKG)
 # neo4j Docker run script
 
-# Please consult the README.md file in the root folder of the ubkg-neo4j repository for information on this script.
+# Please consult the README.md file in the root folder of the ubkg-neo4j repository for more information on this script.
 
 ###########
 # Help function
@@ -11,14 +11,16 @@
 Help()
 {
    # Display Help
-   echo "UBKG neo4j Docker container script"
+   echo ""
+   echo "****************************************"
+   echo "HELP: UBKG neo4j Docker container script"
    echo
    echo "Syntax: ./run.sh [-option1] [argument1] [-option2] [argument2]..."
    echo "options (in any order)"
    echo "p     password for the neo4j account (REQUIRED)"
-   echo "d     name for the Docker container (OPTIONAL; default = ubkg-neo4j"
+   echo "d     name for the Docker container (OPTIONAL; default = ubkg-neo4j)"
    echo "u     username used to connect to the neo4j database (OPTIONAL; default = neo4j)"
-   echo "c     path to the directory in the local repository containing the ontology CSV files (OPTIONAL; default = current directory)"
+   echo "c     path to the directory in the local repository containing the ontology CSV files (OPTIONAL; default = ../neo4j/import)"
    echo "n     port to expose the neo4j browser/UI on (OPTIONAL; default = 7474)"
    echo "b     port to expose the neo4j/bolt:// interface on (OPTIONAL; default = 7687)"
    echo "h     print this help"
@@ -30,23 +32,29 @@ neo4j_password=""
 docker_name="ubkg-neo4j"
 neo4j_user="neo4j"
 ui_port="7474"
-neo4j_port="7687"
+bolt_port="7687"
 
-# The default CSV path is ../neo4j/import
-csv_dir="$(dirname -- "${BASH_SOURCE[0]}")" # relative
-csv_dir="$(cd -- "$csv_dir" && pwd -P;)"    # absolute
-csv_dir="$(dirname -- "$csv_dir")"          # parent
+# The default CSV path is ../neo4j/import, which is excluded by .gitignore.
+# Get relative path to current directory.
+csv_dir="$(dirname -- "${BASH_SOURCE[0]}")"
+# Convert to absolute path.
+csv_dir="$(cd -- "$csv_dir" && pwd -P;)"
+# Get parent path.
+csv_dir="$(dirname -- "$csv_dir")"
+# Add default path.
 csv_dir+="/neo4j/import"
 
 ######
-# Get the options
-while getopts ":hp:u:c:n:b:" option; do
+# Get options
+while getopts ":hp:d:u:c:n:b:" option; do
    case $option in
       h) # display Help
          Help
          exit;;
-      p) #password
+      p) # neo4j password
          neo4j_password=$OPTARG;;
+      d) # docker container name
+        docker_name=$OPTARG;;
       u) # user
         neo4j_user=$OPTARG;;
       c) # csv path
@@ -54,7 +62,7 @@ while getopts ":hp:u:c:n:b:" option; do
       n) # neo4j browser/UI port
         ui_port=$OPTARG;;
       b) # neo4j bolt interface port
-        neo4j_port=$OPTARG;;
+        bolt_port=$OPTARG;;
       \?) # Invalid option
          echo "Error: Invalid option"
          exit;;
@@ -62,7 +70,7 @@ while getopts ":hp:u:c:n:b:" option; do
 done
 
 ######
-# Main program
+# Validate options
 
 # Check for password
 if [ "$neo4j_password" == "" ]
@@ -71,10 +79,43 @@ then
   exit 1;
 fi
 
-# Check for Docker container name (in case it was cleared via parameter)
-if [ "$docker_name" == ""]
+# Check for Docker container name
+if [ "$docker_name" == "" ]
 then
   echo "Error: no Docker container name. Either accept the default (ubkg-neo4j) or specify the Docker name with the -d option."
+  exit 1;
+fi
+
+# Check for neo4j user name
+if [ "$neo4j_user" == "" ]
+then
+  echo "Error: no neo4j user name. Either accept the default (neo4j) or specify the Docker name with the -u option."
+  exit 1;
+fi
+
+# Check for integer browser port
+if ! [[ "$ui_port" =~ ^[0-9]+$ ]]
+then
+  echo "Error: non-integer neo4j browser port. Either accept the default (7474) or specify an integer with the -n option."
+  exit 1;
+fi
+
+if [ "$ui_port" == "" ]
+then
+  echo "Error: null neo4j browser port. Either accept the default (7474) or specify an integer with the -n option."
+  exit 1;
+fi
+
+# Check for integer bolt port
+if ! [[ "$bolt_port" =~ ^[0-9]+$ ]]
+then
+  echo "Error: non-integer bolt port. Either accept the default (7687) or specify an integer with the -b option."
+  exit 1;
+fi
+
+if [ "$bolt_port" == "" ]
+then
+  echo "Error: null bolt port. Either accept the default (7687) or specify an integer with the -b option."
   exit 1;
 fi
 
@@ -95,12 +136,32 @@ for str in "${csvlist[@]}"; do
     exit 1;
   fi
 done
-echo "***********"
+echo ""
+echo "**********************************************************************"
 echo "All 12 required ontology CSV files were found in directory '$csv_dir'."
 echo ""
 echo "A Docker container for a neo4j instance will be created using the following parameters:"
+echo "  - container name: " $docker_name
 echo "  - neo4j account name: $neo4j_user"
 echo "  - neo4j account password: $neo4j_password"
-echo "  - CSV directory: $csv_dir"
+echo "  - CSV directory for ontology CSV files: $csv_dir"
 echo "  - neo4j browser/UI port: $ui_port"
-echo "  - neo4j bolt port: $neo4j_port"
+echo "  - neo4j bolt port: $bolt_port"
+
+# Start Docker, providing:
+# - Docker name
+# - Account information as environment variables
+# - browser and bolt ports
+# - absolute path to the directory that contains the ontology CSVs
+# - neo4j image to use
+docker run -it \
+--name $docker_name \
+-p$ui_port:$ui_port \
+-p$bolt_port:$bolt_port \
+--env "NEO4J_USER=$neo4j_user" \
+--env "NEO4J_PASSWORD=$neo4j_password" \
+--env "CSV_DIR=$csv_dir" \
+--env "UI_PORT=$ui_port" \
+--env "BOLT_PORT=$bolt_port" \
+hubmap/neo4j-image:4.2.5
+

@@ -60,7 +60,7 @@ The Dockerfile will:
 
 # Dependencies
 1. The machine that hosts the local repository must be running Docker.
-2. A complete set of ontology CSVs must be in the neo4j/import path of the local repository.
+2. A complete set of ontology CSVs must be in the specified path. The default path is the **/neo4j/import** folder of this repo; other paths can be specified with the **-c** option.
 
 # Files in the set of ontology CSVs 
 1. CODE-SUIs.csv
