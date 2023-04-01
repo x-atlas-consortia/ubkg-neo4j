@@ -1,4 +1,7 @@
 #!/bin/bash
+echo " "
+echo "*****************************"
+echo "Ontology neo4j start script"
 
 # Neo4j installation directory.
 NEO4J=/usr/src/app/neo4j

@@ -4,6 +4,7 @@
 # Change directory
 WORKDIR /usr/src/app
 
+RUN echo "Copying configuration files to image..."
 # Copy files from host to image
 COPY start.sh .
 COPY set_constraints.cypher .
@@ -27,6 +28,7 @@ ENV IMPORT=/usr/src/app/neo4j/import
 # Copy ontology CSV files to the image from the directory specified in the CSV_DIR environment variable,
 # which was passed in the call to docker run.
 # The variable should be an absolute file path.
+RUN echo "Copying ontology CSV files from ${CSV_DIR to ${IMPORT}"
 COPY ${CSV_DIR}/*.csv ${IMPORT}/
 
 # Change directory
@@ -35,6 +37,7 @@ WORKDIR /usr/src/app/neo4j/bin
 # Run the neo4j-admin import, using the ontology CSVs to specify nodes and edges.
 # Name of the database: ontology (via --database flag), which the UBKG API expects.
 # NOTE: The NDC nodes (NDCs.csv), and relationships (NDCrel.csv) are not imported at this time.
+RUN echo "Running neo4j-admin import"
 RUN ./neo4j-admin import --verbose --database=ontology --nodes=Semantic="${IMPORT}/TUIs.csv" --nodes=Concept="${IMPORT}/CUIs.csv"  --nodes=Code="${IMPORT}/CODEs.csv"  nodes=Term="${IMPORT}/SUIs.csv"  nodes=Definition="${IMPORT}/DEFs.csv"  --relationships=ISA_STY="${IMPORT}/TUIrel.csv"  --relationships=STY="${IMPORT}/CUI-TUIs.csv"  --relationships="${IMPORT}/CUI-CUIs.csv"  --relationships=CODE="${IMPORT}/CUI-CODEs.csv"  --relationships="${IMPORT}/CODE-SUIs.csv"  --relationships=PREF_TERM="${IMPORT}/CUI-SUIs.csv"  --relationships=DEF="${IMPORT}/DEFrel.csv"  --skip-bad-relationships  --skip-duplicate-nodes\
 
 # - Install curl
