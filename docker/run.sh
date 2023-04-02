@@ -158,44 +158,11 @@ echo "  - neo4j bolt port: $bolt_port"
 echo " "
 echo "**************"
 echo "Starting Docker container"
-docker run \
--d \
--i \
--t \
---platform linux/amd64 \
---name $docker_name \
---env "NEO4J_USER=$neo4j_user" \
---env "NEO4J_PASSWORD=$neo4j_password" \
-hubmap/neo4j-image:4.2.5 \
-/bin/sh
+docker run -it \
+       -p"$ui_port":7474 \
+       -p"$bolt_port":7687 \
+       -v "$csv_dir":/usr/src/app/neo4j/import \
+       --env NEO4J_USER="$neo4j_user" \
+       --env NEO4J_PASSWORD="$neo4j_password" \
+       hubmap/ubkg-neo4j:latest
 
-# --env "CSV_DIR=$csv_dir" \
-# Note: hubmap/neo4j-image hard-codes the ports.
-# -p$ui_port:$ui_port \
-# -p$bolt_port:$bolt_port \
-# --env "UI_PORT=$ui_port" \
-#--env "BOLT_PORT=$bolt_port" \
-
-echo "Stopping neo4j in container"
-# Stop neo4j in the container.
-docker exec -d $docker_name  /usr/src/app/neo4j/bin/neo4j stop
-
-echo "Copying configuration files to container"
-# Copy configuration files to container.
-docker cp neo4j.conf $docker_name:/usr/src/app/neo4j.conf
-docker cp start.sh $docker_name:/usr/src/app/start.sh
-docker cp set_constraints.cypher $docker_name:/usr/src/app/set_constraints.cypher
-# Enable the start script.
-docker exec -d  $docker_name chmod +x /usr/src/app/start.sh
-
-echo "Copying ontology CSVs to container"
-# Copy ontology CSVs to container.
-docker cp $csv_dir/. $docker_name:/usr/src/app/neo4j/import
-
-echo "Importing ontology CSVs into ontology database"
-docker exec -d $docker_name /usr/src/app/neo4j/bin/neo4j-admin import --verbose --database=ontology --nodes=Semantic="${IMPORT}/TUIs.csv" --nodes=Concept="${IMPORT}/CUIs.csv"  --nodes=Code="${IMPORT}/CODEs.csv"  nodes=Term="${IMPORT}/SUIs.csv"  nodes=Definition="${IMPORT}/DEFs.csv"  --relationships=ISA_STY="${IMPORT}/TUIrel.csv"  --relationships=STY="${IMPORT}/CUI-TUIs.csv"  --relationships="${IMPORT}/CUI-CUIs.csv"  --relationships=CODE="${IMPORT}/CUI-CODEs.csv"  --relationships="${IMPORT}/CODE-SUIs.csv"  --relationships=PREF_TERM="${IMPORT}/CUI-SUIs.csv"  --relationships=DEF="${IMPORT}/DEFrel.csv"  --skip-bad-relationships  --skip-duplicate-nodes\
-
-echo "Running start script to set constraints and set to read-only"
-docker exec -d $docker_name /usr/src/app/start.sh
-
-echo "Done."
