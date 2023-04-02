@@ -6,6 +6,9 @@ echo "Ontology neo4j start script"
 # Neo4j installation directory.
 NEO4J=/usr/src/app/neo4j
 
+# Internal docker directory where import csvs are mounted
+IMPORT=/usr/src/app/neo4j/import
+
 # Set JAVA_HOME
 export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:/bin/java::")
 
@@ -14,7 +17,6 @@ NEO4J_USER=${NEO4J_USER}
 NEO4J_PASSWORD=${NEO4J_PASSWORD}
 
 echo "NEO4J_USER: $NEO4J_USER"
-echo "NEO4J_PASSWORD: $NEO4J_PASSWORD"
 
 # Run a simple query which (if it succeeds) tells us that the Neo4j is running...
 function test_cypher_query {
@@ -26,6 +28,11 @@ function test_cypher_query {
 # Must be performed before starting up the database for the first time
 echo "Setting the neo4j password as the value of NEO4J_PASSWORD environment variable: $NEO4J_PASSWORD"
 $NEO4J/bin/neo4j-admin set-initial-password $NEO4J_PASSWORD
+
+echo "Importing database from CSV files"
+$NEO4J/bin/neo4j-admin import --verbose --database=ontology --nodes=Semantic=$IMPORT/TUIs.csv --nodes=Concept=$IMPORT/CUIs.csv --nodes=Code=$IMPORT/CODEs.csv --nodes=Term=$IMPORT/SUIs.csv --nodes=Definition=$IMPORT/DEFs.csv --relationships=ISA_STY=$IMPORT/TUIrel.csv --relationships=STY=$IMPORT/CUI-TUIs.csv --relationships=$IMPORT/CUI-CUIs.csv --relationships=CODE=$IMPORT/CUI-CODEs.csv --relationships=$IMPORT/CODE-SUIs.csv --relationships=PREF_TERM=$IMPORT/CUI-SUIs.csv --relationships=DEF=$IMPORT/DEFrel.csv --skip-bad-relationships --skip-duplicate-nodes
+
+
 
 echo "Start the neo4j server in the background..."
 $NEO4J/bin/neo4j start
@@ -39,7 +46,7 @@ done
 
 echo "Creating the constraints using Cypher queries..."
 # https://neo4j.com/docs/operations-manual/current/tools/cypher-shell/
-${NEO4J}/bin/cypher-shell -u "${NEO4J_USER}" -p "${NEO4J_PASSWORD}" --format verbose --fail-at-end --debug -f "/usr/src/app/set_constraints.cypher"
+$NEO4J/bin/cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" --format verbose --fail-at-end --debug -f "/usr/src/app/set_constraints.cypher"
 
 SLEEP_TIME=2m
 echo "Sleeping for $SLEEP_TIME to allow the indexes to be built before going to read_only mode..."
@@ -47,16 +54,16 @@ sleep $SLEEP_TIME
 
 echo "Stopping neo4j server to go into read_only mode..."
 # https://neo4j.com/developer/kb/how-to-properly-shutdown-a-neo4j-database/
-if [[ ! `${NEO4J}/bin/neo4j stop` ]]; then
-  while [[ `${NEO4J}/bin/neo4j status` ]]; do
-    echo "Neo4j stop waiting..."
+if [[ ! `$NEO4J/bin/neo4j stop` ]]; then
+  while [[ `$NEO4J/bin/neo4j status` ]]; do
+    echo "Waiting for Neo4j to stop..."
     sleep 1
   done;
 fi
 
 echo "Only allow read operations from this Neo4j instance..."
 # https://neo4j.com/docs/operations-manual/current/configuration/neo4j-conf/#neo4j-conf
-echo "dbms.read_only=true" >> ${NEO4J}/conf/neo4j.conf
+echo "dbms.read_only=true" >> $NEO4J/conf/neo4j.conf
 
 echo "Restarting neo4j server in read_only mode..."
 # Docker requires your command to keep running in the foreground. Otherwise, it thinks that your applications stops and shutdown the container.
