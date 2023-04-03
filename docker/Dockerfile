@@ -3,7 +3,7 @@ FROM redhat/ubi8:8.6
 
 LABEL description="UBKG Neo4j service"
 
-# When trying to run "yum updates" or "yum install" the "system is not registered with an entitlement server" error message is given
+# When trying to run "yum updates" or "yum install", the "system is not registered with an entitlement server" error message is given
 # To fix this issue:
 RUN echo $'[main]\n\
 enabled=0\n\\n\

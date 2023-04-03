@@ -152,7 +152,7 @@ echo "  - neo4j bolt port: $bolt_port"
 # - container name
 # - Account information as environment variables
 # - browser and bolt ports
-# - absolute path to the directory that contains the ontology CSVs
+# - absolute path to the directory that contains the ontology CSVs. (This will be a bind mount.)
 # - neo4j image from Dockerhub
 # set up shell
 echo " "
@@ -164,5 +164,6 @@ docker run -it \
        -v "$csv_dir":/usr/src/app/neo4j/import \
        --env NEO4J_USER="$neo4j_user" \
        --env NEO4J_PASSWORD="$neo4j_password" \
+       --name "$docker_name" \
        hubmap/ubkg-neo4j:latest
 

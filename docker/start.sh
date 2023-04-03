@@ -1,12 +1,12 @@
 #!/bin/bash
 echo " "
 echo "*****************************"
-echo "Ontology neo4j start script"
+echo "UBKG ontology neo4j start script"
 
 # Neo4j installation directory.
 NEO4J=/usr/src/app/neo4j
 
-# Internal docker directory where import csvs are mounted
+# Internal docker directory where ontology CSVs are mounted
 IMPORT=/usr/src/app/neo4j/import
 
 # Set JAVA_HOME
@@ -31,8 +31,6 @@ $NEO4J/bin/neo4j-admin set-initial-password $NEO4J_PASSWORD
 
 echo "Importing database from CSV files"
 $NEO4J/bin/neo4j-admin import --verbose --database=ontology --nodes=Semantic=$IMPORT/TUIs.csv --nodes=Concept=$IMPORT/CUIs.csv --nodes=Code=$IMPORT/CODEs.csv --nodes=Term=$IMPORT/SUIs.csv --nodes=Definition=$IMPORT/DEFs.csv --relationships=ISA_STY=$IMPORT/TUIrel.csv --relationships=STY=$IMPORT/CUI-TUIs.csv --relationships=$IMPORT/CUI-CUIs.csv --relationships=CODE=$IMPORT/CUI-CODEs.csv --relationships=$IMPORT/CODE-SUIs.csv --relationships=PREF_TERM=$IMPORT/CUI-SUIs.csv --relationships=DEF=$IMPORT/DEFrel.csv --skip-bad-relationships --skip-duplicate-nodes
-
-
 
 echo "Start the neo4j server in the background..."
 $NEO4J/bin/neo4j start
