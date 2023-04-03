@@ -21,6 +21,11 @@ The ontology CSV files contain licensed content extracted from the Unified Medic
 2. The account that executes the run.sh script must be logged in to Docker Hub.
 2. A complete set of ontology CSVs must be path associated with the **c** option. The default path is the **/neo4j/import** folder of this repo; other paths can be specified with the **-c** option.
 
+# Deployment machine
+The deployment was developed and tested using Macbook Pros based on the M1 chipset. 
+Scripts assume that the host machine is running Mac OSX or Linux.
+
+
 ## Files in the set of ontology CSVs 
 1. CODE-SUIs.csv
 2. CODEs.csv
