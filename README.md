@@ -12,8 +12,28 @@ For more details on the UBKG, consult the [documentation](https://ubkg.docs.xcon
 
 This repository contains the source to deploy the ontology knowledge graph as a Docker container.
 
-## Licensing restrictions on ontology CSV files
+---
+# Licensing restrictions on ontology CSV files
 The ontology CSV files contain licensed content extracted from the Unified Medical Language System ([UMLS](https://www.nlm.nih.gov/research/umls/index.html). The ontology CSV files cannot be published to public repositories, such as Github or Dockerhub.
+
+# Dependencies
+1. The machine that hosts the local repository must be running Docker.
+2. The account that executes the run.sh script must be logged in to Docker Hub.
+2. A complete set of ontology CSVs must be path associated with the **c** option. The default path is the **/neo4j/import** folder of this repo; other paths can be specified with the **-c** option.
+
+## Files in the set of ontology CSVs 
+1. CODE-SUIs.csv
+2. CODEs.csv
+3. CUI-CODEs.csv
+4. CUI-CUIs.csv
+5. CUI-SUIs.csv
+6. CUI-TUIs.csv
+7. CUIs.csv
+8. DEFrel.csv
+9. DEFs.csv
+10. SUIs.csv
+11. TUIrel.csv
+12. TUIs.csv
 
 ---
 
@@ -22,8 +42,8 @@ The ontology CSV files contain licensed content extracted from the Unified Medic
 Create a Docker container for a neo4j instance of the UBKG by supplying a set of ontology CSVs to a Docker image published in Docker Hub.
 
 1. Clone this GitHub repository (ubkg-neo4j).
-2. Obtain a set of **ontology CSV files** that will be imported into a graph database in the neo4j instance. Depending on your circumstances, you may receive a set of ontology CSVs. Generate a new set of ontology CSVs by using the scripts of the UBKG source and generation frameworks, as described in the [ubkg-etl](https://github.com/x-atlas-consortia/ubkg-etl) repository.)
-3. Copy the ontology CSVs to the neo4j/import path of the local clone of this repository.
+2. Obtain a set of **ontology CSV files** that will be imported into a graph database in the neo4j instance. (Generate a new set of ontology CSVs by using the scripts of the UBKG source and generation frameworks, as described in the [ubkg-etl](https://github.com/x-atlas-consortia/ubkg-etl) repository.))
+3. Copy the ontology CSVs to the **neo4j/import** path of the local clone of this repository.
 4. Log in to [Docker Hub](https://hub.docker.com/).
 5. Start Docker on the local repository's host machine.
 6. Run the script **run.sh** in the **docker** path of the local clone of the repository, with parameters as described below.
@@ -34,7 +54,7 @@ To connect to the container,
 2. Point the browser to the machine and port associated with the container.
 3. Change to the bolt connection in the Connect URL.
 4. Specify the bolt port.
-5. Supply connection information for the neo4j
+5. Supply connection information for the neo4j user.
 
 ## Parameters for run.sh
 
@@ -75,24 +95,6 @@ The **run.sh** script will:
 
 ![img.png](img.png)
 
-# Dependencies
-1. The machine that hosts the local repository must be running Docker.
-2. The account that executes the run.sh script must be logged in to Docker Hub.
-2. A complete set of ontology CSVs must be path associated with the **c** option. The default path is the **/neo4j/import** folder of this repo; other paths can be specified with the **-c** option.
-
-# Files in the set of ontology CSVs 
-1. CODE-SUIs.csv
-2. CODEs.csv
-3. CUI-CODEs.csv
-4. CUI-CUIs.csv
-5. CUI-SUIs.csv
-6. CUI-TUIs.csv
-7. CUIs.csv
-8. DEFrel.csv
-9. DEFs.csv
-10. SUIs.csv
-11. TUIrel.csv
-12. TUIs.csv
 
 # Example output of script.
 
