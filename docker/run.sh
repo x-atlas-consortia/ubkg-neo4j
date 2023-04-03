@@ -159,8 +159,8 @@ echo " "
 echo "**************"
 echo "Starting Docker container"
 docker run -it \
-       -p"$ui_port":7474 \
-       -p"$bolt_port":7687 \
+       -p "$ui_port":7474 \
+       -p "$bolt_port":7687 \
        -v "$csv_dir":/usr/src/app/neo4j/import \
        --env NEO4J_USER="$neo4j_user" \
        --env NEO4J_PASSWORD="$neo4j_password" \
