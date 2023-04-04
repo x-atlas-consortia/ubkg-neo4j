@@ -23,6 +23,7 @@ Help()
    echo "c     path to the directory in the local repository containing the ontology CSV files (OPTIONAL; default = ../neo4j/import)"
    echo "n     port to expose the neo4j browser/UI on (OPTIONAL; default = 7474)"
    echo "b     port to expose the neo4j/bolt:// interface on (OPTIONAL; default = 7687)"
+   echo "t     the docker tag to use when running, if set to local the local image built by docker/build-local.sh script is used (OPTIONAL: default = <latest released version>"
    echo "h     print this help"
    echo "example: './run.sh -p pwd -n 9999' creates a neo4j instance with password 'pwd' and browser port 9999 "
 }
@@ -33,6 +34,7 @@ docker_name="ubkg-neo4j"
 neo4j_user="neo4j"
 ui_port="7474"
 bolt_port="7687"
+docker_tag="1.0.1"
 
 # The default CSV path is ../neo4j/import, which is excluded by .gitignore.
 # Get relative path to current directory.
@@ -46,7 +48,7 @@ csv_dir+="/neo4j/import"
 
 ######
 # Get options
-while getopts ":hp:d:u:c:n:b:" option; do
+while getopts ":hp:d:u:c:n:b:t:" option; do
    case $option in
       h) # display Help
          Help
@@ -63,11 +65,20 @@ while getopts ":hp:d:u:c:n:b:" option; do
         ui_port=$OPTARG;;
       b) # neo4j bolt interface port
         bolt_port=$OPTARG;;
+      t) # docker tag
+	docker_tag=$OPTARG;;
       \?) # Invalid option
          echo "Error: Invalid option"
          exit;;
    esac
 done
+
+if [ "$docker_tag" == "local" ]
+then
+  docker_image_name="ubkg-neo4j-local"
+else
+  docker_image_name="hubmap/ubkg-neo4j:$docker_tag_name"
+fi
 
 ######
 # Validate options
@@ -158,12 +169,22 @@ echo "  - neo4j bolt port: $bolt_port"
 echo " "
 echo "**************"
 echo "Starting Docker container"
+
+#if a docker container of the same name exists or is running stop and/or delete it
+docker stop "$docker_name" > /dev/null 2>&1
+docker rm "$docker_name" > /dev/null 2>&1
+
 docker run -it \
        -p "$ui_port":7474 \
        -p "$bolt_port":7687 \
        -v "$csv_dir":/usr/src/app/neo4j/import \
        --env NEO4J_USER="$neo4j_user" \
        --env NEO4J_PASSWORD="$neo4j_password" \
+       --env UI_PORT="$ui_port" \
+       --env BOLT_PORT="$bolt_port" \
        --name "$docker_name" \
-       hubmap/ubkg-neo4j:latest
+       "$docker_image_name" | grep --line-buffered -v "Bolt enabled on" | grep --line-buffered  -v "Remote interface available at"
 
+#grep -v commands above hide confusing messages coming from inside the container about
+#how to connect to Neo4j potentially only from inside the container if the port number
+#are not the defaults for the external mappings

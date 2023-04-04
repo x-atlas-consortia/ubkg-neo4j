@@ -78,7 +78,8 @@ All optional parameters have default values.
 | u                | no       | the username used to connect to the neo4j database                                  | neo4j        |
 | c                | no       | the path to the directory in the local repository containing the ontology CSV files | neo4j/import |
 | n                | no       | the port to expose the **neo4j browser/UI** on                                      | 7474         |
-| b                | no       | the port to expose the **neo4j/bolt://** interface on                               | 7687         |     
+| b                | no       | the port to expose the **neo4j/bolt://** interface on                               | 7687         |
+| t                | no       | specify the tag to use  when running the container <br />use the value `local` to run local version built with the docker/build-local.sh script| <latest release version |
 | h                | no       | help                                                                                ||
 
 
