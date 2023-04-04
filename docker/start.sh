@@ -12,9 +12,12 @@ IMPORT=/usr/src/app/neo4j/import
 # Set JAVA_HOME
 export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:/bin/java::")
 
-# Get the neo4j password and URI from system environment variable
+# Get the neo4j username, password, UI port and bolt port from system environment variables.
+# The UI and bolt ports are only needed to echo a message to the user
 NEO4J_USER=${NEO4J_USER}
 NEO4J_PASSWORD=${NEO4J_PASSWORD}
+UI_PORT=${UI_PORT}
+BOLT_PORT=${BOLT_PORT}
 
 echo "NEO4J_USER: $NEO4J_USER"
 
@@ -63,6 +66,12 @@ echo "Only allow read operations from this Neo4j instance..."
 # https://neo4j.com/docs/operations-manual/current/configuration/neo4j-conf/#neo4j-conf
 echo "dbms.read_only=true" >> $NEO4J/conf/neo4j.conf
 
-echo "Restarting neo4j server in read_only mode..."
-# Docker requires your command to keep running in the foreground. Otherwise, it thinks that your applications stops and shutdown the container.
+RED='\033[0;31m' # text red color
+NC='\033[0m' # No Color
+echo -e "${RED}***Restarting neo4j server in read_only mode..."
+#show the user the local ports where Neo4j can be accessed
+echo -e "***The Neo4j web desktop UI will be available at http://localhost:$UI_PORT"
+echo -e "***The neo4j/bolt interface will be available at neo4j://localhost:$BOLT_PORT and bolt://localhost:$BOLT_PORT ${NC}"
+
+# Docker requires your command to keep running in the foreground, so start with the console option. Otherwise, it thinks that your applications stops and shuts down the container.
 $NEO4J/bin/neo4j console
