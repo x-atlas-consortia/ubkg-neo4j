@@ -77,7 +77,7 @@ if [ "$docker_tag" == "local" ]
 then
   docker_image_name="ubkg-neo4j-local"
 else
-  docker_image_name="hubmap/ubkg-neo4j:$docker_tag_name"
+  docker_image_name="hubmap/ubkg-neo4j:$docker_tag"
 fi
 
 ######
