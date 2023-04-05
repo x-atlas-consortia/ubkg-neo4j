@@ -17,13 +17,13 @@ Help()
    echo
    echo "Syntax: ./run.sh [-option1] [argument1] [-option2] [argument2]..."
    echo "options (in any order)"
-   echo "p     password for the neo4j account (REQUIRED)"
-   echo "d     name for the Docker container (OPTIONAL; default = ubkg-neo4j)"
-   echo "u     username used to connect to the neo4j database (OPTIONAL; default = neo4j)"
-   echo "c     path to the directory in the local repository containing the ontology CSV files (OPTIONAL; default = ../neo4j/import)"
-   echo "n     port to expose the neo4j browser/UI on (OPTIONAL; default = 7474)"
-   echo "b     port to expose the neo4j/bolt:// interface on (OPTIONAL; default = 7687)"
-   echo "t     the docker tag to use when running, if set to local the local image built by docker/build-local.sh script is used (OPTIONAL: default = <latest released version>"
+   echo "-p     password for the neo4j account (REQUIRED)"
+   echo "-d     name for the Docker container (OPTIONAL; default = ubkg-neo4j)"
+   echo "-u     username used to connect to the neo4j database (OPTIONAL; default = neo4j)"
+   echo "-c     path to the directory in the local repository containing the ontology CSV files (OPTIONAL; default = ./neo4j/import)"
+   echo "-n     port to expose the neo4j browser/UI on (OPTIONAL; default = 7474)"
+   echo "-b     port to expose the neo4j/bolt:// interface on (OPTIONAL; default = 7687)"
+   echo "-t     the docker tag to use when running, if set to local the local image built by docker/build-local.sh script is used (OPTIONAL: default = <latest released version>"
    echo "h     print this help"
    echo "example: './run.sh -p pwd -n 9999' creates a neo4j instance with password 'pwd' and browser port 9999 "
 }
@@ -36,13 +36,11 @@ ui_port="7474"
 bolt_port="7687"
 docker_tag="1.0.1"
 
-# The default CSV path is ../neo4j/import, which is excluded by .gitignore.
+# The default CSV path is ./neo4j/import, which is excluded by .gitignore.
 # Get relative path to current directory.
 csv_dir="$(dirname -- "${BASH_SOURCE[0]}")"
 # Convert to absolute path.
 csv_dir="$(cd -- "$csv_dir" && pwd -P;)"
-# Get parent path.
-csv_dir="$(dirname -- "$csv_dir")"
 # Add default path.
 csv_dir+="/neo4j/import"
 
