@@ -1,30 +1,45 @@
-# Unified Biomedical Knowledge Graph (UBKG)
-## neo4j Ontology Knowledge Graph
+# Unified Biomedical Knowledge Graph (UBKG) Neo4j Docker support
+This repository contains the source to build and run the Unified Biomedical ontology Knowledge Graph (UBKG) in Neo4j as a Docker container.
 
+## Quick start guide
+To intantiate an instance of Neo4j with the UBKG by supplying a set of ontology CSVs follow these steps:
+**Note: We currently only support running on Linux or MacOS, a Windows script will be released soon.
+
+#### Running the UBKG in Neo4j
+  1. Make sure that [Docker is installed](https://docs.docker.com/engine/install/) and running on your computer.
+  2. Download the [run.sh](https://raw.githubusercontent.com/x-atlas-consortia/ubkg-neo4j/main/run.sh) file from this repository or clone this GitHub repository (ubkg-neo4j).  
+  3. Obtain a set of **ontology CSV files** that will be imported into a graph database in the neo4j instance. There are prebuilt CSVs availble for download, but require authorization because of licensing issues or generate a new set of ontology CSVs by using the scripts of the UBKG source and generation frameworks, as described in the [ubkg-etl](https://github.com/x-atlas-consortia/ubkg-etl) repository.))
+  4. Copy the ontology CSVs to the directory **neo4j/import/** under the same directory where run.sh resides .
+  5. Run the script **run.sh** in a shell supplying a password, like `./run.sh -p <password>`, changing <password> to a secret password. Other options are available in the run.sh script (see below), this will start the Docker container running Neo4j with the default options. This will instantiate a Docker container running Neo4j and import the CSV files.  It will take a few minutes to start, wait for it to finish restarting Neo4j in read-only mode before trying to connect.
+  6. Connect to the UBKG Neo4j Browser UI instance locally by browsing to http://localhost:7474/
+    6.a. If you use the -n option with run.sh the web browser port (default 7474) will need to  be change to what was specified.
+    6.b. If you use the -b option with run.sh the Connect URL neo4j/bolt:// port (default 7687) will need to be changed to what was specified after connectiong to the Neo4j Browser UI.
+    6.c. Fill in the default username of `neo4j` in the Neo4j Browser UI, or if the -u option was used with run.sh.
+    6.d Fill in the password that was used with the -p option when running in the Neo4j Browser UI
+    6.e Click Connect in the Neo4j Browser UI
+    
+---
+
+## The Ontology Knowledge Graph (UBKG)
 The components of the UBKG include:
 
 - The **source framework** that extracts ontology information from the UMLS to create a set of CSV files (**UMLS CSVs**)
 - The **generation framework** that appends to the UMLS CSVs assertion data from other ontologies to create a set of **ontology CSVs**
-- A neo4j  **ontology knowledge graph** populated from the ontology CSVs.
+- A neo4j  **ontology knowledge graph** populated from the ontology CSVs (this repository).
 - An **API server** that provides RESTful endpoints to query the ontology knowledge graph.
 
 For more details on the UBKG, consult the [documentation](https://ubkg.docs.xconsortia.org/).
 
-This repository contains the source to deploy the ontology knowledge graph as a Docker container.
-
----
-# Licensing restrictions on ontology CSV files
+## Licensing restrictions on ontology CSV files
 The ontology CSV files contain licensed content extracted from the Unified Medical Language System ([UMLS](https://www.nlm.nih.gov/research/umls/index.html). The ontology CSV files cannot be published to public repositories, such as Github or Dockerhub.
 
-# Dependencies
+## Dependencies
 1. The machine that hosts the local repository must be running Docker.
-2. The account that executes the run.sh script must be logged in to Docker Hub.
 2. A complete set of ontology CSVs must be path associated with the **c** option. The default path is the **/neo4j/import** folder of this repo; other paths can be specified with the **-c** option.
 
-# Deployment machine
-The deployment was developed and tested using Macbook Pros based on the M1 chipset. 
-Scripts assume that the host machine is running Mac OSX or Linux.
-
+## Deployment machine
+The deployment was developed and tested using Macbook Pros based on the M1 chipset as well as on RHEL 9 with an x86 architecture.
+Scripts assume that the host machine is running Mac OSX or Linux.  A run script to that works with Windows will be developed in the future.
 
 ## Files in the set of ontology CSVs 
 1. CODE-SUIs.csv
@@ -42,48 +57,33 @@ Scripts assume that the host machine is running Mac OSX or Linux.
 
 ---
 
-# Generating a UBKG neo4j Docker container
+## Building the UBKG Neo4j Docker image
+Files to build the UBKG Neo4j Docker image are included in the `/docker/` directory of this repository.  This directory includes scripts to build and deploy the image to Docker Hub as well as a script to build a local image for development/debugging purposes. Information about building the image is in the [docker/README.md](https://github.com/x-atlas-consortia/ubkg-neo4j/blob/main/docker/README.md) file there.
 
-Create a Docker container for a neo4j instance of the UBKG by supplying a set of ontology CSVs to a Docker image published in Docker Hub.
+---
 
-1. Clone this GitHub repository (ubkg-neo4j).
-2. Obtain a set of **ontology CSV files** that will be imported into a graph database in the neo4j instance. (Generate a new set of ontology CSVs by using the scripts of the UBKG source and generation frameworks, as described in the [ubkg-etl](https://github.com/x-atlas-consortia/ubkg-etl) repository.))
-3. Copy the ontology CSVs to the **neo4j/import** path of the local clone of this repository.
-4. Log in to [Docker Hub](https://hub.docker.com/).
-5. Start Docker on the local repository's host machine.
-6. Run the script **run.sh** in the **docker** path of the local clone of the repository, with parameters as described below.
+## The run.sh Script
 
-## Connecting to the container
-To connect to the container,
-1. Start a browser.
-2. Point the browser to the machine and port associated with the container.
-3. Change to the bolt connection in the Connect URL.
-4. Specify the bolt port.
-5. Supply connection information for the neo4j user.
+  SYNOPOSIS
+  run.sh -p password [-d name] [-u usrname] [-c path] [-n port] [-b port] [-t tag] || -h
 
-## Parameters for run.sh
+The run.sh script will, when run with the minimum, -p option to set the password, will download the latest release UBKG Neo4j Docker image from Docker Hub, and run the container.  When the container starts up it will import the provided UBKG CSVs, apply Neo4j constraints and build indices then restart Neo4j in read-only mode.  At a minimum, to run the UBKG Neo4j Docker container, a password ust be supplied with the -p option and UBKG CSVs need to be provided in the directory `neo4j/import/` which exists in the same directory as run.sh.  If executed with the -h option only, help text will be shown.
 
-Parameters are specified as options--i.e., in format
-
-```
--<option letter> <value>
-```
-
-All optional parameters have default values.
+Parameters are specified as options--i.e., in the format `-<option letter> <value)`.  All optional parameters, except -p, have default values.
 
 | Parameter option | required | Description                                                                         | Default      |
 |------------------|----------|-------------------------------------------------------------------------------------|--------------|
-| p                | yes      | password for the neo4j account                                                      |              |
-| d                | no       | name of the neo4j Docker container                                                  | ubkg-neo4j   |
-| u                | no       | the username used to connect to the neo4j database                                  | neo4j        |
-| c                | no       | the path to the directory in the local repository containing the ontology CSV files | neo4j/import |
-| n                | no       | the port to expose the **neo4j browser/UI** on                                      | 7474         |
-| b                | no       | the port to expose the **neo4j/bolt://** interface on                               | 7687         |
-| t                | no       | specify the tag to use  when running the container <br />use the value `local` to run local version built with the docker/build-local.sh script| <latest release version |
-| h                | no       | help                                                                                ||
+| -p                | yes      | password for the neo4j account                                                      |              |
+| -d                | no       | name of the neo4j Docker container                                                  | ubkg-neo4j   |
+| -u                | no       | the username used to connect to the neo4j database                                  | neo4j        |
+| -c                | no       | the path to the directory in the local repository containing the ontology CSV files | neo4j/import |
+| -n                | no       | the port to expose the **neo4j browser/UI** on                                      | 7474         |
+| -b                | no       | the port to expose the **neo4j/bolt://** interface on                               | 7687         |
+| -t                | no       | specify the tag to use  when running the container <br />use the value `local` to run local version built with the docker/build-local.sh script| <latest release version |
+| -h                | no       | help                                                                                ||
 
 
-### Examples
+#### Examples
 ```
 ./run.sh -p pwd
 ```
@@ -93,16 +93,9 @@ Creates a Docker container for an ontology database with password **pwd**, with 
 ```
 Creates a Docker container named **linda** for an ontology database with an account named **bob** with password **pwd**, with the browser port of **9988**.
 
-## run.sh actions
-The **run.sh** script will:
-1. Create a Docker container on the host machine from the UBKG neo4j image in DockerHub.
-2. Populate a knowledge graph database in the neo4j instance named **ontology** using the ontology CSVs from the neo4j/import path of the local github repository.
-3. Set constraints on the ontology database and make it read-only.
-
 ![img.png](img.png)
 
-
-# Example output of script.
+## Example output of script.
 
 The script was called on the local machine with options:
 
@@ -118,7 +111,7 @@ jas971@jas971s-MBP docker % ./run.sh -p test -d ubkg-test -n 4000 -b 4500
 
 ```
 
-## Validation
+### Validation
 The script:
 - validates parameters
 - confirms that a full set of ontology CSV files are available
@@ -136,7 +129,7 @@ A Docker container for a neo4j instance will be created using the following para
   - neo4j bolt port: 4500
 ```
 
-## Building the Docker container
+### Instantiating the Docker container
 
 ```
 **************
@@ -155,7 +148,7 @@ Digest: sha256:3504a5fcf1ad86a804c442b58d6425b07d116e7eed959cfbdda01dd768e8af11
 Status: Downloaded newer image for hubmap/ubkg-neo4j:latest
 ```
 
-## Import of ontology CSV files
+### Import of ontology CSV files
 ```
 *****************************
 Ontology neo4j start script
@@ -288,7 +281,7 @@ Started neo4j (pid 361). It is available at http://localhost:7474/
 There may be a short delay until the server is ready.
 ```
 
-## Setting of constraints and setting to read-only
+### Setting of constraints and setting to read-only
 ```
 See /usr/src/app/neo4j/logs/neo4j.log for current status.
 Waiting for server to begin fielding Cypher queries...
@@ -349,18 +342,10 @@ Starting Neo4j.
 2023-04-03 19:58:43.492+0000 INFO  Started.
 
 ```
-## Result in Docker Desktop
+### Result in Docker Desktop
 ![img_1.png](img_1.png)
 
-## Result in browser
+### Result in browser
 
 ![img_2.png](img_2.png)
 
-# Building a local image
-It is possible to run containers from local Docker images of the UBKG. To generate from a local image, execute the following scripts in the 
-docker directory:
-1. build-local.sh
-2. run-local.sh
-
-# Updating the Docker Hub image
-It is possible to push an update of the Docker image in DockerHub if you have the appropriate credentials to the image.
