@@ -2,12 +2,12 @@
 This repository contains the source to build and run the Unified Biomedical ontology Knowledge Graph (UBKG) in Neo4j as a Docker container.
 
 ## Quick start guide
-To intantiate an instance of Neo4j with the UBKG by supplying a set of ontology CSVs follow these steps:
-**Note: We currently only support running on Linux or MacOS, a Windows script will be released soon.
+To intantiate an instance of Neo4j with the UBKG by supplying a set of ontology CSVs follow these steps: <br />
+&nbsp;&nbsp;&nbsp;**Note: We currently only support running on Linux or MacOS, a Windows script will be released soon.
 
 #### Running the UBKG in Neo4j
   1. Make sure that [Docker is installed](https://docs.docker.com/engine/install/) and running on your computer.
-  2. Download the [run.sh](https://raw.githubusercontent.com/x-atlas-consortia/ubkg-neo4j/main/run.sh) file from this repository or clone this GitHub repository (ubkg-neo4j).  
+  2. Download the [run.sh](https://raw.githubusercontent.com/x-atlas-consortia/ubkg-neo4j/main/run.sh) file from this repository or `git clone` this repository ([ubkg-neo4j](https://github.com/x-atlas-consortia/ubkg-neo4j)).  
   3. Obtain a set of **ontology CSV files** that will be imported into a graph database in the neo4j instance. There are prebuilt CSVs availble for download, but require authorization because of licensing issues or generate a new set of ontology CSVs by using the scripts of the UBKG source and generation frameworks, as described in the [ubkg-etl](https://github.com/x-atlas-consortia/ubkg-etl) repository.))
   4. Copy the ontology CSVs to the directory **neo4j/import/** under the same directory where run.sh resides .
   5. Run the script **run.sh** in a shell supplying a password, like `./run.sh -p <password>`, changing <password> to a secret password. Other options are available in the run.sh script (see below), this will start the Docker container running Neo4j with the default options. This will instantiate a Docker container running Neo4j and import the CSV files.  It will take a few minutes to start, wait for it to finish restarting Neo4j in read-only mode before trying to connect.
