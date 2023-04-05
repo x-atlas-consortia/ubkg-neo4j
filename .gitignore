@@ -1,24 +1,16 @@
+# JetBrains
 .idea/
+
+# Mac OSX
 .DS_Store
-server.bak/
-venv/
+
 **/*.bak
 \#*\#
 **~
+
+# specific to neo4j import directory
 neo4j/import*
 neo4j/data/
-Generation_framework/builds/logs/*.log
-scripts/resources/
-scripts/pkt_kg/
-scripts/owlnets_output*
-scripts/owl
-scripts/venv
-scripts/.python-version
-scripts/robot
-scripts/.openapi-generator
-
-# config file
-api/openapi_server/resources/app.properties
 
 # log files in any path
 **/*.log
