@@ -12,7 +12,7 @@ Scripts in this repository  currently run on Linux or MacOS hosts. Scripts for W
 ---
 
 ## Quick start guide
-To intantiate an instance of Neo4j with the UBKG by supplying a set of ontology CSVs, follow these steps: <br />
+To instantiate an instance of Neo4j with the UBKG by supplying a set of ontology CSVs, follow these steps: <br />
 
 1. [Install and run Docker](https://docs.docker.com/engine/install/) on the host machine.
 2. Download the [run.sh](https://raw.githubusercontent.com/x-atlas-consortia/ubkg-neo4j/main/run.sh) file from this repository or `git clone` this repository ([ubkg-neo4j](https://github.com/x-atlas-consortia/ubkg-neo4j)).  
