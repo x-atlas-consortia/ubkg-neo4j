@@ -1,4 +1,4 @@
-#by default this script will build and push both intel64/amd64 and arm64
+#by default this script will build and push both x86-64 and arm64
 #versions of the image to Docker Hub with the tag "latest"
 #
 #if given "-rv <version>" argument it will also tag the pushed version
