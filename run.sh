@@ -34,7 +34,7 @@ docker_name="ubkg-neo4j"
 neo4j_user="neo4j"
 ui_port="7474"
 bolt_port="7687"
-docker_tag="1.0.1"
+docker_tag="current-release"
 
 # The default CSV path is ./neo4j/import, which is excluded by .gitignore.
 # Get relative path to current directory.
