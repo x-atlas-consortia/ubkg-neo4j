@@ -1,11 +1,8 @@
-#!/bin/pwsh
 # -------------------------
 # Unified Biomedical Knowledge Graph (UBKG)
 # neo4j Docker run script
 # PowerShell
-
 # Please consult the README.md file in the root folder of the ubkg-neo4j repository for more information on this script.
-
 param (
 
     # password for the neo4 account
@@ -13,13 +10,13 @@ param (
     [string]$p,
 
     # name for the Docker container
-    [string]$d ='ubkg-neo4j',
+    [string]$d ="ubkg-neo4j",
 
     # username used to connect to the neo4j database
-    [string]$u = 'neo4j',
+    [string]$u = "neo4j",
 
     # path to the directory containing the ontology CSV files
-    [string]$c='.\neo4j\import',
+    [string]$c=".\neo4j\import",
 
     # port to expose the neo4j browser UI on 
     [int]$n=7474,
@@ -28,7 +25,7 @@ param (
     [int]$b=7687,
 
     # the docker tag to use when running
-    [string]$t='current-release',
+    [string]$t="current-release",
 
     # help
     [switch]$h = $false
@@ -159,4 +156,3 @@ docker run -it `
 #grep -v commands above hide confusing messages coming from inside the container about
 #how to connect to Neo4j potentially only from inside the container if the port number
 #are not the defaults for the external mappings
-
