@@ -7,7 +7,10 @@ This deployment was developed and tested using the following types of machines a
 - Macbook Pros with the M1 chipset
 - Red Hat Entrprise Linux (RHEL) 9 with an x86 architecture
 
-Scripts in this repository  currently run on Linux or MacOS hosts. Scripts for Windows machines will be released soon.
+Scripts in this repository  currently run on Linux or MacOS hosts. 
+
+There is an initial version of a PowerShell script in the folder named **run.ps1.test**. 
+This script was tested on a Windows server VM, but has not been tested on a Windows 10 machine.
 
 ---
 
