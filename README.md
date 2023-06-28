@@ -1,6 +1,7 @@
 # Unified Biomedical Knowledge Graph (UBKG) Neo4j Docker support
 This repository contains the source to build and run the Unified Biomedical ontology Knowledge Graph (UBKG) in Neo4j as a Docker container.
 
+
 ### Note on platform
 
 This deployment was developed and tested using the following types of machines and platforms:
@@ -11,6 +12,12 @@ Scripts in this repository  currently run on Linux or MacOS hosts.
 
 There is an initial version of a PowerShell script in the folder named **run.ps1.test**. 
 This script was tested on a Windows server VM, but has not been tested on a Windows 10 machine.
+====== 
+### Note about supported platforms:
+The current release was developed and tested on Mac OS X with M1 and Linux with x86-64 arcitecture.<br />
+The release *should* work on OS X with Intel or M2 processors and any Linux release supported by Docker.<br />
+The run.sh script documented below was developed to work on OS X or Linux, a run script for Windows will be available soon.
+
 
 ---
 
