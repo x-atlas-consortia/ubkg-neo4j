@@ -68,7 +68,7 @@ echo "Only allow read operations from this Neo4j instance..."
 # https://neo4j.com/docs/operations-manual/current/configuration/neo4j-conf/#neo4j-conf
 
 # if RW_MODE is read-write, don't set to read_only mode
-if [ "$RW_MODE" == "read-write" ]
+if [ "$RW_MODE" != "read-write" ]
 then
   echo "dbms.read_only=true" >> $NEO4J/conf/neo4j.conf
 fi
