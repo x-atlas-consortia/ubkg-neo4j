@@ -30,12 +30,12 @@ COPY . .
 # 9 - Clean all yum cache
 RUN yum update -y && \
     yum install -y wget java-11-openjdk && \
-    wget http://dist.neo4j.org/neo4j-community-4.2.5-unix.tar.gz && \
-    tar -zxvf neo4j-community-4.2.5-unix.tar.gz && \
-    mv neo4j-community-4.2.5 neo4j && \
-    wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/4.2.0.2/apoc-4.2.0.2-all.jar && \
-    mv apoc-4.2.0.2-all.jar neo4j/plugins && \
-    rm neo4j-community-4.2.5-unix.tar.gz && \
+    wget http://dist.neo4j.org/neo4j-community-4.4.24-unix.tar.gz && \
+    tar -zxvf neo4j-community-4.4.24-unix.tar.gz && \
+    mv neo4j-community-4.4.24 neo4j && \
+    wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/4.4.0.20/apoc-4.4.0.20-all.jar && \
+    mv apoc-4.4.0.20-all.jar neo4j/plugins && \
+    rm neo4j-community-4.4.24-unix.tar.gz && \
     yum clean all
 
 # Change directory
