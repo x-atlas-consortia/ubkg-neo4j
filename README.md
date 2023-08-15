@@ -85,7 +85,7 @@ Files to build the UBKG Neo4j Docker image are included in the `/docker/` direct
 
   ### Synopsis
 
-  run.sh -p password [-d name] [-u usrname] [-c path] [-n port] [-b port] [-t tag] || -h
+  run.sh -p password [-d name] [-u usrname] [-c path] [-n port] [-b port] [-t tag] [-r true|false] || -h
 
 The **run.sh** script, when run with the minimum (**-p** option to set the password), will download the latest release UBKG Neo4j Docker image from Docker Hub, and run the container.  When the container starts up it will import the provided UBKG CSVs, apply Neo4j constraints and build indices, and then restart Neo4j in read-only mode.  At a minimum, to run the UBKG Neo4j Docker container, a password ust be supplied with the **-p** option and UBKG CSVs need to be provided in the directory `neo4j/import/` which exists in the same directory as run.sh.  If executed with the -h option only, help text will be shown.
 
@@ -100,6 +100,7 @@ Parameters are specified as options--i.e., in the format `-<option letter> <valu
 | -n                | no       | the port to expose the **neo4j browser/UI** on                                      | 7474         |
 | -b                | no       | the port to expose the **neo4j/bolt://** interface on                               | 7687         |
 | -t                | no       | specify the tag to use  when running the container <br />use the value `local` to run local version built with the docker/build-local.sh script| <latest release version |
+| -r                | no       | read-only mode, specify true or false to put the database in read-only (false) or read-write (true) | true |
 | -h                | no       | help                                                                                ||
 
 

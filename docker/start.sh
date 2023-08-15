@@ -18,6 +18,7 @@ NEO4J_USER=${NEO4J_USER}
 NEO4J_PASSWORD=${NEO4J_PASSWORD}
 UI_PORT=${UI_PORT}
 BOLT_PORT=${BOLT_PORT}
+RW_MODE=${RW_MODE}
 
 echo "NEO4J_USER: $NEO4J_USER"
 
@@ -50,8 +51,9 @@ echo "Creating the constraints using Cypher queries..."
 $NEO4J/bin/cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" --format verbose --fail-at-end --debug -f "/usr/src/app/set_constraints.cypher"
 
 SLEEP_TIME=2m
-echo "Sleeping for $SLEEP_TIME to allow the indexes to be built before going to read_only mode..."
+echo "Sleeping for $SLEEP_TIME to allow the indexes to be built..."
 sleep $SLEEP_TIME
+
 
 echo "Stopping neo4j server to go into read_only mode..."
 # https://neo4j.com/developer/kb/how-to-properly-shutdown-a-neo4j-database/
@@ -64,11 +66,16 @@ fi
 
 echo "Only allow read operations from this Neo4j instance..."
 # https://neo4j.com/docs/operations-manual/current/configuration/neo4j-conf/#neo4j-conf
-echo "dbms.read_only=true" >> $NEO4J/conf/neo4j.conf
+
+# if RW_MODE is read-write, don't set to read_only mode
+if [ "$RW_MODE" == "read-write" ]
+then
+  echo "dbms.read_only=true" >> $NEO4J/conf/neo4j.conf
+fi
 
 RED='\033[0;31m' # text red color
 NC='\033[0m' # No Color
-echo -e "${RED}***Restarting neo4j server in read_only mode..."
+echo -e "${RED}***Restarting neo4j server mode..."
 #show the user the local ports where Neo4j can be accessed
 echo -e "***The Neo4j web desktop UI will be available at http://localhost:$UI_PORT"
 echo -e "***The neo4j/bolt interface will be available at neo4j://localhost:$BOLT_PORT and bolt://localhost:$BOLT_PORT ${NC}"

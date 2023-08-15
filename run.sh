@@ -35,6 +35,7 @@ neo4j_user="neo4j"
 ui_port="7474"
 bolt_port="7687"
 docker_tag="current-release"
+ro_mode="true"
 
 # The default CSV path is ./neo4j/import, which is excluded by .gitignore.
 # Get relative path to current directory.
@@ -46,7 +47,7 @@ csv_dir+="/neo4j/import"
 
 ######
 # Get options
-while getopts ":hp:d:u:c:n:b:t:" option; do
+while getopts ":hp:d:u:c:n:b:t:r:" option; do
    case $option in
       h) # display Help
          Help
@@ -65,11 +66,24 @@ while getopts ":hp:d:u:c:n:b:t:" option; do
         bolt_port=$OPTARG;;
       t) # docker tag
 	docker_tag=$OPTARG;;
+      r) # docker tag
+	ro_mode=$OPTARG;;
       \?) # Invalid option
          echo "Error: Invalid option"
          exit;;
    esac
 done
+
+if [ "$ro_mode" == "true" ]
+then
+  rw_mode="read-only"
+elif [ "$ro_mode" == "false" ]
+then
+  rw_mode="read-write"
+else
+  echo "-r must specify must specify true or false as an argument to specify read-only mode.  Case counts."
+  exit
+fi   
 
 if [ "$docker_tag" == "local" ]
 then
@@ -180,6 +194,7 @@ docker run -it \
        --env NEO4J_PASSWORD="$neo4j_password" \
        --env UI_PORT="$ui_port" \
        --env BOLT_PORT="$bolt_port" \
+       --env RW_MODE="$rw_mode" \
        --name "$docker_name" \
        "$docker_image_name" | grep --line-buffered -v "Bolt enabled on" | grep --line-buffered  -v "Remote interface available at"
 
