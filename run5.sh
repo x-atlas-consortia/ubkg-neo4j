@@ -58,6 +58,8 @@ while getopts ":hp:d:u:m:n:b:t:r:" option; do
       d) # docker container name
          docker_name=$OPTARG;;
       u) # user
+	  echo Currently default user of neo4j cannot be changed.
+	  exit 1
          neo4j_user=$OPTARG;;
       m) # db path
          db_mount_dir=${OPTARG%/};;
