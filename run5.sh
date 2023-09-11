@@ -193,7 +193,7 @@ echo "**********************************************************************"
 echo "A Docker container for a neo4j instance will be created using the following parameters:"
 echo "  - container name: " $docker_name
 echo "  - neo4j account name: $neo4j_user"
-echo "  - neo4j account password: $neo4j_password"
+#echo "  - neo4j account password: $neo4j_password"
 echo "  - neo4j browser/UI port: $ui_port"
 echo "  - neo4j bolt port: $bolt_port"
 
