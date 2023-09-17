@@ -22,7 +22,7 @@ mkdir ubkg-neo`
 ```
 wget https://raw.githubusercontent.com/x-atlas-consortia/ubkg-neo4j/shirey/update-to-5.x/run5.sh
 ```
-4. Obtain a set of **ontology Neo4j database files** (see below)
+4. Obtain a set of **ontology Neo4j database files** (see section **Ontology Database Files** section below)
 5. Unpack the the database in the `neo4j/` directory e.g.:
 ```
 mkdir neo4j
@@ -31,11 +31,11 @@ unzip ../ubkg-neo4j5.zip
 cd ../
 ```
 This should unpack the database into a directory `data/` to create the required, default, direcotry neo4j/data/ that contains the UBKG Neo4j database files.
-6. Run the script **run5.sh** in a shell supplying the password for the admin account of the Neo4j instance,--e.g.:
+6. Run the script **run5.sh** in a shell supplying the password for the admin account of the Neo4j instance,--e.g. (change <password> to a secret password of your choosing, the password must be a minimum of 8 characters long containing a minimum of one number and one alpabetic character):
 ```
 ./run5.sh -p <password>
 ```
-changing <password> to a secret password. Other options are available in the run5.sh script. (See **The run5.sh script** below for descriptions of options or run `./run5.sh -h` for help content). 
+Other options are available in the run5.sh script. (See **The run5.sh script** below for descriptions of options or run `./run5.sh -h` for help content). 
 6. **run5.sh** will start a Docker container running neo4j with the default options. The Docker container will host an instance of Neo4j and populated it by importing from the ontology CSV files.  The process requires a few minutes.
 7. Wait for the script to finish restarting Neo4j in read-only mode before trying to connect. (See **Example output of script** below for an example of the complete run of the script.)
 8. Connect to the UBKG Neo4j Browser UI instance locally using http://localhost:_port_.
@@ -43,10 +43,8 @@ changing <password> to a secret password. Other options are available in the run
    * If you did not specify a value for _port_, use the default of 7474. 
 9. The **Connect to Neo4j** screen will appear. In the **Connect URL** box,
    * Change the option to **bolt://**.
-   * If you specified the bolt port in **run5.sh** using the **-b** option, change the port; otherwise, use the default of 7687. 
-10. Fill in the **Username**:
-     * If you specified a username in **run5.sh** using the **-u** option, provide that name.
-     * If you did not specify a username, use the default of **neo4j**.
+   * If you specified the bolt port in **run5.sh** using the **-b** option, change the port; otherwise, use the default of 7687.
+10. Specify the default username of `neo4j` (currently the username cannot be changed in the run script)
 11. Fill in the **Password** that you specified with the **-p** option with **run5.sh**.
 12. Click **Connect**.
     
@@ -96,7 +94,7 @@ Parameters are specified as options--i.e., in the format `-<option letter> <valu
 |------------------|----------|-------------------------------------------------------------------------------------|--------------|
 | -p                | yes      | password for the neo4j account                                                      |              |
 | -d                | no       | name of the neo4j Docker container                                                  | ubkg-neo4j   |
-| -u                | no       | the username used to connect to the neo4j database                                  | neo4j        |
+| -u                | no       | the username used to connect to the neo4j database (this feature is currently disabled)    | neo4j        |
 | -n                | no       | the port to expose the **neo4j browser/UI** on                                      | 7474         |
 | -b                | no       | the port to expose the **neo4j/bolt://** interface on                               | 7687         |
 | -t                | no       | specify the tag to use  when running the container <br />use the value `local` to run local version built with the docker/build-local.sh script| <latest release version |
