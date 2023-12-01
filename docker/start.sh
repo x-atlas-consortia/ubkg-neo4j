@@ -7,7 +7,7 @@ echo "UBKG ontology neo4j start script"
 NEO4J=/usr/src/app/neo4j
 
 # Internal docker directory where ontology CSVs are mounted
-IMPORT=/usr/src/app/neo4j/import
+# IMPORT=/usr/src/app/neo4j/import
 
 # Set JAVA_HOME
 export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:/bin/java::")
