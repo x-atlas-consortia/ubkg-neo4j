@@ -33,17 +33,21 @@ function test_cypher_query {
 #echo "Setting the neo4j password as the value of NEO4J_PASSWORD environment variable: $NEO4J_PASSWORD"
 #$NEO4J/bin/neo4j-admin set-initial-password $NEO4J_PASSWORD
 
-
-echo "Start the neo4j server, set the password then restart"
+echo "Starting the neo4j server, setting the password, then restarting"
 echo "Please wait, this may take a minute or two..."
+
+# Disable authentication of requests to neo4j server via configuration.
 cp $NEO4J/conf/neo4j.conf $NEO4J/conf/neo4j.conf.secure
 cp $NEO4J/conf/neo4j.conf.noauth $NEO4J/conf/neo4j.conf
+
 $NEO4J/bin/neo4j start > /dev/null 2>&1
 until test_cypher_query ; do
     echo 'Waiting for server to start...'
     sleep 5
 done
-echo "ALTER USER $NEO4J_USER SET PASSWORD '$NEO4J_PASSWORD'" | $NEO4J/bin/cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" > /dev/null 2>&1
+
+# JAS added SET PASSWORD CHANGE NOT REQUIRED.
+echo "ALTER USER $NEO4J_USER SET PASSWORD '$NEO4J_PASSWORD' SET PASSWORD CHANGE NOT REQUIRED" | $NEO4J/bin/cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" > /dev/null 2>&1
 sleep 5
 if [[ ! `$NEO4J/bin/neo4j stop` ]]; then
   while [[ `$NEO4J/bin/neo4j status` ]]; do
@@ -52,6 +56,7 @@ if [[ ! `$NEO4J/bin/neo4j stop` ]]; then
   done;
 fi
 
+# Re-enable authentication.
 cp $NEO4J/conf/neo4j.conf.secure $NEO4J/conf/neo4j.conf
 
 ## Spin here till the neo4j cypher-shell successfully responds...

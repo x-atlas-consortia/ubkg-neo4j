@@ -16,3 +16,5 @@ neo4j/data/*
 # log files in any path
 **/*.log
 
+# config files
+*.cfg
