@@ -16,26 +16,13 @@ Help()
    echo "HELP: UBKG neo4j Docker container build script"
    echo
    echo "Syntax: ./build_container.sh -c container.cfg"
-   echo "-c path to config file containing parameters for building the container"
-   #echo "Syntax: ./build_container.sh -p password [-m database-directory] [-d docker-name] [-u username] [-n ui-port] [-b neo-bolt-port] [-t docker-tag] [-r true|false][-i]"
-   #echo "options (in any order)"
-   #echo "-p     password for the neo4j account (REQUIRED; must be at least 8 characters and include at least one alphabetic and one numeric character)"
-   #echo "-d     name for the Docker container (OPTIONAL; default = ubkg-neo4j)"
-   #echo "-u     username used to connect to the neo4j database (OPTIONAL; default = neo4j)"
-   #echo "-m     path to the external neo4j database (bind mount) (OPTIONAL; default = ./neo4j/data)"
-   #echo "-n     port to expose the neo4j browser/UI on (OPTIONAL; default = 7474)"
-   #echo "-b     port to expose the neo4j/bolt:// interface on (OPTIONAL; default = 7687)"
-   #echo "-t     the docker tag to use when running; set to local to use the local image built by docker/build-local.sh script (OPTIONAL: default = <latest released version>)"
-   #echo "-r     run Neo4j in read-only mode; set to true or false (OPTIONAL; default = true)"
-   #echo "-i     for developer: build intialization container to obtain primer neo4j database (OPTIONAL: default is to build container with external bind mount)"
-   #echo "-h     print this help"
-   #echo "example: './build_container.sh -p abcd1234 -n 9999' creates a neo4j instance with password 'abcd1234' and browser port 9999 "
+   echo "-c path to config file containing parameters for building the container (REQUIRED: default=container.cfg)"
 }
-######
+##############################
 # Set defaults.
-config_file=""
+config_file="container.cfg"
 neo4j_password=""
-docker_name="ubkg-neo4j-5.11.0alpha"
+container_name="ubkg-neo4j-5.11.0alpha"
 neo4j_user="neo4j"
 ui_port="7474"
 bolt_port="7687"
@@ -53,39 +40,8 @@ base_dir="$(cd -- "$base_dir" && pwd -P;)"
 db_mount_dir="$base_dir"/data
 import_dir="$base_dir"/import
 
-######
-# Get options
-#while getopts ":hp:d:u:m:n:b:t:r::i" option; do
-   #case $option in
-      #i) # initialize; do not use external bind mount
-        #use_external_bind_mount="false";;
-      #h) # display Help
-         #Help
-         #exit;;
-      #p) # neo4j password
-         #neo4j_password=$OPTARG;;
-      #d) # docker container name
-         #docker_name=$OPTARG;;
-      #u) # user
-	        #echo Currently default user of neo4j cannot be changed.
-	        #exit 1
-          #neo4j_user=$OPTARG;;
-      #m) # path for external bind mount
-         #db_mount_dir=${OPTARG%/};;
-      #n) # neo4j browser/UI port
-          #ui_port=$OPTARG;;
-      #b) # neo4j bolt interface port
-        #bolt_port=$OPTARG;;
-      #t) # docker tag
-	      #docker_tag=$OPTARG;;
-      #r) # read/write tag
-	      #ro_mode=$OPTARG;;
-      #\?) # Invalid option
-         #echo "Error: Invalid option"
-         #exit;;
-   #esac
-#done
-
+##############################
+# Process options
 while getopts ":hc:" option; do
   case $option in
     h) # display Help
@@ -99,7 +55,16 @@ while getopts ":hc:" option; do
   esac
 done
 
-###### Read parameters from config file.
+##############################
+# Read parameters from config file.
+
+if [ "$config_file" == "" ]
+then
+  echo "Error: No configuration file specified. This script obtains parameters from a configuration file."
+  echo "Either accept the default (container.cfg) or specify a file name using the -c flag."
+  exit;
+fi
+
 if [ ! -e "$config_file" ]
 then
   echo "Error: no config file '$config_file' exists."
@@ -108,15 +73,23 @@ else
   source "$config_file";
 fi
 
-######
+##############################
 # Validate parameters obtained from config file.
 
 # Read/Write mode
 if [ "$read_mode" == "" ]
 then
-  echo "Error: no value for read_mode specified in config file. Options are read_write and read_only. "
+  echo "Error: no value for read_mode specified in config file. Either accept the default (read-only) or specify $read_mode in the config file."
+  echo "Options are 'read-write' and 'read-only'."
   exit 1;
-fi   
+fi
+
+if ! ([[ "$read_mode" == "read-only" ]] || [[ "$read_mode" == "read-write" ]])
+then
+  echo "Error: invalid value for 'read_mode'. Options are 'read-write' and 'read-only'."
+  exit 1;
+fi
+
 
 # Docker image name for container, based on tag
 if [ "$docker_tag" == "local" ]
@@ -126,7 +99,7 @@ else
   docker_image_name="hubmap/ubkg-neo4j:$docker_tag"
 fi
 
-# Check for password
+# neo4j password
 if [ "$neo4j_password" == "" ]
 then
   echo "Error: no neo4j_password specified in config file."
@@ -151,21 +124,21 @@ then
     exit 1;
 fi
 
-# Check for Docker container name
+# Docker container name
 if [ "$container_name" == "" ]
 then
   echo "Error: no value for container_name. Either accept the default (ubkg-neo4j) or specify a value in the config file."
   exit 1;
 fi
 
-# Check for neo4j user name
+# neo4j user name
 if [ "$neo4j_user" == "" ]
 then
   echo "Error: no value for neo4j_user. Either accept the default (neo4j) or specify a value in the config file."
   exit 1;
 fi
 
-# Check for integer browser port
+# Integer browser port
 if ! [[ "$ui_port" =~ ^[0-9]+$ ]]
 then
   echo "Error: non-integer neo4j browser port. Either accept the default (7474) or specify an integer for ui_port in the config file."
@@ -178,7 +151,7 @@ then
   exit 1;
 fi
 
-# Check for integer bolt port
+# Integer bolt port
 if ! [[ "$bolt_port" =~ ^[0-9]+$ ]]
 then
   echo "Error: non-integer bolt port. Either accept the default (7687) or specify an integer for bolt_port in the config file."
@@ -191,6 +164,7 @@ then
   exit 1;
 fi
 
+# db_mode (external or internal)
 if [ "$db_mode" == "" ]
 then
   echo "Error: no value for db_mode specified. Either accept the default (external) or specify a value in the config file."
@@ -198,7 +172,13 @@ then
   exit;
 fi
 
-# If using an external bind mount, check to make sure external database files exist in the specified mount path.
+if ! ([[ "$db_mode" == "internal" ]] || [[ "$db_mode" == "external" ]])
+then
+  echo "Error: invalid value for 'db_mode'. Options are 'internal' and 'external'."
+  exit 1;
+fi
+
+# If using an external bind mount, check to make sure that external database files exist in the specified mount path.
 if [ "$db_mode" == "external" ]
 then
 
@@ -234,13 +214,15 @@ echo "  - neo4j account name: $neo4j_user"
 #echo "  - neo4j account password: $neo4j_password"
 echo "  - neo4j browser/UI port: $ui_port"
 echo "  - neo4j bolt port: $bolt_port"
+echo "  - read/write mode: $read_mode"
 
-if [ "$db_mode" == "external" ]
+if [ "$db_mode" == "internal" ]
 then
-  echo "  - external bind mount path: $db_mount_dir"
+  echo "  - internal database (inside container)"
 else
-  echo "  - No external bind mount path. Run export_db.sh to copy primer database from container named $docker_name."
+  echo "  - external database at bind mount path: $db_mount_dir"
 fi
+
 
 # Run Docker container, providing:
 # - container name
@@ -257,14 +239,10 @@ echo "Starting Docker container"
 docker stop "$container_name" > /dev/null 2>&1
 docker rm "$container_name" > /dev/null 2>&1
 
-auth="$neo4j_user"/"$neo4j_password"
-
 # Conditional instantiation.
 if [ "$db_mode" == "external" ]
 then
   # Create container with external bind mounts for data and import.
-  #--env NEO4J_USER="$neo4j_user" \
-  #--env NEO4J_PASSWORD="$neo4j_password" \
   docker run -it \
        -p "$ui_port":7474 \
        -p "$bolt_port":7687 \
@@ -274,13 +252,12 @@ then
        --env NEO4J_PASSWORD="$neo4j_password" \
        --env UI_PORT="$ui_port" \
        --env BOLT_PORT="$bolt_port" \
-       --env RW_MODE="$rw_mode" \
+       --env RW_MODE="$read_mode" \
        --name "$container_name" \
        "$docker_image_name" | grep --line-buffered -v "Bolt enabled on" | grep --line-buffered  -v "Remote interface available at"
 else
   # Create initialization container without an external bind mount. The neo4j database inside the container
   # will be used as a primer database for the import of CSV files.
-
   docker run -it \
        -p "$ui_port":7474 \
        -p "$bolt_port":7687 \
@@ -288,7 +265,7 @@ else
        --env NEO4J_PASSWORD="$neo4j_password" \
        --env UI_PORT="$ui_port" \
        --env BOLT_PORT="$bolt_port" \
-       --env RW_MODE="$rw_mode" \
+       --env RW_MODE="$read_mode" \
        --name "$container_name" \
        "$docker_image_name" | grep --line-buffered -v "Bolt enabled on" | grep --line-buffered  -v "Remote interface available at"
 fi

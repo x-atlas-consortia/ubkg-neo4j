@@ -2,7 +2,10 @@
 # Unified Biomedical Knowledge Graph (UBKG)
 # Container configuration parameters for build_container script
 
+# Name of Docker container
 container_name=v5test
+# Name of ontology database. The script default is "ontology".
+ubkg_db_name=ontology
 # Docker tag. If "local", the build_container script will use the local Docker image instead of pulling an image
 # from DockerHub.
 docker_tag=neo-5.11.0-ALPHA1
@@ -26,6 +29,6 @@ db_mode=external
 # Path to the external bind mount for import.
 # The script default is a /import subdirectory of the current folder.
 #import_dir='/import'
-# Path to ontology CSVs.
-# The script default is a /CSV subdirectory of the current folder.
-#csv_dir='./csv'
+# Path to the ontology CSV files.
+# The script default is a /csv subdirectory of the current folder.
+#csv_dir='/csv'
