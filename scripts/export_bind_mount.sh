@@ -5,6 +5,10 @@
 # 1. Reads a config file to obtain properties of a Docker container hosting a neo4j instance.
 # 2. Extracts the complete database from the neo4j instance.
 
+# Assumptions:
+# 1. neo4j Community Edition
+# 2. The container specified by the config file has an internal database--i.e., no external bind mount.
+
 ###########
 # Help function
 ##########
@@ -18,16 +22,18 @@ Help()
    echo
    echo "Syntax: ./export_db.sh [-c config file]"
    echo "options (in any order)"
-   echo "-c   path to config file containing properties for the container"
+   echo "-c   path to config file containing properties for the container (REQUIRED: default='container.cfg')"
    echo "-h   print this help"
-   echo "example: './export_bind_mounts.sh -c container.cfg' exports the data and import folders of the container specified in the config file."
+   echo "example: './export_bind_mounts.sh' exports the data and import folders of the container specified in the config file."
+   echo "Review container.cfg.example for descriptions of parameters."
 }
 
 ##############################
-# Set defaults.
+# SET DEFAULTS.
 config_file="container.cfg"
-container_name="ubkg-neo4j"
+container_name="ubkg-neo4j-5.11.0alpha"
 
+# Default path to external bind mount
 # Get relative path to current directory.
 base_dir="$(dirname -- "${BASH_SOURCE[0]}")"
 # Convert to absolute path.
@@ -36,7 +42,7 @@ base_dir="$(cd -- "$base_dir" && pwd -P;)"
 db_mount_dir="$base_dir"
 
 ##############################
-# Process options
+# PROCESS OPTIONS
 while getopts ":hc:" option; do
   case $option in
     h) # display Help
@@ -51,7 +57,7 @@ while getopts ":hc:" option; do
 done
 
 ##############################
-# Read parameters from config file.
+# READ PARAMETERS FROM CONFIG FILE.
 
 if [ "$config_file" == "" ]
 then
@@ -69,8 +75,7 @@ else
 fi
 
 ##############################
-# Validate parameters obtained from config file.
-
+# VALIDATE PARAMETERS OBTAINED FROM CONFIG FILE.
 # Check for Docker container name
 if [ "$container_name" == "" ]
 then
@@ -83,4 +88,6 @@ echo "**********************************************************************"
 echo "The database will be extracted from the neo4j instance in the container with the following properties:"
 echo "  - container name: " $container_name
 
+##############################
+# EXPORT DATABASE TO BIND MOUNT PATH.
 docker cp "$container_name":/usr/src/app/neo4j/data/ "$db_mount_dir"/data

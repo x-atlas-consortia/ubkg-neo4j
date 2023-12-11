@@ -2,12 +2,23 @@
 # -------------------------
 # Unified Biomedical Knowledge Graph (UBKG)
 # CSV Import script:
-# 1. Reads a configuration file of properties of a Docker container hosting an instance of neo4j.
+# 1. Reads a configuration file of properties of a Docker container hosting an instance of neo4j with an external bind mount.
 # 2. Connects to the Docker container.
 # 3. Imports a set of CSVs into a new database named ontology.
-# 4. Stops the neo4j instance.
-# 5. Resets the default database to point to the ontology database.
-# 6. Restarts the neo4j instance.
+# 4. Replaces the content of the neo4j database directories (databases and transactions directories) with the content
+#    from ontology.
+#
+
+# Assumptions:
+# 1. The Docker container specified by the configuration file has external bind mounts to folders in the application
+#    directory named
+#    - data
+#    - import
+# 2. There is a folder, specified by configuration, that contains the full set of 12 CSV files for the UBKG import.
+#    The contents of this folder will be copied into the import bind mount.
+# 3. neo4j Community Edition, which can only have one database. Because the neo4j has already been instantiated,
+#    the database name has to be neo4j.
+
 
 ###########
 # Help function
@@ -22,23 +33,21 @@ Help()
    echo
    echo "Syntax: ./export_db.sh [-c config file]"
    echo "options (in any order)"
-   echo "-c   path to config file containing properties for the container"
+   echo "-c   path to config file containing properties for the container (REQUIRED: default='container.cfg'."
    echo "-h   print this help"
-   echo "example: './import_csvs.sh -c container.cfg' exports the data folder of the container specified in the config file."
+   echo "example: './import_csvs.sh' exports the data folder of the container specified in the config file."
+   echo "Review container.cfg.example for descriptions of parameters."
 }
 ##############################
 # Set defaults.
 config_file="container.cfg"
-container_name="ubkg-neo4j"
-ubkg_db_name="ontology"
+container_name="ubkg-neo4j-5.11.0alpha"
 
 # Default relative paths
 # Get relative path to current directory.
 base_dir="$(dirname -- "${BASH_SOURCE[0]}")"
 # Convert to absolute path.
 base_dir="$(cd -- "$base_dir" && pwd -P;)"
-# UBKG database path in external bind mount.
-ubkg_dir="$base_dir/data/$ubkg_db_name"
 
 # Default folder containing the ontology CSVs.
 csv_dir="$base_dir/csv"
@@ -46,8 +55,9 @@ csv_dir="$base_dir/csv"
 # points to a non-empty folder, Docker "obscures" the existing contents.
 import_dir="$base_dir/import"
 
+
 ##############################
-# Process options
+# PROCESS OPTIONS
 while getopts ":hc:" option; do
   case $option in
     h) # display Help
@@ -62,7 +72,7 @@ while getopts ":hc:" option; do
 done
 
 ##############################
-# Read parameters from config file.
+# READ PARAMETERS FROM CONFIG FILE.
 
 if [ "$config_file" == "" ]
 then
@@ -79,35 +89,12 @@ else
 fi
 
 ##############################
-# Validate parameters obtained from config file.
+# VALIDATE PARAMETERS FROM CONFIG FILE.
 
 # Check for Docker container name.
 if [ "$container_name" == "" ]
 then
   echo "Error: no Docker container name. Either accept the default (ubkg-neo4j) or specify container_name in the config file."
-  exit 1;
-fi
-
-# Neo4j username
-if [ "$neo4j_user" == "" ]
-then
-  echo "Error: No neo4j user account described."
-  echo "Specify neo4j_user in the config file."
-  exit 1;
-fi
-# Neo4j password
-if [ "$neo4j_password" == "" ]
-then
-  echo "Error: No neo4j password."
-  echo "Specify neo4j_password in the config file."
-  exit 1;
-fi
-
-# Name for the ubkg datbase.
-if [ "$ubkg_db_name" == "" ]
-then
-  echo "Error: No name for the ubkg neo4j database."
-  echo "Accept the default (ontology) or specify ubkg_db_name in the config file."
   exit 1;
 fi
 
@@ -135,7 +122,6 @@ echo ""
 echo "**********************************************************************"
 echo "Importing CSV files"
 echo " - CSV source directory: $csv_dir "
-echo " - neo4j database: $ubkg_db_name"
 echo " - Docker container: $container_name."
 
 # Connect to the neo4j instance and import CSVs.
@@ -153,20 +139,22 @@ IMPORT="$NEO4J"/import
 cp "$csv_dir"/* "$import_dir"
 
 # Delete the specified ubkg database from the external bind mount, if it exists.
-echo "Removing $ubkg_db_name database from external bind mount (in path $ubkg_dir), if it exists."
-rm -f "$ubkg_dir"
+echo "Dropping existing ontology database files from external bind mount."
+rm -fr "$base_dir/data/databases/data/ontology"
+rm -fr "$base_dir/data/transactions/ontology"
 echo ""
 
-# Set the default database to be the specified ubkg database instead of neo4j.
-#docker exec "$container_name" echo "initial.dbms.default_database=$ubkg_db_name" >> "$NEO4J"/conf/neo4j.conf
 
 # Import CSVs.
 # Changes to neo4j-admin import for v5:
 # 1. "import" is now "database import full"
 # 2. "bad_tolerance" parameter, with default of 1000. We will increase this threshold.
-# 3. The name of the target database (e.g., ontology) is now the final argument instead of a --database parameter.
-echo "Importing CSVs from directory $csv_dir to external data bind mount $ubkg_dir."
-docker exec -it "$container_name" "$NEO4J"/bin/neo4j-admin database import full --verbose \
+# 3. The name of the import database (e.g., neo4j) is now the final argument instead of a --database parameter.
+# 4. high-parallel-io=on
+# 5. overwrite-destination
+docker exec "$container_name" "$NEO4J"/bin/neo4j-admin database import full \
+  --verbose \
+  --high-parallel-io=on \
   --nodes=Semantic="$IMPORT"/TUIs.csv \
   --nodes=Concept="$IMPORT"/CUIs.csv \
   --nodes=Code="$IMPORT"/CODEs.csv \
@@ -182,7 +170,19 @@ docker exec -it "$container_name" "$NEO4J"/bin/neo4j-admin database import full 
   --skip-bad-relationships \
   --skip-duplicate-nodes \
   --bad-tolerance=1000000 \
-  "$ubkg_db_name"
+  --overwrite-destination\
+  neo4j
 
-#echo "Restarting neo4j"
-#exec "$container_name" "$NEO4J"/bin/neo4j start
+# Replace the content of the neo4j database folder path (default) with the content of the ontology database folder path.
+# Do not delete the original neo4j folders.
+#echo ""
+#echo "**********************************************************************"
+#echo "Replacing default database (neo4j) with content from imported ubkg database"
+#rm -rf "$base_dir/data/databases/neo4j/*"
+#rm -rf "$base_dir/data/transactions/neo4j/*"
+#mv "$base_dir/data/databases/ubkg/*" "$base_dir/data/databases/neo4j"
+#mv "$base_dir/data/transactions/ubkg/*" "$base_dir/data/transactions/neo4j"
+#rm -rf "$base_dir/data/databases/ubkg"
+#rm -rf "$base_dir/data/transactions/ubkg"
+echo "CSV import complete."
+

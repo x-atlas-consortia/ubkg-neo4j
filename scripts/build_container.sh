@@ -5,6 +5,14 @@
 # 1. Reads a configuration file.
 # 2. Builds a Docker container hosting a neo4j server.
 
+# The script builds two types of container:
+# 1. Without a bind mount. This allows for the export of an empty neo4j database appropriate to the version of neo4j.
+#    This database will be a "primer" for a later import of UBKG data.
+# 2. With bind mounts for neo4j data and import, pointing to directories in the application directory.
+
+# Assumptions:
+# neo4j Community Edition
+
 ###########
 # Help function
 ##########
@@ -15,33 +23,55 @@ Help()
    echo "****************************************"
    echo "HELP: UBKG neo4j Docker container build script"
    echo
-   echo "Syntax: ./build_container.sh -c container.cfg"
-   echo "-c path to config file containing parameters for building the container (REQUIRED: default=container.cfg)"
+   echo "Syntax: ./build_container.sh mode -c container.cfg"
+   echo "mode (REQUIRED: default=external) relationship of neo4j database files to the neo4j server:"
+   echo "     internal - databases are internal (in the Docker container)"
+   echo "     external - databases are external (in a bind mount)"
+   echo "-c   path to config file containing parameters for building the container (REQUIRED: default=container.cfg)"
+   echo "Review container.cfg.example for descriptions of parameters."
 }
 ##############################
-# Set defaults.
+# SET DEFAULTS.
+
+# Name of the configuration file.
 config_file="container.cfg"
-neo4j_password=""
+# Name of the Docker container.
 container_name="ubkg-neo4j-5.11.0alpha"
+# Tag for the docker container.
+docker_tag="neo-5.11.0-ALPHA1"
+
 neo4j_user="neo4j"
+neo4j_password=""
 ui_port="7474"
 bolt_port="7687"
-docker_tag="neo-5.11.0-ALPHA1"
-# read only
 read_mode="read_only"
-# external bind mount
 db_mode="external"
 
+# Default paths for external bind mounts.
 # Get relative path to current directory.
 base_dir="$(dirname -- "${BASH_SOURCE[0]}")"
 # Convert to absolute path.
 base_dir="$(cd -- "$base_dir" && pwd -P;)"
-# Add default path.
 db_mount_dir="$base_dir"/data
 import_dir="$base_dir"/import
 
 ##############################
-# Process options
+# VALIDATE ARGUMENT
+db_mode=$1
+if [ "$1" == "" ]
+then
+  db_mode="external"
+fi
+
+if ! ([[ "$db_mode" == "internal" ]] || [[ "$db_mode" == "external" ]])
+then
+  echo "Error: invalid value for database mode. Options are 'internal' and 'external'."
+  exit 1;
+fi
+
+
+##############################
+# VALIDATE OPTIONS
 while getopts ":hc:" option; do
   case $option in
     h) # display Help
@@ -56,7 +86,7 @@ while getopts ":hc:" option; do
 done
 
 ##############################
-# Read parameters from config file.
+# READ PARAMETERS FROM CONFIG FILE.
 
 if [ "$config_file" == "" ]
 then
@@ -74,12 +104,12 @@ else
 fi
 
 ##############################
-# Validate parameters obtained from config file.
+# VALIDATE PARAMETERS FROM CONFIG FILE.
 
 # Read/Write mode
 if [ "$read_mode" == "" ]
 then
-  echo "Error: no value for read_mode specified in config file. Either accept the default (read-only) or specify $read_mode in the config file."
+  echo "Error: no value for 'read_mode' specified in $config_file. Either accept the default (read-only) or specify a value."
   echo "Options are 'read-write' and 'read-only'."
   exit 1;
 fi
@@ -89,7 +119,6 @@ then
   echo "Error: invalid value for 'read_mode'. Options are 'read-write' and 'read-only'."
   exit 1;
 fi
-
 
 # Docker image name for container, based on tag
 if [ "$docker_tag" == "local" ]
@@ -157,26 +186,12 @@ then
   echo "Error: non-integer bolt port. Either accept the default (7687) or specify an integer for bolt_port in the config file."
   exit 1;
 fi
-
 if [ "$bolt_port" == "" ]
 then
   echo "Error: null bolt port. Either accept the default (7687) or specify an integer for bolt_port in the config file."
   exit 1;
 fi
 
-# db_mode (external or internal)
-if [ "$db_mode" == "" ]
-then
-  echo "Error: no value for db_mode specified. Either accept the default (external) or specify a value in the config file."
-  echo "Options: external (external bind mount) or internal (in the container)."
-  exit;
-fi
-
-if ! ([[ "$db_mode" == "internal" ]] || [[ "$db_mode" == "external" ]])
-then
-  echo "Error: invalid value for 'db_mode'. Options are 'internal' and 'external'."
-  exit 1;
-fi
 
 # If using an external bind mount, check to make sure that external database files exist in the specified mount path.
 if [ "$db_mode" == "external" ]
@@ -189,13 +204,15 @@ then
     exit 1;
   fi
 
-  # Check for existence of ontology database directory and dabase auth file
+  # Check for existence of ontology database directory and database auth file
   ont_db_dir="$db_mount_dir"/databases/neo4j
+
   # auth_file="$db_mount_dir"/dbms/auth.ini
 
   if [ ! -d "$ont_db_dir" ]
   then
-    echo "Error: no path '$ont_db_dir' exists. The directory containing the ontology database does not exist. Be sure to copy a UBKG database to '$db_mount_dir'"
+    echo "Error: no path '$ont_db_dir' exists."
+    echo "Either copy a pre-generated UBKG database to '$db_mount_dir' or generate a new database."
     exit 1;
   fi
 
@@ -206,12 +223,14 @@ then
   #fi
 fi # $use_external_bind_mount check
 
+##############################
+# BUILD CONTAINER.
+
 echo ""
 echo "**********************************************************************"
 echo "A Docker container for a neo4j instance will be created using the following parameters:"
 echo "  - container name: " $container_name
 echo "  - neo4j account name: $neo4j_user"
-#echo "  - neo4j account password: $neo4j_password"
 echo "  - neo4j browser/UI port: $ui_port"
 echo "  - neo4j bolt port: $bolt_port"
 echo "  - read/write mode: $read_mode"
@@ -222,7 +241,6 @@ then
 else
   echo "  - external database at bind mount path: $db_mount_dir"
 fi
-
 
 # Run Docker container, providing:
 # - container name

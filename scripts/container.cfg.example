@@ -4,11 +4,11 @@
 
 # Name of Docker container
 container_name=v5test
-# Name of ontology database. The script default is "ontology".
-ubkg_db_name=ontology
+# Name of UBKG database. The default is "ontology" for external databases (bind mounts) and "neo4j" for internal databases.
+# db_name=ontology
 # Docker tag. If "local", the build_container script will use the local Docker image instead of pulling an image
 # from DockerHub.
-docker_tag=neo-5.11.0-ALPHA1
+docker_tag=local
 # Account name and password for the neo4j server running in the Docker container.
 # The password must contain at least 8 characters, of which one must be alphabetic and one numeric.
 neo4j_user=neo4j
@@ -17,18 +17,10 @@ neo4j_password=abcd1234
 ui_port=4000
 bolt_port=4500
 # Whether the neo4j instance is read-write or read-only
-read_mode=read-only
-# Relationship of the neo4j server to its database.
-# Options are:
-# internal (in the default data path for the neo4j server in the Docker container
-# external (an external bind mount)
-db_mode=external
+read_mode=read-write
 # Path to the external bind mount for the database - a complete neo4j database, corresponding to the neo4j/data path
 # The script default is a /data subdirectory of the current folder.
 #db_mount_dir='/data'
-# Path to the external bind mount for import.
-# The script default is a /import subdirectory of the current folder.
-#import_dir='/import'
 # Path to the ontology CSV files.
 # The script default is a /csv subdirectory of the current folder.
 #csv_dir='/csv'
