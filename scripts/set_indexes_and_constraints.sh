@@ -109,4 +109,4 @@ docker exec "$container_name" \
 -f "/usr/src/app/indexes_constraints.cypher"
 
 
-echo "Setting of constraints and indexes complete."
+echo "Setting of constraints and indexes requested. Run SHOW INDEXES to determine when indexes have completed."
