@@ -260,12 +260,13 @@ docker rm "$container_name" > /dev/null 2>&1
 # Conditional instantiation.
 if [ "$db_mode" == "external" ]
 then
-  # Create container with external bind mounts for data and import.
+  # Create container with external bind mounts for data, import, and logs.
   docker run -it \
        -p "$ui_port":7474 \
        -p "$bolt_port":7687 \
        -v "$db_mount_dir":/usr/src/app/neo4j/data \
        -v "$import_dir":/usr/src/app/neo4j/import \
+       -v "$base_dir/logs":/usr/src/app/neo4j/logs \
        --env NEO4J_USER="$neo4j_user" \
        --env NEO4J_PASSWORD="$neo4j_password" \
        --env UI_PORT="$ui_port" \

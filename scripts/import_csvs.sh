@@ -173,16 +173,10 @@ docker exec "$container_name" "$NEO4J"/bin/neo4j-admin database import full \
   --overwrite-destination\
   neo4j
 
-# Replace the content of the neo4j database folder path (default) with the content of the ontology database folder path.
-# Do not delete the original neo4j folders.
-#echo ""
-#echo "**********************************************************************"
-#echo "Replacing default database (neo4j) with content from imported ubkg database"
-#rm -rf "$base_dir/data/databases/neo4j/*"
-#rm -rf "$base_dir/data/transactions/neo4j/*"
-#mv "$base_dir/data/databases/ubkg/*" "$base_dir/data/databases/neo4j"
-#mv "$base_dir/data/transactions/ubkg/*" "$base_dir/data/transactions/neo4j"
-#rm -rf "$base_dir/data/databases/ubkg"
-#rm -rf "$base_dir/data/transactions/ubkg"
+
+##############################
+# EXPORT IMPORT REPORT TO APPLICATION DIRECTORY.
+echo "Exporting import.report to $base_dir"
+docker cp "$container_name:/usr/src/app/neo4j/bin/import.report" "$base_dir"
 echo "CSV import complete."
 
