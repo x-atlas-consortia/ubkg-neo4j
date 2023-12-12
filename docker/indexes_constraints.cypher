@@ -11,6 +11,7 @@ CREATE INDEX FOR (n:Term) ON (n.name);
 CREATE INDEX FOR (n:Definition) ON (n.SAB);
 CALL db.relationshipTypes()
 YIELD relationshipType
+WHERE NOT (relationshipType CONTAINS '-' OR relationshipType =~ '^\d.*')
 WITH apoc.coll.disjunction(COLLECT(relationshipType),["CODE","ISA_STY","PREF_TERM","DEF","STY"]) AS nosys
 MATCH (c:Code)-[r]->()
 WITH nosys, COLLECT(DISTINCT(TYPE(r))) AS ttys
