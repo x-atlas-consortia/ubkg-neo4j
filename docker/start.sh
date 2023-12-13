@@ -55,35 +55,7 @@ fi
 # Re-enable authentication.
 cp $NEO4J/conf/neo4j.conf.secure $NEO4J/conf/neo4j.conf
 
-## Spin here till the neo4j cypher-shell successfully responds...
-#echo "Waiting for server to begin fielding Cypher queries..."
-#until test_cypher_query ; do
- #   echo 'Cypher Query available waiting...'
- #  sleep 1
-#done
-
-#echo "Creating the constraints using Cypher queries..."
-## https://neo4j.com/docs/operations-manual/current/tools/cypher-shell/
-#$NEO4J/bin/cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" --format verbose --fail-at-end --debug -f "/usr/src/app/set_constraints.cypher"
-#
-#SLEEP_TIME=2m
-#echo "Sleeping for $SLEEP_TIME to allow the indexes to be built..."
-#sleep $SLEEP_TIME
-
-
-#echo "Stopping neo4j server to go into read_only mode..."
-## https://neo4j.com/developer/kb/how-to-properly-shutdown-a-neo4j-database/
-#if [[ ! `$NEO4J/bin/neo4j stop` ]]; then
-#  while [[ `$NEO4J/bin/neo4j status` ]]; do
-#    echo "Waiting for Neo4j to stop..."
-#    sleep 1
-#  done;
-#fi
-
-#echo "Only allow read operations from this Neo4j instance..."
-# https://neo4j.com/docs/operations-manual/current/configuration/neo4j-conf/#neo4j-conf
-
-# Set read-write mode. The default is false.
+# Set read-write mode. The default is read-write.
 if [ "$RW_MODE" == "read-only" ]
 then
   echo "Setting the neo4j instance to be read-only."
