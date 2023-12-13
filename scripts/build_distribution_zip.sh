@@ -88,6 +88,7 @@ docker stop "$container_name" || true
 # 1. An external bind mount database.
 # 2. The example config file.
 # 3. The build_container script.
+echo "Building file $container_name.zip."
 zip -r "$container_name.zip" data/
 zip "$container_name.zip" container.cfg.example
 zip "$container_name.zip" build_container.sh

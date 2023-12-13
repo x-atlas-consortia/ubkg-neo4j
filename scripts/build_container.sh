@@ -44,7 +44,7 @@ neo4j_user="neo4j"
 neo4j_password=""
 ui_port="7474"
 bolt_port="7687"
-read_mode="read_only"
+read_mode="read-only"
 db_mode="external"
 
 # Default paths for external bind mounts.
