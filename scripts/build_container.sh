@@ -257,6 +257,7 @@ echo "Starting Docker container"
 docker stop "$container_name" > /dev/null 2>&1
 docker rm "$container_name" > /dev/null 2>&1
 
+
 # Conditional instantiation.
 if [ "$db_mode" == "external" ]
 then

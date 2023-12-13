@@ -144,6 +144,29 @@ rm -fr "$base_dir/data/databases/data/ontology"
 rm -fr "$base_dir/data/transactions/ontology"
 echo ""
 
+# MAX HEAP MEMORY
+# By default, neo4j uses heuristics to calculate max heap allocation. This can result in an overly large max
+# heap size for the import, which will limit memory for other processes and result in slow imports.
+# For example, on a MacBook Pro M1 with 32 GB of RAM, importing a set of CSVs with 1824 relationships results in
+# a warning like:
+# WARNING: heap size 1.705GiB is unnecessarily large for completing this import.
+# The abundant heap memory will leave less memory for off-heap importer caches. Suggested heap size is 1.003GiBNodes
+#
+# The messages then show that each relationship is processed individually--e.g., the import displays messages like this
+#Relationship <-- Relationship 6/1824, started 2023-12-13 15:09:21.716+0000
+
+# When there is sufficient memory, the entire group of relationships is processed in parallel--e.g.,
+#Relationship <-- Relationship 1-1824/1824, started 2023-12-12 00:07:53.244+0000
+
+# Set heap memory explicitly immediately before import using the JAVA_OPTS environment variable instead of in the
+# neo4j.conf file's dbms.memory.heap.initial_size setting.
+# The machine building the Docker container from a distribution may not have the same memory
+# as the development machine.
+# bash -c directs the container to execute the command in the string.
+
+echo "Setting max heap size explicitly to recommended 1.003GiB for import."
+docker exec "$container_name" \
+bash -c "export JAVA_OPTS='-server -Xms1.003g -Xmx1.003g'"
 
 # Import CSVs.
 # Changes to neo4j-admin import for v5:
