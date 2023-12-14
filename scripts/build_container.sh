@@ -57,6 +57,12 @@ import_dir="$base_dir"/import
 
 ##############################
 # VALIDATE ARGUMENT
+if [ "$1" == "h" ]
+then
+  Help
+  exit;
+fi
+
 db_mode=$1
 if [ "$1" == "" ]
 then
