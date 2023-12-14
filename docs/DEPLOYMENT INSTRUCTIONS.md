@@ -17,7 +17,7 @@
 # Simple Deployment
 This deployment uses default settings. 
 
-![img_3.png](img_3.png)
+![img_3.png](../images/img_3.png)
 
 1. Expand the Zip archive. The expanded distribution directory will contain:
    - a directory named **Data**. This directory contains the UBKG neo4j database files.
@@ -30,7 +30,7 @@ This deployment uses default settings.
 6. Execute `./build_container.sh`.
 7. The **build_container.sh** will run for a short time (1-2 minutes), and will be finished when it displays a message similar to ```[main] INFO org.eclipse.jetty.server.Server - Started Server@16fa5e34{STARTING}[10.0.15,sto=0] @11686ms```
 
-![img_6.png](img_6.png)
+![img_6.png](../images/img_6.png)
 
 The **build_container.sh** will create a Docker container with the following default properties:
 
@@ -42,7 +42,7 @@ The **build_container.sh** will create a Docker container with the following def
 | ports          | 4000:7474<br/>4500:7687 |
 | read-write|read-only|
 
-![img_5.png](img_5.png)
+![img_5.png](../images/img_5.png)
 
 8. Open a browser window. Enter `http://localhost:4000/browser/`. 
 9. The neo4j browser window will appear. Enter connection information:
@@ -54,7 +54,7 @@ The **build_container.sh** will create a Docker container with the following def
 | Username            | neo4j                 |
 | Password            | abcd1234              |
 
-![img_7.png](img_7.png)
+![img_7.png](../images/img_7.png)
 10. Select **Connect**. 
 
 # Custom Deployment

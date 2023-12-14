@@ -113,7 +113,7 @@ Creates a Docker container for an ontology database with password **pwd**, with 
 ```
 Creates a Docker container named **linda** for an ontology database with password **pwd** and browser port of **9988**.  Runs in read-write mone (-r false) to allow for development in the UBKG database.
 
-![img.png](img.png)
+![img.png](../images/img.png)
 
 ## Example output of script
 
@@ -132,9 +132,9 @@ jas971@jas971s-MBP docker % ./run5.sh -p test1234 -d ubkg-test -n 4000 -b 4500
 ```
 
 ### Result in Docker Desktop
-![img_1.png](img_1.png)
+![img_1.png](../images/img_1.png)
 
 ### Result in browser
 
-![img_2.png](img_2.png)
+![img_2.png](../images/img_2.png)
 
