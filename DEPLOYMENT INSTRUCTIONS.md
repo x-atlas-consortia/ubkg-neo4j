@@ -58,3 +58,20 @@ The **build_container.sh** will create a Docker container with the following def
 10. Select **Connect**. 
 
 # Custom Deployment
+## Changes to Docker configuration
+To modify the Docker configuration, change values in the configuration file.
+Keeping the value commented results in the script using a default value.
+
+| Value          | Purpose                                                   | Recommendation                                                                         |
+|----------------|-----------------------------------------------------------|----------------------------------------------------------------------------------------|
+| container_name | Name of the Docker container                              | accept default                                                                         |
+| docker_tag     | Tag for the Docker container                              | accept default                                                                         |
+| neo4j_password | Password for the neo4j user                               | minimum of 8 characters, including at least one letter and one number                  |
+| ui_port        | Port used by the neo4j browser                            | number other than 7474 to prevent possible conflicts with local installations of neo4j |
+| bolt_port      | Port used by neo4j bolt (Cypher)                          | number other than 7687 to prevent possible conflicts with local installations of neo4j |
+| read_mode      | Whether the neo4j database is *read-only* or *read-write* | accept default (read-only)                                                             |
+| db_mount_dir   | Path to the external neo4j database                       | accept default (/data)                                                                 |
+| csv_dir        | Not used for deployment                                   | accept default                                                                         |
+
+## Rename configuration file
+To specify another configuration file, execute the command ```/.build_container.sh external -c <your configuration file>```

@@ -2,6 +2,8 @@
 # Unified Biomedical Knowledge Graph (UBKG)
 # Container configuration parameters for build_container script
 
+# Uncomment variables to change from the default values.
+
 # Name of Docker container
 # container_name=ubkg-neo4j
 
