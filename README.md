@@ -48,8 +48,8 @@ Because of the size of the distribution, the use of [Globus Connect Personal](ht
 is recommended for downloading.
 
 # Instructions
-- [Instructions for deploying a distribution](docs/DEPLOYMENT INSTRUCTIONS.md)
-- [Instructions for building a new distribution](docs/BUILD INSTRUCTIONS.md)
+- [Instructions for deploying a distribution](docs/DEPLOYMENT_INSTRUCTIONS.md)
+- [Instructions for building a new distribution](docs/BUILD_INSTRUCTIONS.md)
 
 
 
