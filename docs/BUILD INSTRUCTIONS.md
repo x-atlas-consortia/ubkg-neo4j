@@ -146,7 +146,7 @@ The **import_csvs.sh** script:
 3. The import will take some time--on the order of minutes, not hours.
 
 ## 5. Rebuild Docker container with external bind mounts.
-Execute './build_container.sh external'
+Execute `./build_container.sh external`
 This will rebuild the Docker container with external bind mounts, including to the **data** directory that now contains a new neo4j database built from importing the ontology CSVs.
 
 At this point, you should be able to open a browser and connect to the neo4j instance using the connection parameters 
@@ -154,7 +154,7 @@ that you set in the configuration file. The instance will contain the UBKG nodes
 
 ## 6. Create indexes and constraints.
 1. Switch to the second Terminal session.
-2. Execute '/.set_indexes_and_constraints.sh'
+2. Execute `/.set_indexes_and_constraints.sh`
 
 The **set_indexes_and_constraints.sh** script executes a series of Cypher statements in the file 
 named **indexes_constraints.cypher**, which is located inside the Docker container. The statements in the Cypher file
