@@ -14,7 +14,4 @@ CREATE INDEX FOR (n:Code) ON (n.value);
 CREATE INDEX FOR (n:Code) ON (n.lowerbound);
 CREATE INDEX FOR (n:Code) ON (n.upperbound);
 CREATE INDEX FOR (n:Code) ON (n.unit);
-CREATE INDEX FOR (n:Concept)-[r]-(m:Concept) ON (r.SAB);
-CREATE INDEX FOR (n:Concept)-[r]-(m:Concept) ON (r.evidence_class);
-CREATE INDEX FOR (c:Code)-[r]-(t:Term) ON c.SAB;
 CALL db.index.fulltext.createNodeIndex("Term_name",["Term"],["name"]);
