@@ -1,0 +1,32 @@
+# -------------------------
+# Unified Biomedical Knowledge Graph (UBKG)
+# Container configuration parameters for build_container script
+
+# Uncomment variables to change from the default values.
+
+# Name of Docker container
+# container_name=ubkg-neo4j
+
+# Docker tag. If "local", the build_container script will use the local Docker image instead of pulling an image
+# from DockerHub.
+# docker_tag=neo-5.11.0-ALPHA1
+
+# Password for the neo4j user.
+# The password must contain at least 8 characters, of which one must be alphabetic and one numeric.
+neo4j_password=abcd1234
+
+# Ports to which to map the container's neo4j instance UI and Bolt ports.
+# The default ports for neo4j are 7474 (browser) and 7687 (bolt); if there is a local installation of
+# neo4j, changing the port assignments here avoids port conflicts.
+ui_port=4000
+bolt_port=4500
+
+# Whether the neo4j instance is read-write or read-only. Default is read-only.
+# read_mode=read-only
+
+# Path to the external bind mount for the database - a complete neo4j database, corresponding to the neo4j/data path
+# The script default is a /data subdirectory of the current folder.
+#db_mount_dir='/data'
+# Path to the ontology CSV files.
+# The script default is a /csv subdirectory of the current folder.
+#csv_dir='/csv'

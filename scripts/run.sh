@@ -74,6 +74,8 @@ while getopts ":hp:d:u:c:n:b:t:r:" option; do
    esac
 done
 
+if [""]
+
 if [ "$ro_mode" == "true" ]
 then
   rw_mode="read-only"
