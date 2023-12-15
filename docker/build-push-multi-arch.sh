@@ -7,6 +7,9 @@
 #to use this script you must first log into DockerHub with the "docker login"
 #command using an account with write privileges in the HuBMAP DockerHub organization
 
+#the following commands may need to be run before running the "docker buildx build" below
+#  docker buildx create --use --platform=linux/amd64,linux/arm64 --name multi-platform-builder-mac_m1-intel_amd
+#  docker buildx inspect --bootstrap
 
 release_tags_args=()
 
