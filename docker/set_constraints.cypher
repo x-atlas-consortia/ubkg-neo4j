@@ -9,7 +9,6 @@ CREATE INDEX FOR (n:Code) ON (n.SAB);
 CREATE INDEX FOR (n:Code) ON (n.CODE);
 CREATE INDEX FOR (n:Term) ON (n.name);
 CREATE INDEX FOR (n:Definition) ON (n.SAB);
-CREATE INDEX FOR (n:Definition) ON (n.DEF);
 CREATE INDEX FOR (n:Code) ON (n.value);
 CREATE INDEX FOR (n:Code) ON (n.lowerbound);
 CREATE INDEX FOR (n:Code) ON (n.upperbound);
