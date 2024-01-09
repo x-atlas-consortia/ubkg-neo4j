@@ -36,7 +36,7 @@ Help()
 # Name of the configuration file.
 config_file="container.cfg"
 # Name of the Docker container.
-container_name="ubkg-neo4j-5.11.0alpha2"
+container_name="ubkg-neo4j"
 # Tag for the docker container.
 docker_tag="neo-5.11.0-ALPHA2"
 

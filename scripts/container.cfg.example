@@ -9,7 +9,7 @@
 
 # Docker tag. If "local", the build_container script will use the local Docker image instead of pulling an image
 # from DockerHub.
-# docker_tag=neo-5.11.0-ALPHA1
+# docker_tag=neo-5.11.0-ALPHA2
 
 # Password for the neo4j user.
 # The password must contain at least 8 characters, of which one must be alphabetic and one numeric.

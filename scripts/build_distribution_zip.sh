@@ -25,7 +25,7 @@ Help()
 ##############################
 # Set defaults.
 config_file="container.cfg"
-container_name="ubkg-neo4j-5.11.0alpha"
+container_name="ubkg-neo4j"
 
 # Default relative paths
 # Get relative path to current directory.
