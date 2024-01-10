@@ -159,7 +159,7 @@ that you set in the configuration file. The instance will contain the UBKG nodes
 The **set_indexes_and_constraints.sh** script executes a series of Cypher statements in the file 
 named **indexes_constraints.cypher**, which is located inside the Docker container. The statements in the Cypher file
 create relationship indexes for almost every type of relationship in the UBKG, with the following exceptions that result in syntax errors in Cypher:
-- relationship types that contain dashes instead of underscores
+- relationship types that contain special characters (except for underscore)
 - relationship types that begin with numbers
 
 ### Monitoring index creation

@@ -41,7 +41,7 @@ Help()
 ##############################
 # Set defaults.
 config_file="container.cfg"
-container_name="ubkg-neo4j-5.11.0alpha"
+container_name="ubkg-neo4j"
 
 # Default relative paths
 # Get relative path to current directory.
@@ -192,7 +192,7 @@ docker exec "$container_name" "$NEO4J"/bin/neo4j-admin database import full \
   --relationships=DEF="$IMPORT"/DEFrel.csv \
   --skip-bad-relationships \
   --skip-duplicate-nodes \
-  --bad-tolerance=1000000 \
+  --bad-tolerance=10000000 \
   --overwrite-destination\
   neo4j
 
