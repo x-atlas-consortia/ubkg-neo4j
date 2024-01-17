@@ -102,6 +102,10 @@ echo " - Docker container: $container_name."
 # Neo4j installation directory.
 NEO4J=/usr/src/app/neo4j
 
+echo "Setting max heap size explicitly to recommended 3.5 GiB for import."
+docker exec "$container_name" \
+bash -c "export JAVA_OPTS='-server -Xms3.500g -Xmx3.500g'"
+
 docker exec "$container_name" \
 "$NEO4J"/bin/cypher-shell \
 -u "$neo4j_user" -p "$neo4j_password" \
