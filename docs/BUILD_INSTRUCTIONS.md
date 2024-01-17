@@ -38,6 +38,14 @@ The host machine's specifications include:
 - git installed
 - a git clone of the **ubkg-neo4j** repository
 
+### Python
+If indexes and constraints are to be created synchronously via the Python script
+(**create_indexes_and_constraints.py** - See discussion below), establish a Python
+environment:
+1. Install Python and a development IDE, such as PyCharm.
+2. Install the packages in **requirements.txt** in the _python_ directory.
+3. Create a Python virtual environment.
+
 ## Obtain Ontology CSVs
 Use the **generation framework** infrastructure (ETL) in the 
 [ubkg-etl](https://github.com/x-atlas-consortia/ubkg-etl) repository to generate a set of **ontology CSVs**.
@@ -49,7 +57,7 @@ Refer to the README.md file in **docker** for more information.
 
 ## scripts
 The **scripts** folder contains:
-- the set of shell scripts used in the workflow
+- the set of shell scripts (and optional Python scripts) used in the workflow
 - **container.cfg.example**, the archetype of the config file used by the scripts
 
 # Build distribution source directory
@@ -60,6 +68,7 @@ The **scripts** folder contains:
 - **set_indexes_and_constraints.sh**
 - **build_distribution_zip.sh**
 - **container.cfg.example**
+- the **python** directory
 2. Create a directory named **csv**. 
 3. Copy the ontology CSVs into the **csv** folder.
 
@@ -119,7 +128,7 @@ that you set in the configuration file. The instance will be empty.
 ## 2. Export the internal neo4j database to create primer database.
 
 1. Open another Terminal window and navigate to the distribution source directory.
-2. Execute `export_bind_mount.sh`
+2. Execute `./export_bind_mount.sh`
 3. The **export_bind_mount.sh** script exports the *\data* folder inside the Docker container that you created earlier to the location specified by **db_mount_dir** in the config file.
 
 ## 3. Rebuild Docker container with neo4j pointing to external bind mounts.
@@ -154,24 +163,50 @@ that you set in the configuration file. The instance will contain the UBKG nodes
 
 ## 6. Create indexes and constraints.
 1. Switch to the second Terminal session.
-2. Execute `/.set_indexes_and_constraints.sh`
+2. Execute one of the following:
+   a. the `create_indexes_and_constraints.sh` Shell script
+   b. the `create_indexes_and_constraints.py` Python script.
 
-The **set_indexes_and_constraints.sh** script executes a series of Cypher statements in the file 
-named **indexes_constraints.cypher**, which is located inside the Docker container. The statements in the Cypher file
-create relationship indexes for almost every type of relationship in the UBKG, with the following exceptions that result in syntax errors in Cypher:
+### Script options
+Both the Shell script and Python script execute a series of Cypher commands
+that create relationship indexes on all relationships in the UBKG.
+
+Even the smallest UBKG implementation will contain nearly 2000 different 
+relationship types, so the scripts will result in a significant
+processing load. In addition, because index creation in Cypher is
+asynchronous by default, creating all of the indexes at once in
+Cypher results in a large number of parallel threads.
+
+If the UBKG database is large, issuing a large number of CREATE INDEX
+statements will likely result in a Java Out of Memory Error (OOME) by
+exceeding the Java max heap memory. To mitigate the risk of OOMEs,
+the Python script (**create_indexes_and_constraints.py**) executes the
+index creation statements synchronously.
+
+Use the Shell script (**create_indexes_and_constraints.sh**) only if the 
+implementation of UBKG is relatively small (around 10 GB).
+
+### Filtering
+The Cypher statments create relationship indexes for almost every type of relationship in the UBKG, 
+with the following exceptions that result in syntax errors in Cypher:
 - relationship types that contain special characters (except for underscore)
 - relationship types that begin with numbers
 
-### Monitoring index creation
+### Monitoring index creation 
+
+#### in the Shell Script
 Because of the large number of relationship types in the UBKG, the creation of the 
 relationship indexes will take some time, even though the **set_indexes_and_constraints** script completes. 
 For example, the HuBMAP/SenNet deployment of the UBKG contains over 1800 relationships; neo4j requires around 30 minutes to create all the relationship indexes.
 
-Wait until all indexes are created before moving to the next step in the workflow. If index creation is interrupted, the database can be corrupted.
-
 To monitor the progress of relationship index creation, you can execute the following Cypher statement:
 `SHOW INDEXES WHERE populationPercent < 100`.
 Index creation is complete when no indexes are returned.
+
+#### in the Python script
+The Python script displays progress indicators.
+
+Wait until all indexes are created before moving to the next step in the workflow. If index creation is interrupted, the database can be corrupted.
 
 ## 7. Build the distribution Zip.
 

@@ -24,13 +24,13 @@ usage: ./build-local.sh
 The build-local.sh simply builds a local image for use during development and debugging of the UBKG Neo4j Docker container. The locally built image will be tagged as `ubkg-neo4j-local`  To run the local image use the [run.sh]() script at the top level directory in this repository with the arguments `-t local`.
 
 ## Files used for image build
-| File                       | Description                                                                                      | Scope          |
-|----------------------------|--------------------------------------------------------------------------------------------------|----------------|
-| **Dockerfile**             | Instructions for building the container                                                          | Build file     |
-| **neo4j.conf**             | Configuration file for the neo4j instance                                                        | Added to image |
-| **neo4j.conf.noauth**      | Version of configuration file used for operations that require disabling authentication          | Added to image |
-| **set_constraints.cypher** | Set of neo4j Cypher instructions to set constraints and build indices in the UBKG Neo4j database | added to image |
-| **start.sh**               | Script that configures the neo4j database per parameters                                         | Added to image |
+| File                           | Description                                                                                      | Scope          |
+|--------------------------------|--------------------------------------------------------------------------------------------------|----------------|
+| **Dockerfile**                 | Instructions for building the container                                                          | Build file     |
+| **neo4j.conf**                 | Configuration file for the neo4j instance                                                        | Added to image |
+| **neo4j.conf.noauth**          | Version of configuration file used for operations that require disabling authentication          | Added to image |
+| **indexes_constraints.cypher** | Set of neo4j Cypher instructions to set constraints and build indices in the UBKG Neo4j database | added to image |
+| **start.sh**                   | Script that configures the neo4j database per parameters                                         | Added to image |
 
 ## Support Scripts
 |File| Description                                                                                      |
@@ -42,3 +42,11 @@ The build-local.sh simply builds a local image for use during development and de
 The file **indexes_constraints.cypher** creates indexes and constraints in the neo4j database. 
 This Cypher script runs after ontology CSVs have been imported into the database, and is called by 
 an external shell script.
+
+The Cypher commands in the script result in the creation of a large
+number of relationship indexes (from 1800 to over 2000). Because index creation in 
+Cypher is asynchronous, the script causes a large number of parallel processes.
+For large UBKG instances, the script can result in Out of Memory Errors.
+
+To mitigate the risk of OOMEs, run the Python script **create_indexes_and_constraints.py**
+instead of the Shell script **create_indexes_and_constraints.sh**.
