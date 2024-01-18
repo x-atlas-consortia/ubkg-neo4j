@@ -129,7 +129,7 @@ echo ""
 echo "**********************************************************************"
 echo "Setting constraints and indexes"
 echo " - Docker container: $container_name"
-echo " - max Java heap memore: $heap_indexing"
+echo " - max Java heap memory: $heap_indexing"
 echo " - indexing architecture: $indexing_architecture"
 
 # Connect to the neo4j instance and import CSVs.
@@ -141,17 +141,34 @@ echo "Setting max heap size explicitly to recommended value for import ($heap_in
 docker exec "$container_name" \
 bash -c "export JAVA_OPTS='-server -Xms$heap_indexing -Xmx$heap_indexing'"
 
+VENV=./venv
+
 if [ "$indexing_architecture" == "synchronous" ]
 then
-  python3 /python/create_indexes_and_constraints.py
+  echo "Executing Python script for synchronous index creation..."
+  if [[ -d ${VENV} ]] ; then
+    echo "*** Using Python venv in ${VENV}"
+    source ${VENV}/bin/activate
+  else
+    echo "*** Installing Python venv to ${VENV}"
+    python3 -m venv ${VENV}
+    python3 -m pip install --upgrade pip
+    source ${VENV}/bin/activate
+    echo "*** Installing required packages..."
+    pip install -r ./python/requirements.txt
+    echo "*** Done installing python venv"
+  fi
+  python3 ./python/create_indexes_and_constraints.py
 else
+  echo "Executing asychronous index creation via native Cypher..."
   docker exec "$container_name" \
   "$NEO4J"/bin/cypher-shell \
   -u "$neo4j_user" -p "$neo4j_password" \
   --format verbose \
   --fail-at-end \
   -f "/usr/src/app/indexes_constraints.cypher"
+  echo "Setting of constraints and indexes requested. Run SHOW INDEXES to determine when indexes have completed."
 fi
 
 
-echo "Setting of constraints and indexes requested. Run SHOW INDEXES to determine when indexes have completed."
+

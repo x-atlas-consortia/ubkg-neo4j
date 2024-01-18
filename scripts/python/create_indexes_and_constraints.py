@@ -33,6 +33,7 @@ import neo4j
 import time
 import os
 from tqdm import tqdm
+import sys
 
 
 # ----------------------------------
@@ -65,7 +66,7 @@ class Neo4jApp:
     def get_config(self) -> ConfigObj:
 
         # Read from the common config file, which is assumed to be somewhere in the application path.
-        cfgfile = '../container.cfg'
+        cfgfile = os.path.join(os.getcwd(),'container.cfg')
         return ConfigObj(cfgfile)
 
 
@@ -96,10 +97,10 @@ def get_cuicuis(application: Neo4jApp) -> list[str]:
 
     """
 
-    print('Obtaining relevant CUI-CUI relationship types...')
+    sys.stderr.write('Obtaining relevant CUI-CUI relationship types...\n')
 
     # Read the Cypher query string.
-    fpath = os.path.join(os.path.curdir, 'cypher/get_cuicuis.cypher')
+    fpath = os.path.join(os.getcwd(), 'cypher/get_cuicuis.cypher')
     query = read_file(file_name=fpath)
 
     # Execute the query.
@@ -123,10 +124,10 @@ def get_tuis(application: Neo4jApp) -> list[str]:
 
     """
 
-    print('Obtaining relevant TUI relationship types...')
+    sys.stderr.write('Obtaining relevant TUI relationship types...\n')
 
     # Read the Cypher query string.
-    fpath = os.path.join(os.path.curdir, 'cypher/get_tuis.cypher')
+    fpath = os.path.join(os.getcwd(), 'cypher/get_tuis.cypher')
     query = read_file(file_name=fpath)
 
     # Execute the query.
@@ -172,7 +173,7 @@ def execute_write_query(application: Neo4jApp, query: str):
 
     # Enforce synchronous index creation.
     while indexes_are_populating(application=application):
-        # print('At least one index is still populating. Waiting 1 second...')
+        # sys.stderr.write('At least one index is still populating. Waiting 1 second...\n')
         time.sleep(1)
 
     # Transaction management is not necessary for the known use cases, so just use session.run.
@@ -226,11 +227,12 @@ def create_r_sab_fulltext_index(application: Neo4jApp):
     Returns: nothing
     """
 
-    print(f'Creating r_SAB FULLTEXT index on SAB property of Concept-Concept relationships...')
+    sys.stderr.write(f'Creating r_SAB FULLTEXT index on SAB property of Concept-Concept relationships...\n')
 
     # Read the Cypher query string.
-    fpath = os.path.join(os.path.curdir, 'cypher/create_rSAB_index.cypher')
+    fpath = os.path.join(os.getcwd(), 'cypher/create_rSAB_index.cypher')
     query = read_file(file_name=fpath)
+    exit(1)
 
     execute_write_query(application=application, query=query)
 
@@ -253,7 +255,7 @@ def create_rsab_relationship_indexes(application: Neo4jApp):
     relationships = get_cuicuis(application=application)
 
     # Create rSAB_* relationship indexes synchronously.
-    print(f'Creating rSAB_<SAB> indexes synchronously on SAB property of Concept-Concept relationships...')
+    sys.stderr.write(f'Creating rSAB_<SAB> indexes synchronously on SAB property of Concept-Concept relationships...\n')
     for rel in tqdm(relationships):
         create_single_rsab_relationship_index(application=neo4j_ubkg, relationship_type=rel)
 
@@ -275,7 +277,7 @@ def create_rcui_relationship_indexes(application: Neo4jApp):
     relationships = get_tuis(application=application)
 
     # Create rSAB_* relationship indexes synchronously.
-    print(f'Creating rCUI_<relationship> indexes synchronously on the CUI property...')
+    sys.stderr.write(f'Creating rCUI_<relationship> indexes synchronously on the CUI property...\n')
     for rel in tqdm(relationships):
         create_single_rcui_relationship_index(application=neo4j_ubkg, relationship_type=rel)
 
@@ -292,12 +294,12 @@ def create_constraints_and_node_indexes(application: Neo4jApp):
 
     """
 
-    print('Creating constraints and node indexes...')
+    sys.stderr.write('Creating constraints and node indexes...\n')
     # Read the Cypher query string. This will be a set of Cypher statements delimited with semicolons.
-    fquery = os.path.join(os.path.curdir, 'cypher/create_constraints_and_node_indexes.cypher')
+    fquery = os.path.join(os.getcwd(), 'python/cypher/create_constraints_and_node_indexes.cypher')
     querystring = read_file(file_name=fquery)
-    print('Executing the following Cypher queries synchronously:')
-    print(querystring)
+    sys.stderr.write('Executing the following Cypher queries synchronously:\n')
+    sys.stderr.write(f'{querystring}\n')
 
     # Split commands for synchronous execution.
     listcypher = querystring.split(';')
@@ -312,6 +314,7 @@ def create_constraints_and_node_indexes(application: Neo4jApp):
 # ----------- MAIN -------------------
 
 # Get the connection to the UBKG, based on information in the config file.
+sys.stderr.write('Connecting to UBKG instance...\n')
 neo4j_ubkg = Neo4jApp()
 
 # Execute Cypher queries synchronously that create constraints and node indexes.
@@ -322,7 +325,7 @@ create_r_sab_fulltext_index(application=neo4j_ubkg)
 
 # Enforce synchronous index creation.
 while indexes_are_populating(application=neo4j_ubkg):
-    print('Waiting 10 minutes for the rSAB index to finish...')
+    sys.stderr.write('Waiting 10 minutes for the rSAB index to finish...\n')
     time.sleep(600)
 
 # Execute Cypher queries synchronously that create rSAB_<SAB> indexes on the SAB properties of
