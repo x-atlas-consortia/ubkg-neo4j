@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-set_indexes_and_constraints
+create_indexes_and_constraints
 
 Creates constraints and relationship indexes synchronously.
 
@@ -254,12 +254,8 @@ def create_rsab_relationship_indexes(application: Neo4jApp):
 
     # Create rSAB_* relationship indexes synchronously.
     print(f'Creating rSAB_<SAB> indexes synchronously on SAB property of Concept-Concept relationships...')
-    irel = 0
     for rel in tqdm(relationships):
         create_single_rsab_relationship_index(application=neo4j_ubkg, relationship_type=rel)
-        irel = irel + 1
-        if irel == 5:  # debug
-            break
 
     return
 
@@ -280,12 +276,8 @@ def create_rcui_relationship_indexes(application: Neo4jApp):
 
     # Create rSAB_* relationship indexes synchronously.
     print(f'Creating rCUI_<relationship> indexes synchronously on the CUI property...')
-    irel = 0
     for rel in tqdm(relationships):
         create_single_rcui_relationship_index(application=neo4j_ubkg, relationship_type=rel)
-        irel = irel + 1
-        if irel == 5:  # debug
-            break
 
     return
 
@@ -330,8 +322,8 @@ create_r_sab_fulltext_index(application=neo4j_ubkg)
 
 # Enforce synchronous index creation.
 while indexes_are_populating(application=neo4j_ubkg):
-    print('Waiting 5 minutes for the rSAB index to finish...')
-    time.sleep(300)
+    print('Waiting 10 minutes for the rSAB index to finish...')
+    time.sleep(600)
 
 # Execute Cypher queries synchronously that create rSAB_<SAB> indexes on the SAB properties of
 # relationships between Concept nodes.
