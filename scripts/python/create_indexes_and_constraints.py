@@ -100,7 +100,7 @@ def get_cuicuis(application: Neo4jApp) -> list[str]:
     sys.stderr.write('Obtaining relevant CUI-CUI relationship types...\n')
 
     # Read the Cypher query string.
-    fpath = os.path.join(os.getcwd(), 'cypher/get_cuicuis.cypher')
+    fpath = os.path.join(os.getcwd(), 'python/cypher/get_cuicuis.cypher')
     query = read_file(file_name=fpath)
 
     # Execute the query.
@@ -127,7 +127,7 @@ def get_tuis(application: Neo4jApp) -> list[str]:
     sys.stderr.write('Obtaining relevant TUI relationship types...\n')
 
     # Read the Cypher query string.
-    fpath = os.path.join(os.getcwd(), 'cypher/get_tuis.cypher')
+    fpath = os.path.join(os.getcwd(), 'python/cypher/get_tuis.cypher')
     query = read_file(file_name=fpath)
 
     # Execute the query.
@@ -230,9 +230,8 @@ def create_r_sab_fulltext_index(application: Neo4jApp):
     sys.stderr.write(f'Creating r_SAB FULLTEXT index on SAB property of Concept-Concept relationships...\n')
 
     # Read the Cypher query string.
-    fpath = os.path.join(os.getcwd(), 'cypher/create_rSAB_index.cypher')
+    fpath = os.path.join(os.getcwd(), 'python/cypher/create_rSAB_index.cypher')
     query = read_file(file_name=fpath)
-    exit(1)
 
     execute_write_query(application=application, query=query)
 

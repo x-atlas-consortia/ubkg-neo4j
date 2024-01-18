@@ -43,10 +43,12 @@ The workflow includes the optional execution of a Python script for the synchron
 in the neo4j instance of UBKG. (**create_indexes_and_constraints.py** - See discussion below)
 Although optional, this is the default architecture.
 
-If the Python script will be used, establish a Python environment on the development machine:
-1. Install Python and a development IDE, such as PyCharm.
-2. Install the packages in **requirements.txt** in the _python_ directory.
-3. Create a Python virtual environment.
+If the Python script will be used, install Python 3 on the development machine.
+The **create_indexes_and_constraints.sh** script will establish a Python virtual environment for the 
+**create_indexes_and_constraints.py** script.
+
+The index creation architecture was developed on a MacBook Pro M1 running MacOs Ventura. 
+The **create_indexes_and_constraints.sh** script assumes a MacOs environment for tasks such as installing packages etc.
 
 ### Java max heap memory recommendations
 The recommended values for Java max heap memory in the configuration file depend on the stage of the workflow.
