@@ -55,6 +55,10 @@ csv_dir="$base_dir/csv"
 # points to a non-empty folder, Docker "obscures" the existing contents.
 import_dir="$base_dir/import"
 
+# Default Java max heap setting for CSV import, based on recommendations for
+# a machine with 32 GB of RAM working with a neo4j instance with a 27 GB database
+# (Data Distillery).
+heap_import="1.003g"
 
 ##############################
 # PROCESS OPTIONS
@@ -105,6 +109,15 @@ if [ ! -d "$csv_dir" ]
     echo "This path must contain a full set of ontology CSVs."
     echo "Either accept the default (./csv) or specify csv_dir in the config file."
     exit 1;
+fi
+
+# max Java heap memory
+if [ "$heap_import" == "" ]
+then
+  echo "Error: no value of max Java heap memory for CSV import specified."
+  echo "Either accept the default (1.003g) or specify a value for heap_indexing in the configuration file."
+  echo "(Run ./neo4j-admin import in the Docker container for recommendations for the size max Java heap memory for your machine.)"
+  exit 1;
 fi
 
 # Check that all ontology CSV files are in the CSV directory.
@@ -164,9 +177,9 @@ echo ""
 # as the development machine.
 # bash -c directs the container to execute the command in the string.
 
-echo "Setting max heap size explicitly to recommended 1.003GiB for import."
+echo "Setting max heap size explicitly to recommended value for import ($heap_import)."
 docker exec "$container_name" \
-bash -c "export JAVA_OPTS='-server -Xms1.003g -Xmx1.003g'"
+bash -c "export JAVA_OPTS='-server -Xms$heap_import -Xmx$heap_import'"
 
 # Import CSVs.
 # Changes to neo4j-admin import for v5:

@@ -35,6 +35,15 @@ base_dir="$(dirname -- "${BASH_SOURCE[0]}")"
 # Convert to absolute path.
 base_dir="$(cd -- "$base_dir" && pwd -P;)"
 
+# Default Java max heap setting for index creation, based on recommendations for
+# a machine with 32 GB of RAM working with a neo4j instance with a 27 GB database
+# (Data Distillery).
+heap_indexing="3.500g"
+
+# Default indexing architecture is synchronous--i.e., to create indexes synchronously
+# using the Python script instead of asynchronously via native Cypher.
+indexing_architecture="synchronous"
+
 ##############################
 # PROCESS OPTIONS
 while getopts ":hc:" option; do
@@ -91,27 +100,58 @@ then
   exit 1;
 fi
 
+# max Java heap memory
+if [ "$heap_indexing" == "" ]
+then
+  echo "Error: no value of max Java heap memory for index creation specified."
+  echo "Either accept the default (3.500g) or specify a value for heap_indexing in the configuration file."
+  echo "(Run ./neo4j-admin server memory-recommendation in the Docker container for recommendations for the size max Java heap memory for your machine.)"
+  exit 1;
+fi
+
+# Index creation architecture
+if [ "$indexing_architecture" == "" ]
+then
+  echo "Error: no value for index creation architecture specified."
+  echo "Either accept the default (synchronous) or specify a value for indexing_architecture in the configuration file."
+  echo "Available values are 'synchronous' or 'asychronous'"
+  exit 1;
+fi
+
+if ! ([[ "$indexing_architecture" == "synchronous" ]] || [[ "$indexing_architecture" == "asynchronous" ]])
+then
+  echo "Error: invalid value for indexing_architecture. Options are 'synchronous' and 'asynchronous'."
+  exit 1;
+fi
+
 
 echo ""
 echo "**********************************************************************"
 echo "Setting constraints and indexes"
-echo " - Docker container: $container_name."
+echo " - Docker container: $container_name"
+echo " - max Java heap memore: $heap_indexing"
+echo " - indexing architecture: $indexing_architecture"
 
 # Connect to the neo4j instance and import CSVs.
 
 # Neo4j installation directory.
 NEO4J=/usr/src/app/neo4j
 
-echo "Setting max heap size explicitly to recommended 3.5 GiB for import."
+echo "Setting max heap size explicitly to recommended value for import ($heap_indexing)."
 docker exec "$container_name" \
-bash -c "export JAVA_OPTS='-server -Xms3.500g -Xmx3.500g'"
+bash -c "export JAVA_OPTS='-server -Xms$heap_indexing -Xmx$heap_indexing'"
 
-docker exec "$container_name" \
-"$NEO4J"/bin/cypher-shell \
--u "$neo4j_user" -p "$neo4j_password" \
---format verbose \
---fail-at-end \
--f "/usr/src/app/indexes_constraints.cypher"
+if [ "$indexing_architecture" == "synchronous" ]
+then
+  python3 /python/create_indexes_and_constraints.py
+else
+  docker exec "$container_name" \
+  "$NEO4J"/bin/cypher-shell \
+  -u "$neo4j_user" -p "$neo4j_password" \
+  --format verbose \
+  --fail-at-end \
+  -f "/usr/src/app/indexes_constraints.cypher"
+fi
 
 
 echo "Setting of constraints and indexes requested. Run SHOW INDEXES to determine when indexes have completed."

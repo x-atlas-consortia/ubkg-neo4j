@@ -26,7 +26,7 @@ will not be contained in the public Docker image. To acheive this objective, the
 
 The following image illustrates the workflow.
 
-![img_8.png](../images/img_8.png)
+![img.png](img.png)
 # Prerequisites for building
 
 ## Set up host machine
@@ -39,12 +39,35 @@ The host machine's specifications include:
 - a git clone of the **ubkg-neo4j** repository
 
 ### Python
-If indexes and constraints are to be created synchronously via the Python script
-(**create_indexes_and_constraints.py** - See discussion below), establish a Python
-environment:
+The workflow includes the optional execution of a Python script for the synchronous creation of indexes and constraints
+in the neo4j instance of UBKG. (**create_indexes_and_constraints.py** - See discussion below)
+Although optional, this is the default architecture.
+
+If the Python script will be used, establish a Python environment on the development machine:
 1. Install Python and a development IDE, such as PyCharm.
 2. Install the packages in **requirements.txt** in the _python_ directory.
 3. Create a Python virtual environment.
+
+### Java max heap memory recommendations
+The recommended values for Java max heap memory in the configuration file depend on the stage of the workflow.
+
+The recommendations are based on the following use case:
+1. Developer machine: 
+   - MacBook Pro
+   - Apple M1 Max processor
+   - 32 GB RAM
+2. Docker
+3. neo4j server
+   - Community Edition
+   - v 5.11
+4. 27 GB UBKG database (Data Distillery)
+
+If your use case differs, obtain recommendations using neo4j-admin as shown in the **source** column.
+
+| Workflow            | Recommended Java Heap memory | source                                   |
+|---------------------|------------------------------|------------------------------------------|
+| import of CSVs      | -Xms1.003g -Xmx1.003g        | neo4j-admin import                       |
+| creation of indexes | -Xms3.500g -Xmx3.500g        | neo4j-admin server memory-recommendation |
 
 ## Obtain Ontology CSVs
 Use the **generation framework** infrastructure (ETL) in the 
@@ -57,7 +80,7 @@ Refer to the README.md file in **docker** for more information.
 
 ## scripts
 The **scripts** folder contains:
-- the set of shell scripts (and optional Python scripts) used in the workflow
+- the set of Shell scripts (and optional Python scripts) used in the workflow
 - **container.cfg.example**, the archetype of the config file used by the scripts
 
 # Build distribution source directory
@@ -68,7 +91,7 @@ The **scripts** folder contains:
 - **set_indexes_and_constraints.sh**
 - **build_distribution_zip.sh**
 - **container.cfg.example**
-- the **python** directory
+- the **python** directory (if indexes and constraints will be created synchonously)
 2. Create a directory named **csv**. 
 3. Copy the ontology CSVs into the **csv** folder.
 
@@ -79,16 +102,18 @@ Copy **container.cfg.example** to a file named **container.cfg**. (Files with ex
 
 Uncomment and edit variables in the configuration file as necessary.
 
-| Value          | Purpose                                                   | Recommendation                                                                                                                                                                                         |
-|----------------|-----------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| container_name | Name of the Docker container                              | accept default                                                                                                                                                                                         |
-| docker_tag     | Tag for the Docker container                              | If you are modifying the Docker image and have built a local image with **build-local.sh**, set *docker_tag=local*; otherwise, accept the default, which is name of the published image in Docker Hub. |
-| neo4j_password | Password for the neo4j user                               | minimum of 8 characters, including at least one letter and one number                                                                                                                                  |
-| ui_port        | Port used by the neo4j browser                            | number other than 7474 to prevent possible conflicts with local installations of neo4j                                                                                                                 |
-| bolt_port      | Port used by neo4j bolt (Cypher)                          | number other than 7687 to prevent possible conflicts with local installations of neo4j                                                                                                                 |
-| read_mode      | Whether the neo4j database is *read-only* or *read-write* | Because you will be writing to the database, set *read_mode=read-write*.                                                                                                                               |
-| db_mount_dir   | Path to the external neo4j database  (bind mount)         | accept default (/data)                                                                                                                                                                                 |
-| csv_dir        | Path to the folder that contains the ontology CSVs        | accept default                                                                                                                                                                                         |
+| Value          | Purpose                                                                 | Recommendation                                                                                                                                                                                         |
+|----------------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| container_name | Name of the Docker container                                            | accept default                                                                                                                                                                                         |
+| docker_tag     | Tag for the Docker container                                            | If you are modifying the Docker image and have built a local image with **build-local.sh**, set *docker_tag=local*; otherwise, accept the default, which is name of the published image in Docker Hub. |
+| neo4j_password | Password for the neo4j user                                             | minimum of 8 characters, including at least one letter and one number                                                                                                                                  |
+| ui_port        | Port used by the neo4j browser                                          | number other than 7474 to prevent possible conflicts with local installations of neo4j                                                                                                                 |
+| bolt_port      | Port used by neo4j bolt (Cypher)                                        | number other than 7687 to prevent possible conflicts with local installations of neo4j                                                                                                                 |
+| read_mode      | Whether the neo4j database is *read-only* or *read-write*               | Because you will be writing to the database, set *read_mode=read-write*.                                                                                                                               |
+| db_mount_dir   | Path to the external neo4j database  (bind mount)                       | accept default (/data)                                                                                                                                                                                 |
+| csv_dir        | Path to the folder that contains the ontology CSVs                      | accept default                                                                                                                                                                                         |
+| heap_import    | Max Java heap memory size for importing CSVs                            | accept default                                                                                                                                                                                         |
+| heap_indexing  | Max Java heap memory size for creating indexes and constraints in neo4j | accept default                                                                                                                                                                                         |
 
 # Execute workflow
 ## 1. Build Docker container hosting neo4j with internal primer database.
@@ -151,8 +176,8 @@ The **import_csvs.sh** script:
 
 ### Notes on the import script
 1. As described [here](https://docs.docker.com/storage/bind-mounts/#mount-into-a-non-empty-directory-on-the-container), a bind mount on a non-empty directory can result in Docker "obscuring" the files that were in the directory. This is the case for the *import* bind mount, but not for the *data* bind mount. For this reason, the script copies CSVs into the *import* bind mount after it is created.
-2. The script explicitly sets the maximum heap memory instead of relying on neo4j to allocate heap memory via heuristics. Without the explicit allocation, neo4j will overallocate the maximum heap memory, which results in memory swapping and slow imports. See [this Stack Overflow post](https://stackoverflow.com/questions/58808877/set-heap-memory-for-neo4j-admin-import?rq=2) for details, which includes comments that I contributed. 
-3. The import will take some time--on the order of minutes, not hours.
+2. The script explicitly sets the maximum heap memory instead of relying on neo4j to allocate heap memory via heuristics. Without the explicit allocation, neo4j will overallocate the maximum heap memory, which results in memory swapping and slow imports. See [this Stack Overflow post](https://stackoverflow.com/questions/58808877/set-heap-memory-for-neo4j-admin-import?rq=2) for details. 
+3. The import will take some time--however, on the order of minutes, not hours.
 
 ## 5. Rebuild Docker container with external bind mounts.
 Execute `./build_container.sh external`
@@ -163,42 +188,51 @@ that you set in the configuration file. The instance will contain the UBKG nodes
 
 ## 6. Create indexes and constraints.
 1. Switch to the second Terminal session.
-2. Execute one of the following:
-   a. the `create_indexes_and_constraints.sh` Shell script
-   b. the `create_indexes_and_constraints.py` Python script.
+2. Execute `./create_indexes_and_constraints.sh`
 
-### Script options
-Both the Shell script and Python script execute a series of Cypher commands
+### Memory considerations
+Both the asynchronous (native Cypher) and synchronous (Python) index architectures execute a series of Cypher commands
 that create relationship indexes on all relationships in the UBKG.
 
-Even the smallest UBKG implementation will contain nearly 2000 different 
-relationship types, so the scripts will result in a significant
-processing load. In addition, because index creation in Cypher is
-asynchronous by default, creating all of the indexes at once in
-Cypher results in a large number of parallel threads.
+In general, a UBKG implementation will contain a large number of different 
+relationship types (e.g., 1800). The script will result in a significant
+processing load. Because index creation in neo4j is
+asynchronous by default, creating all indexes at once with
+asynchronous native Cypher commands results in a large number of parallel threads.
 
-If the UBKG database is large, issuing a large number of CREATE INDEX
-statements will likely result in a Java Out of Memory Error (OOME) by
-exceeding the Java max heap memory. To mitigate the risk of OOMEs,
-the Python script (**create_indexes_and_constraints.py**) executes the
+If the UBKG database is large, creating a large number of indexes asynchronously
+will likely result in a Java Out of Memory Error (OOME) by
+exceeding the Java max heap memory. This will be reflected in the **debug.log** of the neo4j
+instance (available in the **logs** external bind mount) with messages such as
+```
+2024-01-11 01:51:26.529+0000 ERROR [o.n.k.i.a.i.IndexPopulationJob] [neo4j/947a8a6c] Failed to populate index: [Index( id=1198, name='rSAB_coexpression_Colon___Transverse', type='RANGE', schema=()-[:coexpression_Colon___Transverse {SAB}]-(), indexProvider='range-1.0' )]
+java.lang.OutOfMemoryError: Java heap space
+```
+To mitigate the risk of OOMEs,
+a Python script (**create_indexes_and_constraints.py**) executes the
 index creation statements synchronously.
 
-Use the Shell script (**create_indexes_and_constraints.sh**) only if the 
+Use the asynchronous option (**indexing=synchronous** in the configuration file) only if the 
 implementation of UBKG is relatively small (around 10 GB).
 
-### Filtering
+### Filtering for relationship types
 The Cypher statments create relationship indexes for almost every type of relationship in the UBKG, 
-with the following exceptions that result in syntax errors in Cypher:
+with the following exceptions that violate [neo4j naming rules](https://neo4j.com/docs/cypher-manual/current/syntax/naming/):
 - relationship types that contain special characters (except for underscore)
 - relationship types that begin with numbers
 
+
+To avoid excluding relationships from a relationship index, name relationships using only alphanumeric characters and underscores.
+The UBKG generation framework ETLs automatically reformats relationship names that violate neo4j naming rules.
+
 ### Monitoring index creation 
-
-#### in the Shell Script
+#### General
 Because of the large number of relationship types in the UBKG, the creation of the 
-relationship indexes will take some time, even though the **set_indexes_and_constraints** script completes. 
-For example, the HuBMAP/SenNet deployment of the UBKG contains over 1800 relationships; neo4j requires around 30 minutes to create all the relationship indexes.
+relationship indexes will take some time. Example generation times:
+- HuBMAP/SenNet: 30 minutes
+- Data Distillery: 120 minutes
 
+#### in neo4j
 To monitor the progress of relationship index creation, you can execute the following Cypher statement:
 `SHOW INDEXES WHERE populationPercent < 100`.
 Index creation is complete when no indexes are returned.
@@ -206,7 +240,7 @@ Index creation is complete when no indexes are returned.
 #### in the Python script
 The Python script displays progress indicators.
 
-Wait until all indexes are created before moving to the next step in the workflow. If index creation is interrupted, the database can be corrupted.
+**Wait until all indexes are created before moving to the next step in the workflow. If index creation is interrupted, the database can be corrupted.**
 
 ## 7. Build the distribution Zip.
 

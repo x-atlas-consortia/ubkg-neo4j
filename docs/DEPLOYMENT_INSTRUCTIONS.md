@@ -71,7 +71,7 @@ Keeping the value commented results in the script using a default value.
 | bolt_port      | Port used by neo4j bolt (Cypher)                          | number other than 7687 to prevent possible conflicts with local installations of neo4j |
 | read_mode      | Whether the neo4j database is *read-only* or *read-write* | accept default (read-only)                                                             |
 | db_mount_dir   | Path to the external neo4j database                       | accept default (/data)                                                                 |
-| csv_dir        | Not used for deployment                                   | accept default                                                                         |
+| all others     | Not used for deployment; values will be ignored           | accept default                                                                         |
 
 ## Rename configuration file
 To specify another configuration file, execute the command ```/.build_container.sh external -c <your configuration file>```

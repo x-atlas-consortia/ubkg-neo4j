@@ -30,3 +30,16 @@ bolt_port=4500
 # Path to the ontology CSV files.
 # The script default is a /csv subdirectory of the current folder.
 #csv_dir='/csv'
+
+# Java max heap memory values for different parts of the workflow.
+# Default values based on recommendations for a machine with 32 GB RAM generating a
+# Data Distillery instance with a 27 GB database.
+# for importing from CSV
+# heap_import=1.003g
+# for creating indexes
+# heap_indexing=3.500g
+
+# Index creation architecture.
+# The recommended default solution involves executing the synchronous Python script instead of
+# relying on asynchronous index creation in Cypher.
+# indexing_architecture=synchronous
