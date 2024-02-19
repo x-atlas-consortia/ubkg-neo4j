@@ -11,9 +11,13 @@
 # from DockerHub.
 # docker_tag=neo-5.11.0-ALPHA3
 
+# Docker network name, on which apps such as ubkg_api communicate with this server.
+# Matches an entry in the ubkg_api docker-compose.yml file.
+docker_network_name=data_distillary_network
+
 # Password for the neo4j user.
 # The password must contain at least 8 characters, of which one must be alphabetic and one numeric.
-neo4j_password=abcd1234
+neo4j_password=
 
 # Ports to which to map the container's neo4j instance UI and Bolt ports.
 # The default ports for neo4j are 7474 (browser) and 7687 (bolt); if there is a local installation of
