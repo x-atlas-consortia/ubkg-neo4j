@@ -210,7 +210,7 @@ echo ""
 echo "**********************************************************************"
 echo "A Docker container for a neo4j instance will be created using the following parameters:"
 echo "  - container name: " $container_name
-echo "  --network " $docker_network_name
+echo "  --network data_distillary_network"
 echo "  - neo4j account name: $neo4j_user"
 echo "  - neo4j browser/UI port: $ui_port"
 echo "  - neo4j bolt port: $bolt_port"
@@ -233,13 +233,16 @@ docker stop "$container_name" > /dev/null 2>&1
 docker rm "$container_name" > /dev/null 2>&1
 
 # Create container with external bind mounts for data, import, and logs.
+# The network name data_distillary_network matches an entry in the
+# ubkg_api docker-compose.yml file, for the ubkg_api app to communicate with this server.
 docker run -d \
      -p "$ui_port":7474 \
      -p "$bolt_port":7687 \
      -v "$db_mount_dir":/usr/src/app/neo4j/data \
      -v "$import_dir":/usr/src/app/neo4j/import \
      -v "$base_dir/logs":/usr/src/app/neo4j/logs \
-     --network "$docker_network_name" \
+     --network "data_distillary_network" \
+     --hostname "ubkg-neo4j" \
      --env NEO4J_USER="$neo4j_user" \
      --env NEO4J_PASSWORD="$neo4j_password" \
      --env UI_PORT="$ui_port" \
