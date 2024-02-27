@@ -194,7 +194,7 @@ def create_single_rsab_relationship_index(application: Neo4jApp, relationship_ty
     Returns: nothing
     """
 
-    query = f'CREATE INDEX rSAB_{relationship_type} FOR() - [r: {relationship_type}]->() ON (r.SAB)'
+    query = f'CREATE INDEX rSAB_{relationship_type} FOR ()-[r: {relationship_type}]->() ON (r.SAB)'
     execute_write_query(application=application, query=query)
 
     return
@@ -210,7 +210,7 @@ def create_single_rcui_relationship_index(application: Neo4jApp, relationship_ty
 
     Returns: nothing
     """
-    query = f'CREATE INDEX rCUI_{relationship_type} FOR() - [r: {relationship_type}]->() ON (r.CUI)'
+    query = f'CREATE INDEX rCUI_{relationship_type} FOR ()-[r: {relationship_type}]->() ON (r.CUI)'
     execute_write_query(application=application, query=query)
 
     return
