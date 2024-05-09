@@ -28,4 +28,4 @@ then
   exit 1  
 fi
 
-docker buildx build --platform linux/amd64,linux/arm64 --push -t hubmap/ubkg-neo4j:latest "${release_tags_args[@]}" .
+echo docker buildx build --platform linux/amd64,linux/arm64 --push -t hubmap/ubkg-neo4j:latest "${release_tags_args[@]}" .
