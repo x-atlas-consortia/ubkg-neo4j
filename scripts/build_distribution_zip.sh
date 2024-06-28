@@ -78,10 +78,13 @@ fi
 
 echo ""
 echo "**********************************************************************"
-echo "Stopping container $container_name"
+echo "Shutting down neo4j and stopping container $container_name"
 # Stopping the container shuts down the neo4j server so that the data in the external bind mount is stable prior
 # to copying.
 # Piping with true results in success even if the container is not running.
+# Stop the neo4j database
+docker exec "$container_name" \
+bash -c "./neo4j stop"
 docker stop "$container_name" || true
 
 # A distribution consists of:

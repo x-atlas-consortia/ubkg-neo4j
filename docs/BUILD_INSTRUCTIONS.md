@@ -249,8 +249,9 @@ The Python script displays progress indicators.
 Once you are assured that index creation is complete and no other transactions are occurring in the neo4j instance, execute `./build_distribution_zip.sh`
 
 The **build_distribution_zip.sh** script:
-- stops the Docker container, which should result in a graceful shutdown of the neo4j server
-- creates a zip file with the same name as the Docker container, containing the files for the distribution
+- Explicitly shuts down the neo4j service inside the Docker container. This should prevent a 137 error (killed process) in the next step.
+- Stops the Docker container.
+- Creates a zip file with the same name as the Docker container, containing the files for the distribution.
 
 ## 8. Upload the distribution Zip.
 
