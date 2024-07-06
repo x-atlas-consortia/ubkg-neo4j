@@ -78,20 +78,6 @@ then
   exit 1;
 fi
 
-# neo4j user name
-if [ "$neo4j_user" == "" ]
-then
-  echo "Error: no value for neo4j_user. Either accept the default (neo4j) or specify a value in the config file."
-  exit 1;
-fi
-
-# neo4j password
-if [ "$neo4j_password" == "" ]
-then
-  echo "Error: no neo4j_password specified in config file."
-  exit 1;
-fi
-
 
 echo ""
 echo "**********************************************************************"
@@ -105,6 +91,8 @@ NEO4J=/usr/src/app/neo4j/bin
 docker exec "$container_name" \
 bash -c "./neo4j stop"
 
+echo "Exit Code:"
+docker inspect "$container_name" --format={{.State.ExitCode}}
 
 
 
