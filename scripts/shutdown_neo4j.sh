@@ -1,7 +1,7 @@
 #!/bin/bash
 # -------------------------
 # Unified Biomedical Knowledge Graph (UBKG)
-# Build a Zip archive for a UBKG distribution.
+# Shuts down the UBKG neo4j instance, waiting until all processes are complete.
 #
 
 
@@ -13,25 +13,28 @@ Help()
    # Display Help
    echo ""
    echo "****************************************"
-   echo "HELP: UBKG Zip distribution build script"
-   echo "Builds a Zip distribution of the UBKG neo4j Docker instance from content in the current directory.."
+   echo "HELP: UBKG neo4j shutdown script"
+   echo "Shuts down an UBKG database in a neo4j instance hosted in a Docker container."
    echo
-   echo "Syntax: ./build_container.sh [-c config file]"
+   echo "Syntax: ./shutdown_neo4j.sh [-c config file]"
    echo "options (in any order)"
    echo "-c   path to config file containing properties for the container (REQUIRED: default='container.cfg'."
    echo "-h   print this help"
+   echo "example: './shudown_neo4j.sh' shuts down the container/instance specified in the config file."
    echo "Review container.cfg.example for descriptions of parameters."
 }
 ##############################
 # Set defaults.
 config_file="container.cfg"
 container_name="ubkg-neo4j"
+neo4j_user="neo4j"
 
 # Default relative paths
 # Get relative path to current directory.
 base_dir="$(dirname -- "${BASH_SOURCE[0]}")"
 # Convert to absolute path.
 base_dir="$(cd -- "$base_dir" && pwd -P;)"
+
 
 ##############################
 # PROCESS OPTIONS
@@ -78,22 +81,18 @@ fi
 
 echo ""
 echo "**********************************************************************"
-echo "Shutting down neo4j and stopping container $container_name"
-# Stopping the container shuts down the neo4j server so that the data in the external bind mount is stable prior
-# to copying.
-# Piping with true results in success even if the container is not running.
+echo "Shutting down neo4j server"
+echo " - Docker container: $container_name"
+
+# Neo4j binary directory.
+NEO4J=/usr/src/app/neo4j/bin
+
 # Stop the neo4j database
 docker exec "$container_name" \
 bash -c "./neo4j stop"
-docker stop "$container_name" || true
 
-# A distribution consists of:
-# 1. An external bind mount database.
-# 2. The example config file.
-# 3. The build_container script.
-echo "Building file $container_name.zip."
-zip -9 -r "$container_name.zip" data/
-zip "$container_name.zip" container.cfg.example
-zip "$container_name.zip" build_container.sh
+echo "Exit Code:"
+docker inspect "$container_name" --format={{.State.ExitCode}}
 
-echo "The UBKG distribution is available in $container_name.zip."
+
+
