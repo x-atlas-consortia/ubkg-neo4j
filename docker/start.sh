@@ -29,6 +29,15 @@ function test_cypher_query {
     echo 'match (n) return count(n);' | ${NEO4J}/bin/cypher-shell -u "${NEO4J_USER}" -p "${NEO4J_PASSWORD}" >/dev/null 2>&1
 }
 
+# JAS August 2024
+# Check index population.
+function test_index_population {
+  # The query will return a string in format 'p x', where x is the number of indexes that are still populating.
+  # A return of "p 0" indicates that all indexes have been built.
+  local test=$(echo 'SHOW INDEXES YIELD state, populationPercent WHERE populationPercent <100 RETURN COUNT(populationPercent) AS p;' | ${NEO4J}/bin/cypher-shell -u ${NEO4J_USER} -p ${NEO4J_PASSWORD})
+  echo $test
+}
+
 echo "Starting the neo4j server; resetting the password; then restarting."
 echo "Please wait, this may take a minute or two..."
 
@@ -40,6 +49,12 @@ $NEO4J/bin/neo4j start > /dev/null 2>&1
 until test_cypher_query ; do
     echo 'Waiting for server to start...'
     sleep 5
+done
+
+# JAS Aug 2024 - Wait until all indexes have been built before moving on to other tasks, such as setting the server to read-only.
+until [[ $(test_index_population) == "p 0" ]]; do
+  echo 'Waiting for indexes to complete populating...'
+  sleep 5
 done
 
 # JAS added SET PASSWORD CHANGE NOT REQUIRED.
