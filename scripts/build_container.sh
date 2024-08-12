@@ -106,6 +106,7 @@ then
   echo "Error: no config file '$config_file' exists."
   exit 1;
 else
+  echo "Obtaining parameters from configuration file at " $config_file
   source "$config_file";
 fi
 
@@ -127,7 +128,7 @@ then
 fi
 
 # Docker image name for container, based on tag
-if [ "$docker_tag" == "local" ]
+if [[ "$docker_tag" == "local" ]]
 then
   docker_image_name="ubkg-neo4j-local"
 else
@@ -135,7 +136,7 @@ else
 fi
 
 # neo4j password
-if [ "$neo4j_password" == "" ]
+if [[ "$neo4j_password" == "" ]]
 then
   echo "Error: no neo4j_password specified in config file."
   exit 1;
@@ -160,14 +161,14 @@ then
 fi
 
 # Docker container name
-if [ "$container_name" == "" ]
+if [[ "$container_name" == "" ]]
 then
   echo "Error: no value for container_name. Either accept the default (ubkg-neo4j) or specify a value in the config file."
   exit 1;
 fi
 
 # neo4j user name
-if [ "$neo4j_user" == "" ]
+if [[ "$neo4j_user" == "" ]]
 then
   echo "Error: no value for neo4j_user. Either accept the default (neo4j) or specify a value in the config file."
   exit 1;
@@ -180,7 +181,7 @@ then
   exit 1;
 fi
 
-if [ "$ui_port" == "" ]
+if [[ "$ui_port" == "" ]]
 then
   echo "Error: null neo4j browser port. Either accept the default (7474) or specify an integer for ui_port in the config file."
   exit 1;
@@ -192,7 +193,7 @@ then
   echo "Error: non-integer bolt port. Either accept the default (7687) or specify an integer for bolt_port in the config file."
   exit 1;
 fi
-if [ "$bolt_port" == "" ]
+if [[ "$bolt_port" == "" ]]
 then
   echo "Error: null bolt port. Either accept the default (7687) or specify an integer for bolt_port in the config file."
   exit 1;
@@ -200,11 +201,11 @@ fi
 
 
 # If using an external bind mount, check to make sure that external database files exist in the specified mount path.
-if [ "$db_mode" == "external" ]
+if [[ "$db_mode" == "external" ]]
 then
 
   echo "Checking for external bind mount volume..."
-  if [ ! -d "$db_mount_dir" ]
+  if [[ ! -d "$db_mount_dir" ]]
   then
     echo "Error: no external bind mount path '$db_mount_dir' exists. A full set of Neo4j 5.x database files must exist at '$db_mount_dir'"
     exit 1;
@@ -215,7 +216,7 @@ then
 
   # auth_file="$db_mount_dir"/dbms/auth.ini
 
-  if [ ! -d "$ont_db_dir" ]
+  if [[ ! -d "$ont_db_dir" ]]
   then
     echo "Error: no path '$ont_db_dir' exists."
     echo "Either copy a pre-generated UBKG database to '$db_mount_dir' or generate a new database."
@@ -236,12 +237,13 @@ echo ""
 echo "**********************************************************************"
 echo "A Docker container for a neo4j instance will be created using the following parameters:"
 echo "  - container name: " $container_name
+echo "  - Docker image name: " $docker_image_name
 echo "  - neo4j account name: $neo4j_user"
 echo "  - neo4j browser/UI port: $ui_port"
 echo "  - neo4j bolt port: $bolt_port"
 echo "  - read/write mode: $read_mode"
 
-if [ "$db_mode" == "internal" ]
+if [[ "$db_mode" == "internal" ]]
 then
   echo "  - internal database (inside container)"
 else
@@ -265,7 +267,7 @@ docker rm "$container_name" > /dev/null 2>&1
 
 
 # Conditional instantiation.
-if [ "$db_mode" == "external" ]
+if [[ "$db_mode" == "external" ]]
 then
   # Create container with external bind mounts for data, import, and logs.
   docker run -it \
