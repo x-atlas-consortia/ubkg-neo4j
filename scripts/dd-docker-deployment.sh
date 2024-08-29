@@ -22,7 +22,7 @@ network="data_distillary_network"
 hostname="ubkg-neo4j"
 
 # Image with tag
-docker_image_name="hubmap/ubkg-neo4j:neo-5.11.0-ALPHA3"
+docker_image_name="hubmap/ubkg-neo4j:current-release"
 
 # Neo4j connection
 neo4j_user="neo4j"
