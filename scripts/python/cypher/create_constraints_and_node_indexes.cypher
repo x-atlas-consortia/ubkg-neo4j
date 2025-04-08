@@ -9,3 +9,10 @@ CREATE INDEX FOR (n:Code) ON (n.SAB);
 CREATE INDEX FOR (n:Code) ON (n.CODE);
 CREATE INDEX FOR (n:Term) ON (n.name);
 CREATE INDEX FOR (n:Definition) ON (n.SAB);
+CREATE FULLTEXT INDEX termNames FOR (t:Term) ON EACH [t.name]
+OPTIONS {
+  indexConfig: {
+    `fulltext.analyzer`: 'english',
+    `fulltext.eventually_consistent`: true
+  }
+};
