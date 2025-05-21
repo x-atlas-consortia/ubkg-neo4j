@@ -1,6 +1,8 @@
 # Docker Deployment of UBKG neo4j
 
-This directory contains the files needed to create the Docker images used to run the UBKG Neo4j container. Docker images supporting both x86-64 and arm64 platforms are built. For details on Docker using this image to host the UBKG in Neo4j, consult the [README.md](https://github.com/x-atlas-consortia/ubkg-neo4j/blob/main/README.md) at the root of this respository.
+This directory contains the files needed to create the Docker images used to run the UBKG Neo4j container. 
+Docker images supporting both linux/amd64 (x86-64) and linux/arm64 platforms are built. 
+For details on Docker using this image to host the UBKG in Neo4j, consult the [README.md](https://github.com/x-atlas-consortia/ubkg-neo4j/blob/main/README.md) at the root of this respository.
 
 ## Requirements
   - [Docker must be installed](https://docs.docker.com/engine/install/) with Docker BuildX build support.  By default Docker BuildX support is installed with Docker Desktop.  If you have a version of Docker installed without Desktop you can [install Docker BuildX manually](https://docs.docker.com/build/install-buildx/).

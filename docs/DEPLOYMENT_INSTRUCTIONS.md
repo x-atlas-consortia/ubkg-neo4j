@@ -4,9 +4,8 @@
 
 # Prerequisites
 ## Access
-1. Obtain access to the Globus collection in which the distribution is stored. (Refer to the main README for details on obtaining access.)
-2. Download the distribution Zip archive, using Globus Connect Personal.
-
+Download the distribution Zip archive from the [UBKG Download](https://ubkg-downloads.xconsortia.org/) site.
+As described in the instructions on the site, you will need to provide a UMLS API Key.
 
 ## Host machine
 1. Install [Docker](https://docs.docker.com/engine/install/) on the host machine.

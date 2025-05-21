@@ -118,6 +118,11 @@ Uncomment and edit variables in the configuration file as necessary.
 | heap_indexing  | Max Java heap memory size for creating indexes and constraints in neo4j | accept default                                                                                                                                                                                         |
 
 # Execute workflow
+## The need for multiple Terminal sessions
+The workflow will require the use of two Terminal sessions, with switching between sessions. 
+This is a consequence of the complex interaction between the **build_container.sh** script, the Dockerfile, and the **start.sh** script. 
+The execution of a step involving **build_container.sh** must remain active until the Docker container has completely started, evidence of which is something of a mystery.
+
 ## 1. Build Docker container hosting neo4j with internal primer database.
 
 1. Open a Terminal window. 
@@ -145,7 +150,7 @@ The script's default values are:
 - c: **container.cfg**
 
 The **build_container.sh** will run for a short time (1-2 minutes), and will be finished when it displays a message similar to `[main] INFO org.eclipse.jetty.server.Server - Started Server@16fa5e34{STARTING}[10.0.15,sto=0] @11686ms`
-Because the script runs neo4j Console, you will not be able to execute CLI commands in the Terminal window.
+Because the script runs neo4j Console, you will not be able to execute additional CLI commands in the Terminal window.
 
 ![img_6.png](../images/img_6.png)
 
@@ -168,7 +173,7 @@ The new container will have *external bind mounts* to the following directories:
 - **logs**
 
 ## 4. Copy CSVs to import external bind mount and import CSVs to data external bind mount.
-1. Return to the first Terminal session. Because the execution of **build_container.sh** in the second Terminal session closed the original Docker container, you can now execute commands in this session.
+1. Return to the first Terminal session, which will now accept input. Because the execution of **build_container.sh** in the second Terminal session closed the original Docker container, you can now execute commands in this session.
 2. Execute `./import_csvs.sh`
 
 The **import_csvs.sh** script:
@@ -189,7 +194,7 @@ At this point, you should be able to open a browser and connect to the neo4j ins
 that you set in the configuration file. The instance will contain the UBKG nodes and edges, but without indexes or constraints.
 
 ## 6. Create indexes and constraints.
-1. Switch to the second Terminal session.
+1. Switch to the second Terminal session, which will now accept input.
 2. Execute `./create_indexes_and_constraints.sh`
 
 ### Memory considerations

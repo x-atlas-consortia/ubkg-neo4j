@@ -21,31 +21,16 @@ The distribution should also work on the following platforms:
  
 A PowerShell version of the distribution shell script for Windows will be developed if necessary.
 
-## Requests for Access
+## Obtaining a distribution
+
+### Licensing
 The UBKG contains material extracted from the 
 Unified Medical Language System ([UMLS](https://www.nlm.nih.gov/research/umls/index.html)) under license.
 
-UBKG distributions cannot be published to public repositories, such as Github or Dockerhub.
+UBKG distributions cannot be published to public repositories, such as Github or Dockerhub. Use of the distribution requires authorization per licensing requirements. 
 
-Use of the distribution requires authorization per licensing requirements. 
-
-To obtain access to a UBKG distribution, contact the UBKG steward:
-
-   [Jonathan Silverstein, MD](mailto:j.c.s@pitt.edu)
-
-      
-    Jonathan Silverstein, MD
-    Department of Biomedical Informatics
-    University of Pittsburgh
-
-
-## Access to distributions
-The UBKG is distributed as a Zip file stored in a private collection in
-[Globus](https://www.globus.org/). Downloading the distribution 
-requires a Globus account.
-
-Because of the size of the distribution, the use of [Globus Connect Personal](https://www.globus.org/globus-connect-personal)
-is recommended for downloading.
+### Downloading
+Distributions of various UBKG contexts are available at the [UBKG Download](https://ubkg-downloads.xconsortia.org/) site. A UMLS API Key is required to download distribution files.
 
 # Instructions
 - [Instructions for deploying a distribution](docs/DEPLOYMENT_INSTRUCTIONS.md)
