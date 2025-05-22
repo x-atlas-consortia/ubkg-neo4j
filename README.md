@@ -1,43 +1,25 @@
 # Unified Biomedical Knowledge Graph (UBKG) 
-# Docker neo4j Distribution
+# Docker Distribution options for the UBKG neo4j
 
-The **ubkg-neo4j** repository contains infrastructure to build and deploy a Docker distribution
-of a UBKG instance running with version 5 of neo4j. The Docker distribution eliminates the need to 
-have a local installation of neo4j.
+Containerized distribution options for instances of the UBKG are
+available from the [UBKG Download](https://ubkg-downloads.xconsortia.org/) site.
+Distributions are available as Zip archives.
 
-The UBKG distribution takes advantage of improvements to neo4j indexing that were 
-introduced in version 5, including relationship indexes.
+Distribution types include:
+## Turnkey Docker distribution
 
-UBKG distributions are provided as Zip archives.
+A turnkey Docker distribution builds a Docker container running an instance of a UBKG neo4j graph database.
 
-## Supported platforms
-The distribution was developed and tested on the following platforms:
-- Mac OSX with M1 processors
-- Linux with x86-64 arcitecture
+Instructions for building a turnkey Docker distribution are in the file README-Docker.md. (_link after merge to main_)
 
-The distribution should also work on the following platforms:
-- Max OSX with Intel or M2 processors
-- a Linux release supported by Docker
- 
-A PowerShell version of the distribution shell script for Windows will be developed if necessary.
+## UBKGBox distribution
 
-## Obtaining a distribution
+**[UBKGBox](https://github.com/x-atlas-consortia/ubkg-box)** is a Docker Compose
+multi-container application featuring:
+- a **ubkg-back-end** service running an instance of a UBKG context in neo4j
+- a **ubkg-front-end** service running a number of UBKG clients, including an instance of ubkg-api.
 
-### Licensing
-The UBKG contains material extracted from the 
-Unified Medical Language System ([UMLS](https://www.nlm.nih.gov/research/umls/index.html)) under license.
+Instructions for building and publishing the **ubkg-front-end** image are in the ubkg-api repo. (_link after merge_)
 
-UBKG distributions cannot be published to public repositories, such as Github or Dockerhub. Use of the distribution requires authorization per licensing requirements. 
-
-### Downloading
-Distributions of various UBKG contexts are available at the [UBKG Download](https://ubkg-downloads.xconsortia.org/) site. A UMLS API Key is required to download distribution files.
-
-# Instructions
-- [Instructions for deploying a distribution](docs/DEPLOYMENT_INSTRUCTIONS.md)
-- [Instructions for building a new distribution](docs/BUILD_INSTRUCTIONS.md)
-
-
-
-
-
-
+Instructions for build the complete UBKGBox instance, including the **ubkg-back-end** service, are in the file 
+README - UBKGBOX.md (_link after merge_).

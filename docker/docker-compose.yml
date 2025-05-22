@@ -1,0 +1,54 @@
+# UBKGBox Docker Compose file
+name: ubkgbox
+
+services:
+
+  # ubkg-front-end hosts clients that query the UBKG neo4j back end.
+
+  ubkg-front-end:
+    # Use the published image and tag from Docker Hub
+    image: hubmap/ubkg-front-end:latest
+
+    # Map host machine port 7000 to container port 8080
+    # Only root can listen on ports below 1024, we use higher-numbered ports
+    # since nginx is running under non-root user ubkg.
+    # Divergence from standard hubmapconsortium API architecture:
+    # The standard architecture maps port 6666, which the Chrome browser considers an "unsafe port".
+    ports:
+      - "7000:8080"
+    volumes:
+      # Mount the ubkg-api's app config (in the instance subdirectory of the build directory) to container in order to keep it outside of the image.
+      - "./instance:/usr/src/app/src/ubkg-api/instance"
+      # Mount the logging to container
+      - "../log:/usr/src/app/log"
+      # Mount conf.d on host machine to the nginx conf.d on container
+      #- "./ubkg-api/nginx/conf.d:/etc/nginx/conf.d"
+
+    environment:
+      # UID and GID 1001 to match the ubkg user by default.
+      # These environment variables will be passed to the Dockerfile and used to configure the non-root
+      # user under which nginx will run.
+      - HOST_GID=${HOST_GID:-1001}
+      - HOST_UID=${HOST_UID:-1001}
+
+  # ubkg-back-end will be based on a local turnkey distribution of a Docker container. 
+  ubkg-back-end:
+    # Use the published image and tag from Docker Hub which is used to build the turnkey Docker distribution
+    image: hubmap/ubkg-neo4j
+
+    # Map host machine ports to container ports.
+    # To do: parameterize this to use values from the container.cfg.
+    ports:
+      # ui port
+      - "7001:4000"
+      # bolt port
+      - "7002:4500"
+
+    # Map to the external bind mounts.
+    volumes:
+      # neo4j database
+      - "./data:/usr/src/app/neo4j/data"
+      # logs
+      - "./logs:/usr/src/app/neo4j/logs"
+
+    
