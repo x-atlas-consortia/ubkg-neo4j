@@ -19,7 +19,7 @@ services:
     volumes:
       # Mount the ubkg-api's app config (in the instance subdirectory of the build directory) to container in order to keep it outside of the image.
       - "./instance:/usr/src/app/src/ubkg-api/instance"
-      # Mount the logging to container
+      # Mount the nginx log to container
       - "./log:/usr/src/app/log"
       # Mount conf.d on host machine to the nginx conf.d on container
       #- "./ubkg-api/nginx/conf.d:/etc/nginx/conf.d"
@@ -31,7 +31,12 @@ services:
       - HOST_GID=${HOST_GID:-1001}
       - HOST_UID=${HOST_UID:-1001}
 
-    mem_limit: 2g # Example: Limit to 2GB of RAM
+    mem_limit: 2g # Limit to 2GB of RAM
+
+    # Wor neo4j container to be ready.
+    depends_on:
+      ubkg-back-end:
+        condition: service_healthy
 
   # ubkg-back-end will be based on a local turnkey distribution of a Docker container. 
   ubkg-back-end:
@@ -54,10 +59,20 @@ services:
       - "./logs:/usr/src/app/neo4j/logs"
 
     environment:
-      # neo4j username and password passed from container.cfg.
+      # neo4j username and password obtained by the build_ubkgbox.sh script from container.cfg.
       - NEO4J_USER
       - NEO4J_PASSWORD
 
-    mem_limit: 2g # Example: Limit to 2GB of RAM
+    mem_limit: 2g 
+
+    # health check for neo4j server. The issue is that the server shows as being ready before it actually is ready.
+    healthcheck:
+      #test: wget -q --no-verbose --spider http://localhost:7474/ || exit 1
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 1m
+
 
     
