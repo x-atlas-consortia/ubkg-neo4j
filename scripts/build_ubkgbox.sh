@@ -78,5 +78,9 @@ fi
 export NEO4J_USER="neo4j"
 export NEO4J_PASSWORD="$neo4j_password"
 
+# Export neo4j ui and bolt ports.
+export UI_PORT="$ui_port"
+export BOLT_PORT="$bolt_port"
+
 # Call Docker compose
 docker compose up
