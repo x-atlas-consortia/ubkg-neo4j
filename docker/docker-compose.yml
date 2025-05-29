@@ -18,11 +18,9 @@ services:
       - "7000:8080"
     volumes:
       # Mount the ubkg-api's app config (in the instance subdirectory of the build directory) to container in order to keep it outside of the image.
-      - "./api_instance:/usr/src/app/src/ubkg-api/instance"
+      - "./api_instance:/usr/src/app/src/ubkg_api/instance"
       # Mount the nginx log to container
       - "./log:/usr/src/app/log"
-      # Mount conf.d on host machine to the nginx conf.d on container
-      #- "./ubkg-api/nginx/conf.d:/etc/nginx/conf.d"
 
     environment:
       # UID and GID 1001 to match the ubkg user by default.
@@ -33,21 +31,22 @@ services:
 
     mem_limit: 2g # Limit to 2GB of RAM
 
-    #depends_on:
-      #ubkg-back-end:
-        #condition: service_healthy
+    # Wait until the neo4j server in the back end service is running.
+    depends_on:
+      ubkg-back-end:
+        condition: service_healthy
 
   # ubkg-back-end will be based on a local turnkey distribution of a Docker container. 
   ubkg-back-end:
     # Use the published image and tag from Docker Hub which is used to build the turnkey Docker distribution
-    image: hubmap/ubkg-neo4j
+    image: hubmap/ubkg-neo4j:current-release
 
     # Map host machine ports to container ports, as defined in the container.cfg file for the back end.
     ports:
       # ui port
-      - 7001:${UI_PORT}
+      - ${UI_PORT}:7474
       # bolt port
-      - 7002:${BOLT_PORT}
+      - ${BOLT_PORT}:7687
 
     # Map to the external bind mounts.
     volumes:
@@ -63,12 +62,14 @@ services:
 
     mem_limit: 2g 
 
-    #healthcheck:
-      #test: wget --no-verbose --tries=1 --spider http://ubkg-neo4j:7001 || exit 1
-      #interval: 5m
-      #timeout: 3s
-      #retries: 3
-      #start_period: 30s
+    # Check that the neo4j service is running in the container. The startup process takes some time; in addition, it stops and starts
+    # the neo4j server. Wait at least 30 s before starting the health check.
+    healthcheck:
+      test: [ "CMD", "/usr/src/app/neo4j/bin/cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD}", "MATCH () RETURN count(*) as count" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 30s
 
 
 
