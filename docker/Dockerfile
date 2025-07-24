@@ -27,7 +27,7 @@ RUN yum update -y && \
     wget https://github.com/neo4j/apoc/releases/download/5.11.0/apoc-5.11.0-core.jar  && \
     mv apoc-5.11.0-core.jar neo4j/plugins && \
     rm neo4j-community-5.11.0-unix.tar.gz && \
-    rm -rf /usr/src/app/neo4j/data/* && \    
+    rm -rf /usr/src/app/neo4j/data/* && \
     yum clean all
 
 # Change directory
@@ -46,7 +46,7 @@ WORKDIR /usr/src/app/neo4j/bin
 # Make the start script executable
 RUN chmod +x /usr/src/app/start.sh
 
-# The EXPOSE instruction informs Docker that the container 
+# The EXPOSE instruction informs Docker that the container
 # listens on the specified network ports at runtime
 # on the default ports, Web UI:7474  Bolt:7687
 EXPOSE 7474 7687

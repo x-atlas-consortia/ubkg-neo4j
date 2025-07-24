@@ -1,3 +1,7 @@
+CALL apoc.periodic.commit(
+  "MATCH (n:Code{CODE:'NOCODE'}) WITH n LIMIT $limit DETACH DELETE n RETURN count(*)",
+  {limit:1000}
+);
 MATCH (n:Term) WHERE count{(n)--()}=0 DELETE (n);
 CREATE CONSTRAINT FOR (n:Semantic) REQUIRE n.TUI IS UNIQUE;
 CREATE CONSTRAINT FOR (n:Semantic) REQUIRE n.STN IS UNIQUE;
