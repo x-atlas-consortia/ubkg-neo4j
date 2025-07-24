@@ -232,6 +232,13 @@ with the following exceptions that violate [neo4j naming rules](https://neo4j.co
 To avoid excluding relationships from a relationship index, name relationships using only alphanumeric characters and underscores.
 The UBKG generation framework ETLs automatically reformats relationship names that violate neo4j naming rules.
 
+### Deletion of NOCODE codes
+The ontology CSVs from UMLS include 6 codes with CodeID of NOCODE, corresponding to Metathesaurus NOCODE codes
+that the UMLS defines for concepts that have no codes in any source vocabulary. Two of these NOCODE codes have thousands
+of relationships. The **create_constraints_and_node_indexes.cypher** deletes these codes via a call to APOC. These codes
+must be removed before indexes are created.
+
+
 ### Monitoring index creation 
 #### General
 Because of the large number of relationship types in the UBKG, the creation of the 
