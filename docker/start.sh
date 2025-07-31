@@ -100,8 +100,8 @@ RED='\033[0;31m' # text red color
 NC='\033[0m' # No Color
 echo -e "${RED}***Restarting neo4j server..."
 #show the user the local ports where Neo4j can be accessed
-echo -e "***The Neo4j web desktop UI will be available at http://localhost:$UI_PORT"
-echo -e "***The neo4j/bolt interface will be available at neo4j://localhost:$BOLT_PORT and bolt://localhost:$BOLT_PORT"
+#echo -e "***The Neo4j web desktop UI will be available at http://localhost:$UI_PORT"
+#echo -e "***The neo4j/bolt interface will be available at neo4j://localhost:$BOLT_PORT and bolt://localhost:$BOLT_PORT"
 echo -e "***"
 echo -e "***Just a minute or so more..."
 echo -e "***Wait for the \"Started Server\" message ${NC}"
