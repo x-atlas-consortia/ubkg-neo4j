@@ -21,5 +21,5 @@ multi-container application featuring:
 
 Instructions for building and publishing the **ubkg-front-end** image are in the ubkg-api repo. (_link after merge_)
 
-Instructions for build the complete UBKGBox instance, including the **ubkg-back-end** service, are in the file 
-README - UBKGBOX.md (_link after merge_).
+Instructions for build the complete UBKGBox instance, including the **ubkg-back-end** service, are in the README file in
+the [ubkg-box](https://github.com/x-atlas-consortia/ubkg-box/blob/main/README.md) repository.

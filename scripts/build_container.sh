@@ -269,6 +269,12 @@ docker rm "$container_name" > /dev/null 2>&1
 # Conditional instantiation.
 if [[ "$db_mode" == "external" ]]
 then
+  echo "The external mount for UBKG includes content licensed from the Unified Biomedical Language System (UMLS).";
+  read -r -p "Please provide your UMLS API Key to continue: " value
+  if [ -z "$value" ]; then
+    echo "No value entered. Exiting."
+    exit 1
+  fi
   # Create container with external bind mounts for data, import, and logs.
   docker run -it \
        -p "$ui_port":7474 \
