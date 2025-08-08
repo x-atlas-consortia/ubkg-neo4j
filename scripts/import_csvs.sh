@@ -203,6 +203,7 @@ docker exec "$container_name" "$NEO4J"/bin/neo4j-admin database import full \
   --relationships="$IMPORT"/CODE-SUIs.csv \
   --relationships=PREF_TERM="$IMPORT"/CUI-SUIs.csv \
   --relationships=DEF="$IMPORT"/DEFrel.csv \
+  --nodes=Release="$IMPORT"/RELEASE.csv \
   --skip-bad-relationships \
   --skip-duplicate-nodes \
   --bad-tolerance=10000000 \

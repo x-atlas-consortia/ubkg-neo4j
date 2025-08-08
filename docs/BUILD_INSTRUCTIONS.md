@@ -75,6 +75,10 @@ If your use case differs, obtain recommendations using neo4j-admin as shown in t
 Use the **generation framework** infrastructure (ETL) in the 
 [ubkg-etl](https://github.com/x-atlas-consortia/ubkg-etl) repository to generate a set of **ontology CSVs**.
 
+### RELEASE.csv
+The RELEASE.csv is a simple CSV that describes the content of the UBKG. The format of the CSV should be self-evident 
+from the column headers. Build a RELEASE.csv file per release and include with the 12 other ontology CSVs.
+
 # ubkg-neo4j Repository content
 ## docker directory
 The **docker** directory contains source used to build a Docker image that will be published in Docker Hub.
