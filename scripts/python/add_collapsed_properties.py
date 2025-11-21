@@ -17,7 +17,6 @@ batches with commits, showing progress.
 """
 import sys
 import os
-from tqdm import tqdm
 
 # Neo4J interface class
 from neo4japp import Neo4jApp
@@ -39,22 +38,9 @@ def main():
     # Get the connection to the UBKG, based on information in the config file.
     sys.stderr.write('Connecting to UBKG instance...\n')
     neo4j_ubkg = Neo4jApp()
-    query = getbatchquerystring()
+    query_write = getbatchquerystring()
 
-    nodecount = neo4j_ubkg.getnodecount(nodename=NODENAME)
-    sys.stderr.write(f'The UBKG instance has {nodecount} Concept nodes.\n')
-
-    pbar = tqdm(total=nodecount, unit="nodes")
-    processed_total = 0
-
-    # Iterate using SKIP/LIMIT. For large datasets prefer key-range pagination (id range)
-    for skip in range(0, nodecount, BATCH_SIZE):
-        processed = neo4j_ubkg.fetch_batch_and_execute(nodename=NODENAME, query_write=query, skip=skip, limit=BATCH_SIZE)
-        # Update TQDM after the batch is committed.
-        processed_total += processed
-        pbar.update(processed)
-    pbar.close()
-
+    neo4j_ubkg.process_nodes_in_order(nodename='Concept',query_write=query_write, batch_size=BATCH_SIZE)
 
 if __name__ == "__main__":
     main()
