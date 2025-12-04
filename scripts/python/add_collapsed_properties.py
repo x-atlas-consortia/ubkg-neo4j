@@ -27,8 +27,7 @@ NODENAME = 'Concept'
 
 def getbatchquerystring() -> str:
     # Read the Cypher query string.
-    # fpath = os.path.join(os.getcwd(), 'python/cypher/add_collapsed_concept_subgraph_property.cypher')
-    fpath = os.path.join(os.getcwd(), 'python/cypher/add_collapsed_concept_subgraph_property_full.cypher')
+    fpath = os.path.join(os.getcwd(), 'python/cypher/add_collapsed_concept_subgraph_property_primary.cypher')
     f = open(fpath, "r")
     query = f.read()
     f.close()
